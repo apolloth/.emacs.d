@@ -1,0 +1,22 @@
+						;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;                                                                                                                             ;;
+						;;                                                                                                                             ;;
+						;;  EEEEEEEEEEEEEEEEEEEEEEMMMMMMMM               MMMMMMMM               AAA                  CCCCCCCCCCCCC   SSSSSSSSSSSSSSS   ;;
+						;;  E::::::::::::::::::::EM:::::::M             M:::::::M              A:::A              CCC::::::::::::C SS:::::::::::::::S  ;;
+						;;  E::::::::::::::::::::EM::::::::M           M::::::::M             A:::::A           CC:::::::::::::::CS:::::SSSSSS::::::S  ;;
+						;;  EE::::::EEEEEEEEE::::EM:::::::::M         M:::::::::M            A:::::::A         C:::::CCCCCCCC::::CS:::::S     SSSSSSS  ;;
+						;;    E:::::E       EEEEEEM::::::::::M       M::::::::::M           A:::::::::A       C:::::C       CCCCCCS:::::S              ;;
+						;;    E:::::E             M:::::::::::M     M:::::::::::M          A:::::A:::::A     C:::::C              S:::::S              ;;
+						;;    E::::::EEEEEEEEEE   M:::::::M::::M   M::::M:::::::M         A:::::A A:::::A    C:::::C               S::::SSSS           ;;
+						;;    E:::::::::::::::E   M::::::M M::::M M::::M M::::::M        A:::::A   A:::::A   C:::::C                SS::::::SSSSS      ;;
+						;;    E:::::::::::::::E   M::::::M  M::::M::::M  M::::::M       A:::::A     A:::::A  C:::::C                  SSS::::::::SS    ;;
+						;;    E::::::EEEEEEEEEE   M::::::M   M:::::::M   M::::::M      A:::::AAAAAAAAA:::::A C:::::C                     SSSSSS::::S   ;;
+						;;    E:::::E             M::::::M    M:::::M    M::::::M     A:::::::::::::::::::::AC:::::C                          S:::::S  ;;
+						;;    E:::::E       EEEEEEM::::::M     MMMMM     M::::::M    A:::::AAAAAAAAAAAAA:::::AC:::::C       CCCCCC            S:::::S  ;;
+						;;  EE::::::EEEEEEEE:::::EM::::::M               M::::::M   A:::::A             A:::::AC:::::CCCCCCCC::::CSSSSSSS     S:::::S  ;;
+						;;  E::::::::::::::::::::EM::::::M               M::::::M  A:::::A               A:::::ACC:::::::::::::::CS::::::SSSSSS:::::S  ;;
+						;;  E::::::::::::::::::::EM::::::M               M::::::M A:::::A                 A:::::A CCC::::::::::::CS:::::::::::::::SS   ;;
+						;;  EEEEEEEEEEEEEEEEEEEEEEMMMMMMMM               MMMMMMMMAAAAAAA                   AAAAAAA   CCCCCCCCCCCCC SSSSSSSSSSSSSSS     ;;
+						;;                                                                                                                             ;;
+						;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+

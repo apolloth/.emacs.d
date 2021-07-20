@@ -122,7 +122,9 @@
        1 font-lock-warning-face t)))))
 
 ;; (load-theme 'spacemacs-dark t)
-(load-theme 'doom-one t)
+;; (load-theme 'doom-one t)
+
+(load-theme 'doom-dracula t)
 (toggle-frame-maximized)
 
 (provide 'base--apperance)
