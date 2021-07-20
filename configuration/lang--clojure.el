@@ -12,11 +12,11 @@
   (:map clojure-mode-map
 	("C-<left>" . sp-backward-sexp)
 	("M-<left>" . sp-forward-barf-sexp)
-	("C-M-<left>" . sp-backward-barf-sexp)
+	("C-M-<right>" . sp-backward-barf-sexp)
 
 	("C-<right>" . sp-forward-sexp)
 	("M-<right>" . sp-forward-slurp-sexp)
-	("C-M-<right>" . sp-backward-slurp-sexp)
+	("C-M-<left>" . sp-backward-slurp-sexp)
 
 	("C-<up>" . sp-backward-up-sexp)
 	("M-<up>" . sp-convolute-sexp)
@@ -29,8 +29,8 @@
 
 	("M-\"" . sp-wrap-doublequote)
 	("C-(" . sp-wrap-round)
-	("M-[" . sp-wrap-square)
-	("M-{" . sp-wrap-curly)
+	("C-M-8" . sp-wrap-square)
+	("C-M-7" . sp-wrap-curly)
 
 	("C-M-(" . sp-rewrap-sexp)
 
