@@ -8,3 +8,5 @@ auto-save-list/
 /bookmarks
 /.cache/
 custom.el
+eshell/history
+eshell/lastdir
