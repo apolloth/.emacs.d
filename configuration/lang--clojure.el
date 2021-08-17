@@ -53,11 +53,11 @@
 
   :config
   (setq cljr-warn-on-eval nil)
-  (cljr-add-keybindings-with-prefix "M-r")
+  (cljr-add-keybindings-with-prefix "C-,")
   (clj-refactor-mode 1)
 
   :bind-keymap*
-  ("M-r" . clj-refactor-map))
+  ("C-," . clj-refactor-map))
 
 (use-package
   parseedn)
