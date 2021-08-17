@@ -118,7 +118,7 @@
  (lambda ()
    (font-lock-add-keywords
     nil
-    '(("\\<\\(HACK\\|NOTE\\|FIXME\\|TODO\\|BUG\\|INFO\\)"
+    '(("\\<\\(HACK\\|NOTE\\|FIXME\\|TODO\\|WATCHOUT\\|REVIEW\\|BUG\\)"
        1 font-lock-warning-face t)))))
 
 ;; (load-theme 'spacemacs-dark t)
