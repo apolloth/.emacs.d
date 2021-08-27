@@ -502,4 +502,27 @@
 
 	("C-_" . cider-repl-history-undo-other-window)))
 
+
+
+(defun insert-code-seperator ()
+  "Inserts Clojure code seperator at point"
+  (interactive)
+  (loop repeat 80 do (insert ";"))
+  (insert ?\n ";; "))
+
+(defun insert-binding (name)
+  (interactive)
+  (insert "(" name "[]" ?\n ")"))
+
+(defun clj-bind (binding command)
+  (define-key clojure-mode-map (kbd binding) command))
+
+;; FIXME give args to insert-binding in clj-bind
+(add-hook 'clojure-mode-hook
+          '(lambda ()
+             ;;(define-key clojure-mode-map (kbd "C-M-;") 'insert-code-seperator)
+             (clj-bind "C-c i c" 'insert-code-seperator)
+             (clj-bind "C-c i f" '(insert-binding "defn"))))
+
+
 (provide 'lang--clojure)
