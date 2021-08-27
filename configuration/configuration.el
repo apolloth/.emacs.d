@@ -28,10 +28,10 @@
 
 (setq custom-file "~/.emacs.d/custom.el")
 
-(require 'smartrep);
+(require 'smartrep)
 (require 'use-package)
 
-(global-so-long-mode 1)
+;; (global-so-long-mode 1)
 
 (setq
  use-package-verbose t
