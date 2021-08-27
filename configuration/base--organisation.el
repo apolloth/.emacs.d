@@ -73,7 +73,7 @@
     (org-capture nil "c"))
 
   (defun org-insert-jira-issue (&optional jira-issue)
-    (interactive "MJIRA Issue: ")
+    (interactive "JIRA Issue: ")
     (let* ((jira-issue
             (upcase jira-issue))
 
