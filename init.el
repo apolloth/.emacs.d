@@ -4,3 +4,5 @@
 (require 'configuration)
 
 (provide 'init)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
