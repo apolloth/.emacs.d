@@ -7,41 +7,60 @@
 
   :config
   ;; (require 'smartparens-clojure)
+  (defun insert-code-seperator ()
+    "Insert Clojure code seperator at point."
+    (interactive)
+    (cl-loop repeat 80 do (insert ";"))
+    (insert ?\n ";; "))
+
+  (defun insert-binding (fn-name &optional name)
+    "Insert given FN-NAME as function call named NAME with binding vector."
+    (interactive)
+    (insert "(" fn-name " " name ?\n "[]" ?\n ")")
+    (backward-char 3))
+
+  (defun insert-defn (&optional name)
+    (interactive "sFunction Name: ")
+    (insert-binding "defn" name))
+
 
   :bind*
   (:map clojure-mode-map
-	("C-<left>" . sp-backward-sexp)
-	("M-<left>" . sp-forward-barf-sexp)
-	("C-M-<right>" . sp-backward-barf-sexp)
+        ("C-<left>" . sp-backward-sexp)
+        ("M-<left>" . sp-forward-barf-sexp)
+        ("C-M-<right>" . sp-backward-barf-sexp)
 
-	("C-<right>" . sp-forward-sexp)
-	("M-<right>" . sp-forward-slurp-sexp)
-	("C-M-<left>" . sp-backward-slurp-sexp)
+        ("C-<right>" . sp-forward-sexp)
+        ("M-<right>" . sp-forward-slurp-sexp)
+        ("C-M-<left>" . sp-backward-slurp-sexp)
 
-	("C-<up>" . sp-backward-up-sexp)
-	("M-<up>" . sp-convolute-sexp)
+        ("C-<up>" . sp-backward-up-sexp)
+        ("M-<up>" . sp-convolute-sexp)
 
-	("C-<down>" . sp-down-sexp)
-	("M-<down>" . sp-raise-sexp)
+        ("C-<down>" . sp-down-sexp)
+        ("M-<down>" . sp-raise-sexp)
 
-	("C-M-<up>" . sp-backward-transpose-sexp)
-	("C-M-<down>" . sp-forward-transpose-sexp)
+        ("C-M-<up>" . sp-backward-transpose-sexp)
+        ("C-M-<down>" . sp-forward-transpose-sexp)
 
-	("M-\"" . sp-wrap-doublequote)
-	("C-(" . sp-wrap-round)
-	("C-M-8" . sp-wrap-square)
-	("C-M-7" . sp-wrap-curly)
+        ("M-\"" . sp-wrap-doublequote)
+        ("C-(" . sp-wrap-round)
+        ("C-M-8" . sp-wrap-square)
+        ("C-M-7" . sp-wrap-curly)
 
-	("C-M-(" . sp-rewrap-sexp)
+        ("C-M-(" . sp-rewrap-sexp)
 
-	("C-k" . sp-kill-sexp)
-	("C-S-K" . sp-unwrap-sexp)
+        ("C-k" . sp-kill-sexp)
+        ("C-S-K" . sp-unwrap-sexp)
 
-	("M-k" . sp-splice-sexp-killing-forward)
-	("M-K" . sp-splice-sexp-killing-backward)
-	("C-M-k" . sp-splice-sexp-killing-around)
+        ("M-k" . sp-splice-sexp-killing-forward)
+        ("M-K" . sp-splice-sexp-killing-backward)
+        ("C-M-k" . sp-splice-sexp-killing-around)
 
-	("C-;" . comment-dwim)))
+        ("C-;" . comment-dwim)
+
+        ("C-c i c" . insert-code-seperator)
+        ("C-c i f" . insert-defn)))
 
 (use-package
   flycheck-clj-kondo
@@ -501,28 +520,5 @@
 	("C-r" . nil)
 
 	("C-_" . cider-repl-history-undo-other-window)))
-
-
-
-(defun insert-code-seperator ()
-  "Inserts Clojure code seperator at point"
-  (interactive)
-  (loop repeat 80 do (insert ";"))
-  (insert ?\n ";; "))
-
-(defun insert-binding (name)
-  (interactive)
-  (insert "(" name "[]" ?\n ")"))
-
-(defun clj-bind (binding command)
-  (define-key clojure-mode-map (kbd binding) command))
-
-;; FIXME give args to insert-binding in clj-bind
-(add-hook 'clojure-mode-hook
-          '(lambda ()
-             ;;(define-key clojure-mode-map (kbd "C-M-;") 'insert-code-seperator)
-             (clj-bind "C-c i c" 'insert-code-seperator)
-             (clj-bind "C-c i f" '(insert-binding "defn"))))
-
 
 (provide 'lang--clojure)
