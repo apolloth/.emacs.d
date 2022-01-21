@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: iterate
+# key: it
+# --
+(iterate ${1:f} ${2:x})

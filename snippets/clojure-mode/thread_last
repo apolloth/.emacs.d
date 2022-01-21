@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: thread-last
+# key: tl
+# --
+(->> $1
+     $2)

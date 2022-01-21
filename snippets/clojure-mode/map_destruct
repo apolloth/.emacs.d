@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: map-destruct
+# key: dm
+# --
+{:keys [${1:k}] :as ${2:m}}

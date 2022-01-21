@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: hash-map
+# key: :
+# --
+$0{:a $1 :b $2 :c $3}

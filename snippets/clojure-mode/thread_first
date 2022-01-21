@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: thread-first
+# key: tf
+# --
+(-> $1
+    $2)
