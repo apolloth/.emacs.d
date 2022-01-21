@@ -209,17 +209,29 @@
 
   :bind*
   (("M-c m" . mc/mark-more-like-this-extended)
+   ("M-c n" . mc/mark-next-like-this)
+   ("M-c p" . mc/mark-next-like-this)
+
+   ("M-c r" . mc/mark-all-in-region)
+   ("M-c f" . mc/mark-all-like-this-in-defun)
    ("M-c x" . mc/mark-all-like-this-dwim)
    ("M-c a" . mc/mark-all-like-this)
    ("M-c l" . mc/edit-lines)
 
    ("M-c i n" . mc/insert-numbers)
    ("M-c i l" . mc/insert-letters)
-   ("M-c i s" . mc/sort-region)
-   ("M-c i r" . mc/reverse-region)
+   ("M-c i s" . mc/sort-regions)
+   ("M-c i r" . mc/reverse-regions)
+   ("<C-return>" . newline)
 
    :map mc/keymap
    ("<tab>" . mc-hide-unmatched-lines-mode)))
+
+(use-package
+  ace-mc
+
+  :bind*
+  ("M-c j" . ace-mc-add-multiple-cursors))
 
 (use-package
   pkg--zoom
@@ -229,7 +241,7 @@
   :config
   (smartrep-define-key
       global-map
-      "M-+ f"
+      "M-+"
     '(("#" . zoom/default)
       ("+" . zoom/inc)
       ("-" . zoom/dec)

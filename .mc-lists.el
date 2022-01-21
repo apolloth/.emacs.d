@@ -3,6 +3,8 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        ace-jump-char-mode
+        ace-mc-do-keyboard-reset
         basic-electric-colon
         c-electric-colon
         c-electric-lt-gt
@@ -12,12 +14,14 @@
         cljr-slash
         comment-dwim
         counsel-M-x
+        counsel-switch-buffer
         counsel-yank-pop
         haml-electric-backspace
         indent-for-tab-command
         kill-region
         kmacro-call-macro
         mc/reverse-region
+        mc/sort-region
         org-metaleft
         org-metaright
         org-self-insert-command
@@ -39,10 +43,12 @@
         web-mode-element-content-select
         web-mode-element-rename
         web-mode-element-wrap
+        yas-expand
         ))
 
 (setq mc/cmds-to-run-once
       '(
+        ace-jump-move
         cider-eval-dwim
         mouse-drag-vertical-line
         mouse-set-region
