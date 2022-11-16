@@ -57,6 +57,7 @@
 ;; (require 'lang--php)
 (require 'lang--python)
 (require 'lang--html)
+;; (require 'lang--xml)
 (require 'lang--css)
 (require 'lang--clojure)
 (require 'lang--basic)

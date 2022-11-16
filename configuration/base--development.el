@@ -19,6 +19,12 @@
     (sp-backward-sexp)
     (sp-backward-sexp))
 
+  (defun sp-trim-whitespace-of-sexp ()
+    (interactive)
+    (set-mark-command)
+    (sp-backward-whitespace)
+    (delete-active-region))
+
   (defun sp-wrap-doublequote ()
     (interactive)
     (sp-prefix-save-excursion
@@ -78,7 +84,8 @@
   (("C-v" . nil)
    ("M-v g" . magit-status)
    ("M-v l" . magit-log-current)
-   ("M-v L" . magit-log-all))
+   ("M-v L" . magit-log-all)
+   ("M-v b" . magit-blame))
   :config
   (setq magit-completing-read-function 'ivy-completing-read)
   (transient-append-suffix 'magit-push "e"
@@ -148,15 +155,17 @@
 
   :config
   (setq highlight-symbol-idle-delay 1.5)
-  (define-key input-decode-map [?\C-m] [C-m])
-  (global-set-key (kbd "<C-m>") #'highlight-symbol)
+  ;;(define-key input-decode-map [?\C-m] [C-m])
+  ;;(global-set-key (kbd "<C-m>") #'highlight-symbol)
   (global-unset-key (kbd "M-m"))
 
   (smartrep-define-key
       global-map "M-m"
-    '(("n" . (highlight-symbol-next))
+    '(("m" . (highlight-symbol))
+      ("n" . (highlight-symbol-next))
       ("p" . (highlight-symbol-prev))
-      ("r" . (highlight-symbol-query-replace)))))
+      ("r" . (highlight-symbol-query-replace))
+      ("q" . (highlight-symbol-remove-all)))))
 
 (use-package
   restclient
@@ -224,8 +233,5 @@
       eval-sexp-fu-flash-error-duration 0.5
 
       eldoc-echo-area-use-multiline-p t)
-
-(global-set-key (kbd "C-<next>") 'next-buffer)
-(global-set-key (kbd "C-<prior>") 'previous-buffer)
 
 (provide 'base--development)

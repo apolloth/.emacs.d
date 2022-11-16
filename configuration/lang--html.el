@@ -1,7 +1,7 @@
 (use-package
   web-mode
   :mode
-  "\\.\\(html\\|phtml\\|xml\\|xsl\\|xslt\\|xsd\\)\\'"
+  "\\.\\(html\\|phtml\\)\\'"
 
   :config
   (setq web-mode-markup-indent-offset 2

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Square Brackets
+# key: l
+# --
+[$0]

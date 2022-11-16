@@ -78,6 +78,9 @@
   ((prog-mode . rainbow-delimiters-mode)
    (cider-repl-mode . rainbow-delimiters-mode)))
 
+(use-package all-the-icons
+  :if (display-graphic-p))
+
 (defface error-face
   '((t (:foreground "#CC5353"))) "Red Highlight")
 

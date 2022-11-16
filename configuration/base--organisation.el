@@ -115,16 +115,17 @@
         (org-cut-special))))
 
   :bind*
-  (("C-M-- <RET>" . org-capture)
-   ("C-M-- t" . org-capture-todo)
+  (;;("C-M-- <RET>" . org-capture)
+   ;;("C-M-- t" . org-capture-todo)
    ("C-M-- T" . org-capture-todo-deadline)
-   ("C-M-- j" . org-capture-journal)
+   ;;("C-M-- j" . org-capture-journal)
    ("C-M-- c" . org-capture-calendar)
    ("C-M-- a" . org-agenda)
 
-   ("C--" . org-narrow-to-subtree)
+
 
    :map org-mode-map
+   ("C--" . org-narrow-to-subtree)
    ("M-i l" . org-insert-link)
    ("M-i j" . org-insert-jira-issue)
    ("M-i d" . org-deadline)
@@ -141,5 +142,72 @@
 
    ("C-k" . org-kill-line)
    ("C-S-k" . org-kill-item)))
+
+
+(use-package
+  org-roam
+  :ensure t
+  :init (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "/home/fendt/Documents/org")
+  (org-roam-dailies-directory "/home/fendt/Documents/dailies")
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  ;;(setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  ;;ex-config
+  ;; (org-roam-capture-templates
+  ;;  ("d" "default" plain "%?"
+  ;;   :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+  ;;                      "#+title: ${title}\n")
+  ;;   :unnarrowed t))
+  (org-roam-capture-ref-templates
+   '(("r" "ref" plain ""
+      :target (file+head "${slug}.org"
+                         "#+title: ${title}")
+      :unnarrowed t
+      :immediate-finish t)
+     ;; ("w" "Website" plain "%?"
+     ;;  :target (file+olp "${slug}.org" "Web")
+     ;;  "* %c :website:\n%U %?%:initial"
+     ;;  :unarrowed t)
+     ("c" "content" plain "%?"
+      :target (file+head "${slug}.org"
+                         "#+title: ${title}\n${body}\n")
+      :unnarrowed t
+      :immediate-finish t)))
+
+  :config
+  (org-roam-db-autosync-mode)
+  (require 'org-roam-protocol)
+
+  ;;(org-roam-completion-everywhere t)
+  (defun org-roam-node-insert-immediate (arg &rest args)
+    (interactive "P")
+    (let ((args (cons arg args))
+          (org-roam-capture-templates
+           (list (append (car org-roam-capture-templates)
+                         '(:immediate-finish t)))))
+      (apply #'org-roam-node-insert args)))
+
+
+  :bind*
+  (("C-M-- <RET>" . org-roam-capture)
+   ("C-M-- s" . org-roam-node-find)
+   ("C-M-- r" . org-roam-ref-find)
+
+   ;; Dailies
+   ("C-M-- j" . org-roam-dailies-capture-today)
+   ("C-M-- t" . org-roam-dailies-capture-tomorrow)
+   ("C-M-- d" . org-roam-dailies-capture-date)
+
+   ("C-M-- g j" . org-roam-dailies-goto-today)
+   ("C-M-- g t" . org-roam-dailies-goto-tomorrow)
+   ("C-M-- g d" . org-roam-dailies-goto-date)
+   ("C-M-- g y" . org-roam-dailies-goto-yesterday)
+
+
+   :map org-mode-map
+   ;; ("M-j g" . org-roam-graph)
+   ("M-j o" . org-roam-node-insert)
+   ("M-j i" . org-roam-node-insert-immediate)))
 
 (provide 'base--organisation)

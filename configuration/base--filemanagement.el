@@ -21,22 +21,22 @@
     (save-some-buffers t))
 
   :bind
-  (("C-x b" . counsel-switch-buffer)
-   ("C-x B" . counsel-projectile-switch-to-buffer)
+  (("C-S-X bb" . counsel-switch-buffer)
+   ("C-S-X bp" . counsel-projectile-switch-to-buffer)
 
-   ("C-x f" . counsel-find-file)
-   ("C-x F" . counsel-projectile-find-file)
+   ("C-S-X ff" . counsel-find-file)
+   ("C-S-X fp" . counsel-projectile-find-file)
 
-   ("C-x C-f" . counsel-recentf)
-   ("C-x C-S-F" . projectile-recentf)
+   ("C-S-X fr" . counsel-recentf)
+   ;;("C-x C-S-F" . projectile-recentf)
 
-   ("C-x d" . projectile-dired)
-   ("C-x D" . counsel-projectile-find-dir)
+   ;;("C-x d" . projectile-dired)
+   ("C-S-X d" . counsel-projectile-find-dir)
 
-   ("C-x C-d" . nil)
+   ;;("C-x C-d" . nil)
 
-   ("C-x x f" . counsel-projectile-switch-project)
-   ("C-x x F" . counsel-projectile)
+   ("C-S-X p" . counsel-projectile-switch-project)
+   ("C-S-X x" . counsel-projectile)
 
    ("C-q" . switch-to-prev-buffer)
 
@@ -108,11 +108,12 @@
 	treemacs-space-between-root-nodes      t
 	treemacs-tag-follow-cleanup            t
 	treemacs-tag-follow-delay              1.5
+        treemacs-position                      'right
 	treemacs-width                         40)
 
   :bind*
-  (("C-x x d" . treemacs-dwim)
-   ("C-x x D" . treemacs-hide)))
+  (("C-x x" . treemacs-dwim)
+   ("C-x X" . treemacs-hide)))
 
 (use-package treemacs-projectile
   :after treemacs projectile)

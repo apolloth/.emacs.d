@@ -7,23 +7,6 @@
 
   :config
   ;; (require 'smartparens-clojure)
-  (defun insert-code-seperator ()
-    "Insert Clojure code seperator at point."
-    (interactive)
-    (cl-loop repeat 80 do (insert ";"))
-    (insert ?\n ";; "))
-
-  (defun insert-binding (fn-name &optional name)
-    "Insert given FN-NAME as function call named NAME with binding vector."
-    (interactive)
-    (insert "(" fn-name " " name ?\n "[]" ?\n ")")
-    (backward-char 3))
-
-  (defun insert-defn (&optional name)
-    (interactive "sFunction Name: ")
-    (insert-binding "defn" name))
-
-
   :bind*
   (:map clojure-mode-map
         ("C-<left>" . sp-backward-sexp)
@@ -57,10 +40,10 @@
         ("M-K" . sp-splice-sexp-killing-backward)
         ("C-M-k" . sp-splice-sexp-killing-around)
 
-        ("C-;" . comment-dwim)
-
-        ("C-c i c" . insert-code-seperator)
-        ("C-c i f" . insert-defn)))
+        ("C--" . sp-copy-sexp)
+        ("C-<" . sp-forward-transpose-sexp)
+        ("C-|" . sp-trim-whitespace-of-sexp)
+        ("C-;" . comment-dwim)))
 
 (use-package
   flycheck-clj-kondo

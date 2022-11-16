@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Watchout
+# key: ;w
+# --
+;;WATCHOUT: $0

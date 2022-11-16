@@ -18,12 +18,14 @@
    ivy-use-selectable-prompt t
    ivy-height 15
    ivy-wrap t
-   ivy-use-virtual-buffers t)
+   ivy-use-virtual-buffers t
+   ivy-initial-inputs-alist nil)
   (ivy-mode 1)
 
-  :bind*
-  (:map ivy-minibuffer-map
-        ("C-o" . ivy-occur)))
+  :bind
+  (("C-x C-b" . ivy-switch-buffer)
+   :map ivy-minibuffer-map
+   ("C-o" . ivy-occur)))
 
 (use-package
   counsel
@@ -38,10 +40,27 @@
 (use-package
   swiper
   :requires counsel
+  :init
+  ;;TODO: Refactor to something like 'apply-region-text'
+  (defun my-region-text ()
+    (if mark-active
+        (buffer-substring-no-properties (region-beginning) (region-end))))
+
+  (defun my-git-grep ()
+    (interactive)
+    (let ((text (my-region-text)))
+      (deactivate-mark)
+      (counsel-git-grep text)))
+
+  (defun my-swiper ()
+    (interactive)
+    (let ((text (my-region-text)))
+      (deactivate-mark)
+      (swiper text)))
 
   :bind
-  (("C-s" . swiper)
-   ("C-S-s" . counsel-git-grep)
+  (("C-s" . my-swiper)
+   ("C-S-s" . my-git-grep)
 
    ("C-r" . swiper)
    ("C-S-r" . counsel-git-grep-query-replace)
@@ -178,13 +197,13 @@
   (("C-." . er/expand-region)
    ("C-:" . er/contract-region)))
 
-(use-package
-  pkg--narrow
-  :load-path "configuration/"
-  :commands narrow/narrow-dwim
-  :bind*
-  (("C--" . narrow/narrow-dwim)
-   ("C-+" . narrow/widen)))
+;; (use-package
+;;   pkg--narrow
+;;   :load-path "configuration/"
+;;   :commands narrow/narrow-dwim
+;;   :bind*
+;;   (("C--" . narrow/narrow-dwim)
+;;    ("C-+" . narrow/widen)))
 
 (use-package
   which-key
@@ -204,13 +223,10 @@
 (use-package
   multiple-cursors
 
-  :config
-  (define-key mc/keymap (kbd "<return>") nil)
-
   :bind*
   (("M-c m" . mc/mark-more-like-this-extended)
-   ("M-c n" . mc/mark-next-like-this)
-   ("M-c p" . mc/mark-next-like-this)
+   ("M-c <right>" . mc/mark-next-like-this)
+   ("M-c <left>" . mc/mark-previous-like-this)
 
    ("M-c r" . mc/mark-all-in-region)
    ("M-c f" . mc/mark-all-like-this-in-defun)
@@ -222,10 +238,10 @@
    ("M-c i l" . mc/insert-letters)
    ("M-c i s" . mc/sort-regions)
    ("M-c i r" . mc/reverse-regions)
-   ("<C-return>" . newline)
 
    :map mc/keymap
-   ("<tab>" . mc-hide-unmatched-lines-mode)))
+   ("<tab>" . mc-hide-unmatched-lines-mode)
+   ("<C-return>" . newline)))
 
 (use-package
   ace-mc
@@ -264,7 +280,7 @@
  '(shift-select-mode t)
  '(x-select-enable-clipboard t)
  '(initial-major-mode (quote fundamental-mode))
- '(initial-buffer-choice "*empty*")
+ '(initial-buffer-choice "*new*")
  '(ring-bell-function (quote ignore)))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -274,5 +290,11 @@
    ns-alternate-modifier nil
    ns-right-alternate-modifier nil
    mac-command-modifier 'meta))
+
+;; Scroll with n Lines lookahead
+(let ((n 5))
+  (setq scroll-step 1)
+  (setq scroll-conservatively n)
+  (setq scroll-margin n))
 
 (provide 'base--interface)

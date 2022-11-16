@@ -3,7 +3,7 @@
 
 (defun zoom/default ()
   (interactive)
-  (zoom/apply 100))
+  (zoom/apply 175))
 
 (defun zoom/custom-1 ()
   (interactive)
@@ -15,7 +15,7 @@
 
 (defun zoom/custom-3 ()
   (interactive)
-  (zoom/apply 300))
+  (zoom/apply 250))
 
 (defun zoom/modify (n)
   (let ((factor 10))
@@ -30,5 +30,7 @@
 (defun zoom/dec ()
   (interactive)
   (zoom/modify -1))
+
+(zoom/apply 200)
 
 (provide 'pkg--zoom)
