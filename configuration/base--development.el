@@ -21,7 +21,7 @@
 
   (defun sp-trim-whitespace-of-sexp ()
     (interactive)
-    (set-mark-command)
+    (set-mark (point))
     (sp-backward-whitespace)
     (delete-active-region))
 
@@ -148,8 +148,7 @@
     (interactive)
     (setq prettify-symbols-alist
           '(("lambda" . 955) ; λ
-            ("fn" . 955) ; λ
-            ("sum" . 8721))) ; ∑
+            ("fn" . 955)))
     (prettify-symbols-mode))
 
   :hook

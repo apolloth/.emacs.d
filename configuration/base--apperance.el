@@ -28,9 +28,8 @@
       ((buffer-id)
        :priority 99
        :when (not (and buffer-file-name (buffer-modified-p))))
-      (buffer-size
-       :priority 60
-       :when active)
+      (projectile-root
+       :priority 80)
       (major-mode
        :priority 70)
       ((flycheck-error flycheck-warning flycheck-info)
@@ -42,10 +41,7 @@
        :when (and active vc-mode)
        :priority 50))
 
-    '((minor-modes
-       :when active
-       :priority 70)
-      (ide-window
+    '((process
        :priority 60)
       (line-column
        :separator " | "
@@ -53,7 +49,9 @@
        :when active)
       (buffer-position
        :priority 40
-       :when active)))
+       :when active)
+      (hud
+       :priority 40)))
 
   (setq-default
    mode-line-format
@@ -80,6 +78,18 @@
 
 (use-package all-the-icons
   :if (display-graphic-p))
+
+(use-package doom-themes
+  :ensure t
+  :config
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t
+        doom-themes-treemacs-theme "doom-colors"
+        doom-dracula-brighter-modeline t)
+  (load-theme 'doom-dracula t)
+  (doom-themes-visual-bell-config)
+  (doom-themes-treemacs-config)
+  (doom-themes-org-config))
 
 (defface error-face
   '((t (:foreground "#CC5353"))) "Red Highlight")
@@ -124,13 +134,14 @@
  (lambda ()
    (font-lock-add-keywords
     nil
-    '(("\\<\\(HACK\\|NOTE\\|FIXME\\|TODO\\|WATCHOUT\\|REVIEW\\|BUG\\)"
+    '(("\\<\\(HACK\\|NOTE\\|FIXME\\|TODO\\|TEST\\|WATCHOUT\\|REVIEW\\|BUG\\)"
        1 font-lock-warning-face t)))))
 
 ;; (load-theme 'spacemacs-dark t)
 ;; (load-theme 'doom-one t)
 
-(load-theme 'doom-dracula t)
+;; (load-theme 'doom-dracula t)
+
 (toggle-frame-maximized)
 
 (provide 'base--apperance)

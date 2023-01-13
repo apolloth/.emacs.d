@@ -84,18 +84,63 @@
   (("C-M-#" . toggle-fullframe-window)))
 
 (use-package
+  golden-ratio
+  :config
+  (golden-ratio-mode 1)
+  (setq golden-ratio-auto-scale t))
+
+(use-package transpose-frame
+  :init
+  (unbind-key "C-M-.")
+  :bind
+  (("C-M-. t"   . transpose-frame)
+   ("C-M-. j"   . flop-frame)
+   ("C-M-. k"   . flip-frame)
+   ("C-M-. <down>"   . rotate-frame)
+   ("C-M-. <right>"   . rotate-frame-clockwise)
+   ("C-M-. <left>"   . rotate-frame-anti-clockwise)))
+
+(use-package
+  tiling
+  :demand t
+  :load-path "configuration/"
+
+  :bind
+  (("C-M-, ,"   . create-tiling-window)
+   ("C-M-, x"   . delete-tiling-window)
+
+   ("C-M-, j"   . tile-layout-master-left)
+   ("C-M-, t"   . tile-layout-master-top)
+   ("C-M-, v"   . tile-layout-even-vertical)
+   ("C-M-, b"   . tile-layout-even-horizontal)
+   ("C-M-, f"   . tile-layout-tiling-tile-4)
+
+   ("C-M-, <left>"    . windmove-left)
+   ("C-M-, <right>"   . windmove-right)
+   ("C-M-, <up>"      . windmove-up)
+   ("C-M-, <down>"    . windmove-down)))
+
+(use-package
   fullframe
   :config
   (setq fullframe/advice-generic-quit-commands nil))
 
 (use-package
   buffer-move
-  :config (setq buffer-move-stay-after-swap t)
+  :config (setq buffer-move-stay-after-swap nil)
   :bind
   (("C-M-' <up>" . buf-move-up)
    ("C-M-' <down>" . buf-move-down)
    ("C-M-' <left>" . buf-move-left)
    ("C-M-' <right>" . buf-move-right)))
+
+(use-package
+  windmove
+  :bind
+  (("<S-up>"    . windmove-up)
+   ("<S-down>"  . windmove-down)
+   ("<S-left>"  . windmove-left)
+   ("<S-right>" . windmove-right)))
 
 (use-package
   elscreen
@@ -104,8 +149,8 @@
   (elscreen-create)
 
   :bind*
-  (("M-' c" . elscreen-create)
-   ("M-' C" . elscreen-clone)
+  (("M-n c" . elscreen-create)
+   ("M-n C" . elscreen-clone)
 
    :map elscreen-map
    ("c" . elscreen-create)
@@ -136,7 +181,7 @@
 
   :config
   (setq
-   elscreen-prefix-key "\M-'"
+   elscreen-prefix-key "\M-n"
    elscreen-display-screen-number nil
    elscreen-display-tab nil)
 
@@ -173,11 +218,10 @@
 
 (use-package
   ace-jump-mode
-  :bind
-  (("C-j" . ace-jump-char-mode)
-   ("C-S-j" . ace-jump-mode-pop-mark)
-   ("M-j" . nil)
-   ("M-j l" . ace-jump-line-mode)))
+  :bind*
+  (("M-j" . ace-jump-char-mode)
+   ("M-b" . ace-jump-mode-pop-mark)
+   ("M-l" . ace-jump-line-mode)))
 
 (use-package
   ace-window
@@ -224,12 +268,12 @@
   multiple-cursors
 
   :bind*
-  (("M-c m" . mc/mark-more-like-this-extended)
-   ("M-c <right>" . mc/mark-next-like-this)
-   ("M-c <left>" . mc/mark-previous-like-this)
+  (("M-c c" . mc/mark-more-like-this-extended)
+   ("M-c n" . mc/mark-next-like-this)
+   ("M-c p" . mc/mark-previous-like-this)
 
    ("M-c r" . mc/mark-all-in-region)
-   ("M-c f" . mc/mark-all-like-this-in-defun)
+   ("M-c d" . mc/mark-all-like-this-in-defun)
    ("M-c x" . mc/mark-all-like-this-dwim)
    ("M-c a" . mc/mark-all-like-this)
    ("M-c l" . mc/edit-lines)
@@ -240,14 +284,60 @@
    ("M-c i r" . mc/reverse-regions)
 
    :map mc/keymap
-   ("<tab>" . mc-hide-unmatched-lines-mode)
-   ("<C-return>" . newline)))
+   ("<tab>" . mc-hide-unmatched-lines-mode)))
+
+(use-package
+  mc-extras
+  :config
+
+  (require 'multiple-cursors-core)
+  (require 'ace-jump-mode)
+
+  (defun freeze-fake-cursors-and-point ()
+    (interactive)
+    (mc/create-fake-cursor-at-point)
+    (mc/freeze-fake-cursors))
+
+  (defun unfreeze-fake-cursors-without-point ()
+    (interactive)
+    (mc/unfreeze-fake-cursors)
+    (mc/remove-current-cursor))
+
+  (defun add-fake-cursor-newline ()
+    (interactive)
+    (mc/create-fake-cursor-at-point)
+    (newline)
+    (mc/maybe-multiple-cursors-mode))
+
+  (defun add-n-fake-cursors-newline ()
+    (interactive)
+    (dotimes (_ (read-number "How many? "))
+      (add-fake-cursor-newline)))
+
+  :bind*
+  ("M-c RET" . add-n-fake-cursors-newline)
+  ("M-c SPC" . mc/remove-current-cursor)
+  ("M-c <right>" . mc/mark-next-sexps)
+  ("M-c <left>" . mc/mark-previous-sexps)
+  ("M-c <up>" . mc/mark-all-above)
+  ("M-c <down>" . mc/mark-all-below)
+  ("M-c f" . freeze-fake-cursors-and-point)
+  ("M-c F" . unfreeze-fake-cursors-without-point))
 
 (use-package
   ace-mc
+  :config
+
+  (require 'multiple-cursors-core)
+  (require 'mc-extras)
+
+  (defun add-multiple-cursors-line-mode ()
+    (interactive)
+    (ace-mc-add-multiple-cursors 16))
 
   :bind*
-  ("M-c j" . ace-mc-add-multiple-cursors))
+  ("M-c j" . ace-mc-add-multiple-cursors)
+  ("M-c y" . add-multiple-cursors-line-mode))
 
 (use-package
   pkg--zoom

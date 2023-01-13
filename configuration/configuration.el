@@ -15,7 +15,7 @@
   (package-install 'smartrep)
   (package-install 'use-package)
   ;; (package-install 'spacemacs-theme)
-  (package-install 'doom-themes)
+  ;; (package-install 'doom-themes)
   (package-install 'exec-path-from-shell))
 
 (when (memq window-system '(mac ns x))

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Round Brackets
+# key: j
+# --
+($0)

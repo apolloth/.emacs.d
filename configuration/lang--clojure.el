@@ -42,7 +42,7 @@
 
         ("C--" . sp-copy-sexp)
         ("C-<" . sp-forward-transpose-sexp)
-        ("C-|" . sp-trim-whitespace-of-sexp)
+        ("C-c ." . sp-trim-whitespace-of-sexp)
         ("C-;" . comment-dwim)))
 
 (use-package
@@ -58,6 +58,7 @@
   (cljr-add-keybindings-with-prefix "C-,")
   (clj-refactor-mode 1)
 
+  ;;cljr-debug
   :bind-keymap*
   ("C-," . clj-refactor-map))
 
