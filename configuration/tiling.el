@@ -26,15 +26,15 @@
 ;;; Commentary:
 
 ;; As the display geting larger and larger, "Tiling" is getting more and more
-;; popular. Emacs is tiling windows within the frame for sure. However, by
+;; popular.  Emacs is tiling windows within the frame for sure.  However, by
 ;; default, it does not provide an easy way to change a set of preset layouts
-;; like what Xmonad and tmux did. This package is trying to provide one solution
+;; like what Xmonad and tmux did.  This package is trying to provide one solution
 
 ;; To install: download this file into to you load-path and "(require 'tiling)"
 ;; in your init file.
 
 ;; Strongly recommand you use this package together with windmove, winner-mode
-;; and buffermove. The last one is not part of Emacs yet. Beneath is my
+;; and buffermove.  The last one is not part of Emacs yet.  Beneath is my
 ;; configuration:
 
 ;; ;;; Windows related operations
@@ -88,6 +88,12 @@
 (defvar tiling-current-layout (car tiling-layouts)
   "Current layout, maynot reflect the actual layout. But that is
   not a big deal")
+
+(defvar saved-window-configuration (current-window-configuration)
+  "Last saved window-configuration")
+
+(defvar tiling-active? nil
+  "Denotes if the current window-configuration is in a tiling-layout")
 
 
 ;; Layout for 4-window only
@@ -239,7 +245,9 @@
   (let ((bufs
          (mapcar 'window-buffer
                  (window-list nil -1 nil))))
-    (setq tiling-current-layout layout)
+    (setq
+     tiling-current-layout layout
+     tiling-active? t)
     (funcall layout bufs)))
 
 (defun create-tiling-window ()
@@ -254,6 +262,18 @@
   (delete-window)
   (set-tiling-layout tiling-current-layout))
 
+(defun toggle-tiling ()
+  "Toggle tiling."
+  (interactive)
+
+  (if tiling-active?
+      (progn
+        (setq saved-window-configuration (current-window-configuration)
+              tiling-active? nil)
+        (delete-other-windows))
+    (progn
+      (set-window-configuration saved-window-configuration)
+      (set-tiling-layout tiling-current-layout))))
 
 ;; set certain layout
 
@@ -282,4 +302,7 @@
   (interactive)
   (set-tiling-layout 'tiling-tile-4))
 
+
 (provide 'tiling)
+
+;;; tiling.el ends here
