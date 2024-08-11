@@ -1,0 +1,40 @@
+<h1 id="setup-config"> Writing the Setup Configuration File</h1> <div class="admonition note"> <p class="admonition-title">Note</p> <p>This document is being retained solely until the <code>setuptools</code> documentation at <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/setuptools.html">https://setuptools.readthedocs.io/en/latest/setuptools.html</a> independently covers all of the relevant information currently included here.</p> </div> <p>Often, it’s not possible to write down everything needed to build a distribution <em>a priori</em>: you may need to get some information from the user, or from the user’s system, in order to proceed. As long as that information is fairly simple—a list of directories to search for C header files or libraries, for example—then providing a configuration file, <code>setup.cfg</code>, for users to edit is a cheap and easy way to solicit it. Configuration files also let you provide default values for any command option, which the installer can then override either on the command-line or by editing the config file.</p> <p>The setup configuration file is a useful middle-ground between the setup script—which, ideally, would be opaque to installers <a class="footnote-reference brackets" href="#id2" id="id1">1</a>—and the command-line to the setup script, which is outside of your control and entirely up to the installer. In fact, <code>setup.cfg</code> (and any other Distutils configuration files present on the target system) are processed after the contents of the setup script, but before the command-line. This has several useful consequences:</p> <ul class="simple"> <li>installers can override some of what you put in <code>setup.py</code> by editing <code>setup.cfg</code>
+</li> <li>you can provide non-standard defaults for options that are not easily set in <code>setup.py</code>
+</li> <li>installers can override anything in <code>setup.cfg</code> using the command-line options to <code>setup.py</code>
+</li> </ul> <p>The basic syntax of the configuration file is simple:</p> <pre data-language="ini">[command]
+option=value
+...
+</pre> <p>where <em>command</em> is one of the Distutils commands (e.g. <strong class="command">build_py</strong>, <strong class="command">install</strong>), and <em>option</em> is one of the options that command supports. Any number of options can be supplied for each command, and any number of command sections can be included in the file. Blank lines are ignored, as are comments, which run from a <code>'#'</code> character until the end of the line. Long option values can be split across multiple lines simply by indenting the continuation lines.</p> <p>You can find out the list of options supported by a particular command with the universal <code>--help</code> option, e.g.</p> <pre data-language="shell">$ python setup.py --help build_ext
+[...]
+Options for 'build_ext' command:
+  --build-lib (-b)     directory for compiled extension modules
+  --build-temp (-t)    directory for temporary files (build by-products)
+  --inplace (-i)       ignore build-lib and put compiled extensions into the
+                       source directory alongside your pure Python modules
+  --include-dirs (-I)  list of directories to search for header files
+  --define (-D)        C preprocessor macros to define
+  --undef (-U)         C preprocessor macros to undefine
+  --swig-opts          list of SWIG command line options
+[...]
+</pre> <p>Note that an option spelled <code>--foo-bar</code> on the command-line is spelled <code>foo_bar</code> in configuration files.</p> <p id="distutils-build-ext-inplace">For example, say you want your extensions to be built “in-place”—that is, you have an extension <code>pkg.ext</code>, and you want the compiled extension file (<code>ext.so</code> on Unix, say) to be put in the same source directory as your pure Python modules <code>pkg.mod1</code> and <code>pkg.mod2</code>. You can always use the <code>--inplace</code> option on the command-line to ensure this:</p> <pre data-language="sh">python setup.py build_ext --inplace
+</pre> <p>But this requires that you always specify the <strong class="command">build_ext</strong> command explicitly, and remember to provide <code>--inplace</code>. An easier way is to “set and forget” this option, by encoding it in <code>setup.cfg</code>, the configuration file for this distribution:</p> <pre data-language="ini">[build_ext]
+inplace=1
+</pre> <p>This will affect all builds of this module distribution, whether or not you explicitly specify <strong class="command">build_ext</strong>. If you include <code>setup.cfg</code> in your source distribution, it will also affect end-user builds—which is probably a bad idea for this option, since always building extensions in-place would break installation of the module distribution. In certain peculiar cases, though, modules are built right in their installation directory, so this is conceivably a useful ability. (Distributing extensions that expect to be built in their installation directory is almost always a bad idea, though.)</p> <p>Another example: certain commands take a lot of options that don’t change from run to run; for example, <strong class="command">bdist_rpm</strong> needs to know everything required to generate a “spec” file for creating an RPM distribution. Some of this information comes from the setup script, and some is automatically generated by the Distutils (such as the list of files installed). But some of it has to be supplied as options to <strong class="command">bdist_rpm</strong>, which would be very tedious to do on the command-line for every run. Hence, here is a snippet from the Distutils’ own <code>setup.cfg</code>:</p> <pre data-language="ini">[bdist_rpm]
+release = 1
+packager = Greg Ward &lt;gward@python.net&gt;
+doc_files = CHANGES.txt
+            README.txt
+            USAGE.txt
+            doc/
+            examples/
+</pre> <p>Note that the <code>doc_files</code> option is simply a whitespace-separated string split across multiple lines for readability.</p> <div class="admonition seealso"> <p class="admonition-title">See also</p> <dl class="simple"> <dt>
+<a class="reference internal" href="../install/index#inst-config-syntax"><span class="std std-ref">Syntax of config files</span></a> in “Installing Python Modules”</dt>
+<dd>
+<p>More information on the configuration files is available in the manual for system administrators.</p> </dd> </dl> </div> <h4 class="rubric">Footnotes</h4> <dl class="footnote brackets"> <dt class="label" id="id2">
+<code>1</code> </dt> <dd>
+<p>This ideal probably won’t be achieved until auto-configuration is fully supported by the Distutils.</p> </dd> </dl><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/distutils/configfile.html" class="_attribution-link">https://docs.python.org/3.8/distutils/configfile.html</a>
+  </p>
+</div>

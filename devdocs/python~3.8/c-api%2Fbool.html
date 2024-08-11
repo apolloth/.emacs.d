@@ -1,0 +1,24 @@
+<h1 id="boolobjects">Boolean Objects</h1> <p>Booleans in Python are implemented as a subclass of integers. There are only two booleans, <code>Py_False</code> and <code>Py_True</code>. As such, the normal creation and deletion functions don’t apply to booleans. The following macros are available, however.</p> <dl class="function"> <dt id="c.PyBool_Check">
+<code>int PyBool_Check(PyObject *o)</code> </dt> <dd>
+<p>Return true if <em>o</em> is of type <code>PyBool_Type</code>.</p> </dd>
+</dl> <dl class="var"> <dt id="c.Py_False">
+<code>PyObject* Py_False</code> </dt> <dd>
+<p>The Python <code>False</code> object. This object has no methods. It needs to be treated just like any other object with respect to reference counts.</p> </dd>
+</dl> <dl class="var"> <dt id="c.Py_True">
+<code>PyObject* Py_True</code> </dt> <dd>
+<p>The Python <code>True</code> object. This object has no methods. It needs to be treated just like any other object with respect to reference counts.</p> </dd>
+</dl> <dl class="macro"> <dt id="c.Py_RETURN_FALSE">
+<code>Py_RETURN_FALSE</code> </dt> <dd>
+<p>Return <code>Py_False</code> from a function, properly incrementing its reference count.</p> </dd>
+</dl> <dl class="macro"> <dt id="c.Py_RETURN_TRUE">
+<code>Py_RETURN_TRUE</code> </dt> <dd>
+<p>Return <code>Py_True</code> from a function, properly incrementing its reference count.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyBool_FromLong">
+<code>PyObject* PyBool_FromLong(long v)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a new reference to <code>Py_True</code> or <code>Py_False</code> depending on the truth value of <em>v</em>.</p> </dd>
+</dl><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/bool.html" class="_attribution-link">https://docs.python.org/3.8/c-api/bool.html</a>
+  </p>
+</div>

@@ -1,0 +1,2 @@
+(1 (name . "Python") (slug . "python~3.8") (type . "python") (links (home . "https://www.python.org/") (code . "https://github.com/python/cpython")) (version . "3.8") (release . "3.8.14") (mtime . 1666882475) (db_size . 15163896) (attribution . "&copy; 2001&ndash;2024 Python Software Foundation<br>
+      Licensed under the PSF License."))

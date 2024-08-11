@@ -1,0 +1,488 @@
+<h1 id="init-config">Python Initialization Configuration</h1> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.8.</span></p> </div> <p>Structures:</p> <ul class="simple"> <li><a class="reference internal" href="#c.PyConfig" title="PyConfig"><code>PyConfig</code></a></li> <li><a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig"><code>PyPreConfig</code></a></li> <li><a class="reference internal" href="#c.PyStatus" title="PyStatus"><code>PyStatus</code></a></li> <li><a class="reference internal" href="#c.PyWideStringList" title="PyWideStringList"><code>PyWideStringList</code></a></li> </ul> <p>Functions:</p> <ul class="simple"> <li><a class="reference internal" href="#c.PyConfig_Clear" title="PyConfig_Clear"><code>PyConfig_Clear()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_InitIsolatedConfig" title="PyConfig_InitIsolatedConfig"><code>PyConfig_InitIsolatedConfig()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_InitPythonConfig" title="PyConfig_InitPythonConfig"><code>PyConfig_InitPythonConfig()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_Read" title="PyConfig_Read"><code>PyConfig_Read()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_SetArgv" title="PyConfig_SetArgv"><code>PyConfig_SetArgv()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_SetBytesArgv" title="PyConfig_SetBytesArgv"><code>PyConfig_SetBytesArgv()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_SetBytesString" title="PyConfig_SetBytesString"><code>PyConfig_SetBytesString()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_SetString" title="PyConfig_SetString"><code>PyConfig_SetString()</code></a></li> <li><a class="reference internal" href="#c.PyConfig_SetWideStringList" title="PyConfig_SetWideStringList"><code>PyConfig_SetWideStringList()</code></a></li> <li><a class="reference internal" href="#c.PyPreConfig_InitIsolatedConfig" title="PyPreConfig_InitIsolatedConfig"><code>PyPreConfig_InitIsolatedConfig()</code></a></li> <li><a class="reference internal" href="#c.PyPreConfig_InitPythonConfig" title="PyPreConfig_InitPythonConfig"><code>PyPreConfig_InitPythonConfig()</code></a></li> <li><a class="reference internal" href="#c.PyStatus_Error" title="PyStatus_Error"><code>PyStatus_Error()</code></a></li> <li><a class="reference internal" href="#c.PyStatus_Exception" title="PyStatus_Exception"><code>PyStatus_Exception()</code></a></li> <li><a class="reference internal" href="#c.PyStatus_Exit" title="PyStatus_Exit"><code>PyStatus_Exit()</code></a></li> <li><a class="reference internal" href="#c.PyStatus_IsError" title="PyStatus_IsError"><code>PyStatus_IsError()</code></a></li> <li><a class="reference internal" href="#c.PyStatus_IsExit" title="PyStatus_IsExit"><code>PyStatus_IsExit()</code></a></li> <li><a class="reference internal" href="#c.PyStatus_NoMemory" title="PyStatus_NoMemory"><code>PyStatus_NoMemory()</code></a></li> <li><a class="reference internal" href="#c.PyStatus_Ok" title="PyStatus_Ok"><code>PyStatus_Ok()</code></a></li> <li><a class="reference internal" href="#c.PyWideStringList_Append" title="PyWideStringList_Append"><code>PyWideStringList_Append()</code></a></li> <li><a class="reference internal" href="#c.PyWideStringList_Insert" title="PyWideStringList_Insert"><code>PyWideStringList_Insert()</code></a></li> <li><a class="reference internal" href="#c.Py_ExitStatusException" title="Py_ExitStatusException"><code>Py_ExitStatusException()</code></a></li> <li><a class="reference internal" href="#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code>Py_InitializeFromConfig()</code></a></li> <li><a class="reference internal" href="#c.Py_PreInitialize" title="Py_PreInitialize"><code>Py_PreInitialize()</code></a></li> <li><a class="reference internal" href="#c.Py_PreInitializeFromArgs" title="Py_PreInitializeFromArgs"><code>Py_PreInitializeFromArgs()</code></a></li> <li><a class="reference internal" href="#c.Py_PreInitializeFromBytesArgs" title="Py_PreInitializeFromBytesArgs"><code>Py_PreInitializeFromBytesArgs()</code></a></li> <li><a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code>Py_RunMain()</code></a></li> </ul> <p>The preconfiguration (<code>PyPreConfig</code> type) is stored in <code>_PyRuntime.preconfig</code> and the configuration (<code>PyConfig</code> type) is stored in <code>PyInterpreterState.config</code>.</p> <p>See also <a class="reference internal" href="init#initialization"><span class="std std-ref">Initialization, Finalization, and Threads</span></a>.</p> <div class="admonition seealso"> <p class="admonition-title">See also</p> <p><a class="pep reference external" href="https://www.python.org/dev/peps/pep-0587" id="index-0"><strong>PEP 587</strong></a> “Python Initialization Configuration”.</p> </div> <section id="pywidestringlist"> <h2>PyWideStringList</h2> <dl class="type"> <dt id="c.PyWideStringList">
+<code>PyWideStringList</code> </dt> <dd>
+<p>List of <code>wchar_t*</code> strings.</p> <p>If <em>length</em> is non-zero, <em>items</em> must be non-<code>NULL</code> and all strings must be non-<code>NULL</code>.</p> <p>Methods:</p> <dl class="function"> <dt id="c.PyWideStringList_Append">
+<code>PyStatus PyWideStringList_Append(PyWideStringList *list, const wchar_t *item)</code> </dt> <dd>
+<p>Append <em>item</em> to <em>list</em>.</p> <p>Python must be preinitialized to call this function.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyWideStringList_Insert">
+<code>PyStatus PyWideStringList_Insert(PyWideStringList *list, Py_ssize_t index, const wchar_t *item)</code> </dt> <dd>
+<p>Insert <em>item</em> into <em>list</em> at <em>index</em>.</p> <p>If <em>index</em> is greater than or equal to <em>list</em> length, append <em>item</em> to <em>list</em>.</p> <p><em>index</em> must be greater than or equal to 0.</p> <p>Python must be preinitialized to call this function.</p> </dd>
+</dl> <p>Structure fields:</p> <dl class="member"> <dt id="c.PyWideStringList.length">
+<code>Py_ssize_t length</code> </dt> <dd>
+<p>List length.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyWideStringList.items">
+<code>wchar_t** items</code> </dt> <dd>
+<p>List items.</p> </dd>
+</dl> </dd>
+</dl> </section> <section id="pystatus"> <h2>PyStatus</h2> <dl class="type"> <dt id="c.PyStatus">
+<code>PyStatus</code> </dt> <dd>
+<p>Structure to store an initialization function status: success, error or exit.</p> <p>For an error, it can store the C function name which created the error.</p> <p>Structure fields:</p> <dl class="member"> <dt id="c.PyStatus.exitcode">
+<code>int exitcode</code> </dt> <dd>
+<p>Exit code. Argument passed to <code>exit()</code>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyStatus.err_msg">
+<code>const char *err_msg</code> </dt> <dd>
+<p>Error message.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyStatus.func">
+<code>const char *func</code> </dt> <dd>
+<p>Name of the function which created an error, can be <code>NULL</code>.</p> </dd>
+</dl> <p>Functions to create a status:</p> <dl class="function"> <dt id="c.PyStatus_Ok">
+<code>PyStatus PyStatus_Ok(void)</code> </dt> <dd>
+<p>Success.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyStatus_Error">
+<code>PyStatus PyStatus_Error(const char *err_msg)</code> </dt> <dd>
+<p>Initialization error with a message.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyStatus_NoMemory">
+<code>PyStatus PyStatus_NoMemory(void)</code> </dt> <dd>
+<p>Memory allocation failure (out of memory).</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyStatus_Exit">
+<code>PyStatus PyStatus_Exit(int exitcode)</code> </dt> <dd>
+<p>Exit Python with the specified exit code.</p> </dd>
+</dl> <p>Functions to handle a status:</p> <dl class="function"> <dt id="c.PyStatus_Exception">
+<code>int PyStatus_Exception(PyStatus status)</code> </dt> <dd>
+<p>Is the status an error or an exit? If true, the exception must be handled; by calling <a class="reference internal" href="#c.Py_ExitStatusException" title="Py_ExitStatusException"><code>Py_ExitStatusException()</code></a> for example.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyStatus_IsError">
+<code>int PyStatus_IsError(PyStatus status)</code> </dt> <dd>
+<p>Is the result an error?</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyStatus_IsExit">
+<code>int PyStatus_IsExit(PyStatus status)</code> </dt> <dd>
+<p>Is the result an exit?</p> </dd>
+</dl> <dl class="function"> <dt id="c.Py_ExitStatusException">
+<code>void Py_ExitStatusException(PyStatus status)</code> </dt> <dd>
+<p>Call <code>exit(exitcode)</code> if <em>status</em> is an exit. Print the error message and exit with a non-zero exit code if <em>status</em> is an error. Must only be called if <code>PyStatus_Exception(status)</code> is non-zero.</p> </dd>
+</dl> </dd>
+</dl> <div class="admonition note"> <p class="admonition-title">Note</p> <p>Internally, Python uses macros which set <code>PyStatus.func</code>, whereas functions to create a status set <code>func</code> to <code>NULL</code>.</p> </div> <p>Example:</p> <pre data-language="c">PyStatus alloc(void **ptr, size_t size)
+{
+    *ptr = PyMem_RawMalloc(size);
+    if (*ptr == NULL) {
+        return PyStatus_NoMemory();
+    }
+    return PyStatus_Ok();
+}
+
+int main(int argc, char **argv)
+{
+    void *ptr;
+    PyStatus status = alloc(&amp;ptr, 16);
+    if (PyStatus_Exception(status)) {
+        Py_ExitStatusException(status);
+    }
+    PyMem_Free(ptr);
+    return 0;
+}
+</pre> </section> <section id="pypreconfig"> <h2>PyPreConfig</h2> <dl class="type"> <dt id="c.PyPreConfig">
+<code>PyPreConfig</code> </dt> <dd>
+<p>Structure used to preinitialize Python:</p> <ul class="simple"> <li>Set the Python memory allocator</li> <li>Configure the LC_CTYPE locale</li> <li>Set the UTF-8 mode</li> </ul> <p>Function to initialize a preconfiguration:</p> <dl class="function"> <dt id="c.PyPreConfig_InitPythonConfig">
+<code>void PyPreConfig_InitPythonConfig(PyPreConfig *preconfig)</code> </dt> <dd>
+<p>Initialize the preconfiguration with <a class="reference internal" href="#init-python-config"><span class="std std-ref">Python Configuration</span></a>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyPreConfig_InitIsolatedConfig">
+<code>void PyPreConfig_InitIsolatedConfig(PyPreConfig *preconfig)</code> </dt> <dd>
+<p>Initialize the preconfiguration with <a class="reference internal" href="#init-isolated-conf"><span class="std std-ref">Isolated Configuration</span></a>.</p> </dd>
+</dl> <p>Structure fields:</p> <dl class="member"> <dt id="c.PyPreConfig.allocator">
+<code>int allocator</code> </dt> <dd>
+<p>Name of the memory allocator:</p> <ul class="simple"> <li>
+<code>PYMEM_ALLOCATOR_NOT_SET</code> (<code>0</code>): don’t change memory allocators (use defaults)</li> <li>
+<code>PYMEM_ALLOCATOR_DEFAULT</code> (<code>1</code>): default memory allocators</li> <li>
+<code>PYMEM_ALLOCATOR_DEBUG</code> (<code>2</code>): default memory allocators with debug hooks</li> <li>
+<code>PYMEM_ALLOCATOR_MALLOC</code> (<code>3</code>): force usage of <code>malloc()</code>
+</li> <li>
+<code>PYMEM_ALLOCATOR_MALLOC_DEBUG</code> (<code>4</code>): force usage of <code>malloc()</code> with debug hooks</li> <li>
+<code>PYMEM_ALLOCATOR_PYMALLOC</code> (<code>5</code>): <a class="reference internal" href="memory#pymalloc"><span class="std std-ref">Python pymalloc memory allocator</span></a>
+</li> <li>
+<code>PYMEM_ALLOCATOR_PYMALLOC_DEBUG</code> (<code>6</code>): <a class="reference internal" href="memory#pymalloc"><span class="std std-ref">Python pymalloc memory allocator</span></a> with debug hooks</li> </ul> <p><code>PYMEM_ALLOCATOR_PYMALLOC</code> and <code>PYMEM_ALLOCATOR_PYMALLOC_DEBUG</code> are not supported if Python is configured using <code>--without-pymalloc</code></p> <p>See <a class="reference internal" href="memory#memory"><span class="std std-ref">Memory Management</span></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.configure_locale">
+<code>int configure_locale</code> </dt> <dd>
+<p>Set the LC_CTYPE locale to the user preferred locale? If equals to 0, set <code>coerce_c_locale</code> and <code>coerce_c_locale_warn</code> to 0.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.coerce_c_locale">
+<code>int coerce_c_locale</code> </dt> <dd>
+<p>If equals to 2, coerce the C locale; if equals to 1, read the LC_CTYPE locale to decide if it should be coerced.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.coerce_c_locale_warn">
+<code>int coerce_c_locale_warn</code> </dt> <dd>
+<p>If non-zero, emit a warning if the C locale is coerced.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.dev_mode">
+<code>int dev_mode</code> </dt> <dd>
+<p>See <a class="reference internal" href="#c.PyConfig.dev_mode" title="PyConfig.dev_mode"><code>PyConfig.dev_mode</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.isolated">
+<code>int isolated</code> </dt> <dd>
+<p>See <a class="reference internal" href="#c.PyConfig.isolated" title="PyConfig.isolated"><code>PyConfig.isolated</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.legacy_windows_fs_encoding">
+<code>int legacy_windows_fs_encoding(Windows only)</code> </dt> <dd>
+<p>If non-zero, disable UTF-8 Mode, set the Python filesystem encoding to <code>mbcs</code>, set the filesystem error handler to <code>replace</code>.</p> <p>Only available on Windows. <code>#ifdef MS_WINDOWS</code> macro can be used for Windows specific code.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.parse_argv">
+<code>int parse_argv</code> </dt> <dd>
+<p>If non-zero, <a class="reference internal" href="#c.Py_PreInitializeFromArgs" title="Py_PreInitializeFromArgs"><code>Py_PreInitializeFromArgs()</code></a> and <a class="reference internal" href="#c.Py_PreInitializeFromBytesArgs" title="Py_PreInitializeFromBytesArgs"><code>Py_PreInitializeFromBytesArgs()</code></a> parse their <code>argv</code> argument the same way the regular Python parses command line arguments: see <a class="reference internal" href="../using/cmdline#using-on-cmdline"><span class="std std-ref">Command Line Arguments</span></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.use_environment">
+<code>int use_environment</code> </dt> <dd>
+<p>See <a class="reference internal" href="#c.PyConfig.use_environment" title="PyConfig.use_environment"><code>PyConfig.use_environment</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyPreConfig.utf8_mode">
+<code>int utf8_mode</code> </dt> <dd>
+<p>If non-zero, enable the UTF-8 mode.</p> </dd>
+</dl> </dd>
+</dl> </section> <section id="preinitialization-with-pypreconfig"> <h2>Preinitialization with PyPreConfig</h2> <p>Functions to preinitialize Python:</p> <dl class="function"> <dt id="c.Py_PreInitialize">
+<code>PyStatus Py_PreInitialize(const PyPreConfig *preconfig)</code> </dt> <dd>
+<p>Preinitialize Python from <em>preconfig</em> preconfiguration.</p> </dd>
+</dl> <dl class="function"> <dt id="c.Py_PreInitializeFromBytesArgs">
+<code>PyStatus Py_PreInitializeFromBytesArgs(const PyPreConfig *preconfig, int argc, char * const *argv)</code> </dt> <dd>
+<p>Preinitialize Python from <em>preconfig</em> preconfiguration and command line arguments (bytes strings).</p> </dd>
+</dl> <dl class="function"> <dt id="c.Py_PreInitializeFromArgs">
+<code>PyStatus Py_PreInitializeFromArgs(const PyPreConfig *preconfig, int argc, wchar_t * const * argv)</code> </dt> <dd>
+<p>Preinitialize Python from <em>preconfig</em> preconfiguration and command line arguments (wide strings).</p> </dd>
+</dl> <p>The caller is responsible to handle exceptions (error or exit) using <a class="reference internal" href="#c.PyStatus_Exception" title="PyStatus_Exception"><code>PyStatus_Exception()</code></a> and <a class="reference internal" href="#c.Py_ExitStatusException" title="Py_ExitStatusException"><code>Py_ExitStatusException()</code></a>.</p> <p>For <a class="reference internal" href="#init-python-config"><span class="std std-ref">Python Configuration</span></a> (<a class="reference internal" href="#c.PyPreConfig_InitPythonConfig" title="PyPreConfig_InitPythonConfig"><code>PyPreConfig_InitPythonConfig()</code></a>), if Python is initialized with command line arguments, the command line arguments must also be passed to preinitialize Python, since they have an effect on the pre-configuration like encodings. For example, the <a class="reference internal" href="../using/cmdline#id5"><code>-X utf8</code></a> command line option enables the UTF-8 Mode.</p> <p><code>PyMem_SetAllocator()</code> can be called after <a class="reference internal" href="#c.Py_PreInitialize" title="Py_PreInitialize"><code>Py_PreInitialize()</code></a> and before <a class="reference internal" href="#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code>Py_InitializeFromConfig()</code></a> to install a custom memory allocator. It can be called before <a class="reference internal" href="#c.Py_PreInitialize" title="Py_PreInitialize"><code>Py_PreInitialize()</code></a> if <a class="reference internal" href="#c.PyPreConfig.allocator" title="PyPreConfig.allocator"><code>PyPreConfig.allocator</code></a> is set to <code>PYMEM_ALLOCATOR_NOT_SET</code>.</p> <p>Python memory allocation functions like <a class="reference internal" href="memory#c.PyMem_RawMalloc" title="PyMem_RawMalloc"><code>PyMem_RawMalloc()</code></a> must not be used before Python preinitialization, whereas calling directly <code>malloc()</code> and <code>free()</code> is always safe. <a class="reference internal" href="sys#c.Py_DecodeLocale" title="Py_DecodeLocale"><code>Py_DecodeLocale()</code></a> must not be called before the preinitialization.</p> <p>Example using the preinitialization to enable the UTF-8 Mode:</p> <pre data-language="c">PyStatus status;
+PyPreConfig preconfig;
+PyPreConfig_InitPythonConfig(&amp;preconfig);
+
+preconfig.utf8_mode = 1;
+
+status = Py_PreInitialize(&amp;preconfig);
+if (PyStatus_Exception(status)) {
+    Py_ExitStatusException(status);
+}
+
+/* at this point, Python will speak UTF-8 */
+
+Py_Initialize();
+/* ... use Python API here ... */
+Py_Finalize();
+</pre> </section> <section id="pyconfig"> <h2>PyConfig</h2> <dl class="type"> <dt id="c.PyConfig">
+<code>PyConfig</code> </dt> <dd>
+<p>Structure containing most parameters to configure Python.</p> <p>Structure methods:</p> <dl class="function"> <dt id="c.PyConfig_InitPythonConfig">
+<code>void PyConfig_InitPythonConfig(PyConfig *config)</code> </dt> <dd>
+<p>Initialize configuration with <a class="reference internal" href="#init-python-config"><span class="std std-ref">Python Configuration</span></a>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_InitIsolatedConfig">
+<code>void PyConfig_InitIsolatedConfig(PyConfig *config)</code> </dt> <dd>
+<p>Initialize configuration with <a class="reference internal" href="#init-isolated-conf"><span class="std std-ref">Isolated Configuration</span></a>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_SetString">
+<code>PyStatus PyConfig_SetString(PyConfig *config, wchar_t * const *config_str, const wchar_t *str)</code> </dt> <dd>
+<p>Copy the wide character string <em>str</em> into <code>*config_str</code>.</p> <p>Preinitialize Python if needed.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_SetBytesString">
+<code>PyStatus PyConfig_SetBytesString(PyConfig *config, wchar_t * const *config_str, const char *str)</code> </dt> <dd>
+<p>Decode <em>str</em> using <code>Py_DecodeLocale()</code> and set the result into <code>*config_str</code>.</p> <p>Preinitialize Python if needed.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_SetArgv">
+<code>PyStatus PyConfig_SetArgv(PyConfig *config, int argc, wchar_t * const *argv)</code> </dt> <dd>
+<p>Set command line arguments from wide character strings.</p> <p>Preinitialize Python if needed.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_SetBytesArgv">
+<code>PyStatus PyConfig_SetBytesArgv(PyConfig *config, int argc, char * const *argv)</code> </dt> <dd>
+<p>Set command line arguments: decode bytes using <a class="reference internal" href="sys#c.Py_DecodeLocale" title="Py_DecodeLocale"><code>Py_DecodeLocale()</code></a>.</p> <p>Preinitialize Python if needed.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_SetWideStringList">
+<code>PyStatus PyConfig_SetWideStringList(PyConfig *config, PyWideStringList *list, Py_ssize_t length, wchar_t **items)</code> </dt> <dd>
+<p>Set the list of wide strings <em>list</em> to <em>length</em> and <em>items</em>.</p> <p>Preinitialize Python if needed.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_Read">
+<code>PyStatus PyConfig_Read(PyConfig *config)</code> </dt> <dd>
+<p>Read all Python configuration.</p> <p>Fields which are already initialized are left unchanged.</p> <p>Preinitialize Python if needed.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyConfig_Clear">
+<code>void PyConfig_Clear(PyConfig *config)</code> </dt> <dd>
+<p>Release configuration memory.</p> </dd>
+</dl> <p>Most <code>PyConfig</code> methods preinitialize Python if needed. In that case, the Python preinitialization configuration in based on the <a class="reference internal" href="#c.PyConfig" title="PyConfig"><code>PyConfig</code></a>. If configuration fields which are in common with <a class="reference internal" href="#c.PyPreConfig" title="PyPreConfig"><code>PyPreConfig</code></a> are tuned, they must be set before calling a <a class="reference internal" href="#c.PyConfig" title="PyConfig"><code>PyConfig</code></a> method:</p> <ul class="simple"> <li><a class="reference internal" href="#c.PyConfig.dev_mode" title="PyConfig.dev_mode"><code>dev_mode</code></a></li> <li><a class="reference internal" href="#c.PyConfig.isolated" title="PyConfig.isolated"><code>isolated</code></a></li> <li><a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code>parse_argv</code></a></li> <li><a class="reference internal" href="#c.PyConfig.use_environment" title="PyConfig.use_environment"><code>use_environment</code></a></li> </ul> <p>Moreover, if <a class="reference internal" href="#c.PyConfig_SetArgv" title="PyConfig_SetArgv"><code>PyConfig_SetArgv()</code></a> or <a class="reference internal" href="#c.PyConfig_SetBytesArgv" title="PyConfig_SetBytesArgv"><code>PyConfig_SetBytesArgv()</code></a> is used, this method must be called first, before other methods, since the preinitialization configuration depends on command line arguments (if <code>parse_argv</code> is non-zero).</p> <p>The caller of these methods is responsible to handle exceptions (error or exit) using <code>PyStatus_Exception()</code> and <code>Py_ExitStatusException()</code>.</p> <p>Structure fields:</p> <dl class="member"> <dt id="c.PyConfig.argv">
+<code>PyWideStringList argv</code> </dt> <dd>
+<p>Command line arguments, <a class="reference internal" href="../library/sys#sys.argv" title="sys.argv"><code>sys.argv</code></a>. See <a class="reference internal" href="#c.PyConfig.parse_argv" title="PyConfig.parse_argv"><code>parse_argv</code></a> to parse <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code>argv</code></a> the same way the regular Python parses Python command line arguments. If <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code>argv</code></a> is empty, an empty string is added to ensure that <a class="reference internal" href="../library/sys#sys.argv" title="sys.argv"><code>sys.argv</code></a> always exists and is never empty.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.base_exec_prefix">
+<code>wchar_t* base_exec_prefix</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.base_exec_prefix" title="sys.base_exec_prefix"><code>sys.base_exec_prefix</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.base_executable">
+<code>wchar_t* base_executable</code> </dt> <dd>
+<p><code>sys._base_executable</code>: <code>__PYVENV_LAUNCHER__</code> environment variable value, or copy of <a class="reference internal" href="#c.PyConfig.executable" title="PyConfig.executable"><code>PyConfig.executable</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.base_prefix">
+<code>wchar_t* base_prefix</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.base_prefix" title="sys.base_prefix"><code>sys.base_prefix</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.buffered_stdio">
+<code>int buffered_stdio</code> </dt> <dd>
+<p>If equals to 0, enable unbuffered mode, making the stdout and stderr streams unbuffered.</p> <p>stdin is always opened in buffered mode.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.bytes_warning">
+<code>int bytes_warning</code> </dt> <dd>
+<p>If equals to 1, issue a warning when comparing <a class="reference internal" href="../library/stdtypes#bytes" title="bytes"><code>bytes</code></a> or <a class="reference internal" href="../library/stdtypes#bytearray" title="bytearray"><code>bytearray</code></a> with <a class="reference internal" href="../library/stdtypes#str" title="str"><code>str</code></a>, or comparing <a class="reference internal" href="../library/stdtypes#bytes" title="bytes"><code>bytes</code></a> with <a class="reference internal" href="../library/functions#int" title="int"><code>int</code></a>. If equal or greater to 2, raise a <a class="reference internal" href="../library/exceptions#BytesWarning" title="BytesWarning"><code>BytesWarning</code></a> exception.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.check_hash_pycs_mode">
+<code>wchar_t* check_hash_pycs_mode</code> </dt> <dd>
+<p>Control the validation behavior of hash-based <code>.pyc</code> files (see <a class="pep reference external" href="https://www.python.org/dev/peps/pep-0552" id="index-1"><strong>PEP 552</strong></a>): <a class="reference internal" href="../using/cmdline#cmdoption-check-hash-based-pycs"><code>--check-hash-based-pycs</code></a> command line option value.</p> <p>Valid values: <code>always</code>, <code>never</code> and <code>default</code>.</p> <p>The default value is: <code>default</code>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.configure_c_stdio">
+<code>int configure_c_stdio</code> </dt> <dd>
+<p>If non-zero, configure C standard streams (<code>stdio</code>, <code>stdout</code>, <code>stdout</code>). For example, set their mode to <code>O_BINARY</code> on Windows.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.dev_mode">
+<code>int dev_mode</code> </dt> <dd>
+<p>Development mode: see <a class="reference internal" href="../using/cmdline#id5"><code>-X dev</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.dump_refs">
+<code>int dump_refs</code> </dt> <dd>
+<p>If non-zero, dump all objects which are still alive at exit.</p> <p>Require a debug build of Python (<code>Py_REF_DEBUG</code> macro must be defined).</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.exec_prefix">
+<code>wchar_t* exec_prefix</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.exec_prefix" title="sys.exec_prefix"><code>sys.exec_prefix</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.executable">
+<code>wchar_t* executable</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.executable" title="sys.executable"><code>sys.executable</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.faulthandler">
+<code>int faulthandler</code> </dt> <dd>
+<p>If non-zero, call <a class="reference internal" href="../library/faulthandler#faulthandler.enable" title="faulthandler.enable"><code>faulthandler.enable()</code></a> at startup.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.filesystem_encoding">
+<code>wchar_t* filesystem_encoding</code> </dt> <dd>
+<p>Filesystem encoding, <a class="reference internal" href="../library/sys#sys.getfilesystemencoding" title="sys.getfilesystemencoding"><code>sys.getfilesystemencoding()</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.filesystem_errors">
+<code>wchar_t* filesystem_errors</code> </dt> <dd>
+<p>Filesystem encoding errors, <a class="reference internal" href="../library/sys#sys.getfilesystemencodeerrors" title="sys.getfilesystemencodeerrors"><code>sys.getfilesystemencodeerrors()</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.hash_seed">
+<code>unsigned long hash_seed</code> </dt> 
+</dl> <dl class="member"> <dt id="c.PyConfig.use_hash_seed">
+<code>int use_hash_seed</code> </dt> <dd>
+<p>Randomized hash function seed.</p> <p>If <a class="reference internal" href="#c.PyConfig.use_hash_seed" title="PyConfig.use_hash_seed"><code>use_hash_seed</code></a> is zero, a seed is chosen randomly at Pythonstartup, and <a class="reference internal" href="#c.PyConfig.hash_seed" title="PyConfig.hash_seed"><code>hash_seed</code></a> is ignored.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.home">
+<code>wchar_t* home</code> </dt> <dd>
+<p>Python home directory.</p> <p>Initialized from <a class="reference internal" href="../using/cmdline#envvar-PYTHONHOME" id="index-2"><code>PYTHONHOME</code></a> environment variable value by default.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.import_time">
+<code>int import_time</code> </dt> <dd>
+<p>If non-zero, profile import time.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.inspect">
+<code>int inspect</code> </dt> <dd>
+<p>Enter interactive mode after executing a script or a command.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.install_signal_handlers">
+<code>int install_signal_handlers</code> </dt> <dd>
+<p>Install signal handlers?</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.interactive">
+<code>int interactive</code> </dt> <dd>
+<p>Interactive mode.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.isolated">
+<code>int isolated</code> </dt> <dd>
+<p>If greater than 0, enable isolated mode:</p> <ul class="simple"> <li>
+<a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a> contains neither the script’s directory (computed from <code>argv[0]</code> or the current directory) nor the user’s site-packages directory.</li> <li>Python REPL doesn’t import <a class="reference internal" href="../library/readline#module-readline" title="readline: GNU readline support for Python. (Unix)"><code>readline</code></a> nor enable default readline configuration on interactive prompts.</li> <li>Set <a class="reference internal" href="#c.PyConfig.use_environment" title="PyConfig.use_environment"><code>use_environment</code></a> and <a class="reference internal" href="#c.PyConfig.user_site_directory" title="PyConfig.user_site_directory"><code>user_site_directory</code></a> to 0.</li> </ul> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.legacy_windows_stdio">
+<code>int legacy_windows_stdio</code> </dt> <dd>
+<p>If non-zero, use <a class="reference internal" href="../library/io#io.FileIO" title="io.FileIO"><code>io.FileIO</code></a> instead of <code>io.WindowsConsoleIO</code> for <a class="reference internal" href="../library/sys#sys.stdin" title="sys.stdin"><code>sys.stdin</code></a>, <a class="reference internal" href="../library/sys#sys.stdout" title="sys.stdout"><code>sys.stdout</code></a> and <a class="reference internal" href="../library/sys#sys.stderr" title="sys.stderr"><code>sys.stderr</code></a>.</p> <p>Only available on Windows. <code>#ifdef MS_WINDOWS</code> macro can be used for Windows specific code.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.malloc_stats">
+<code>int malloc_stats</code> </dt> <dd>
+<p>If non-zero, dump statistics on <a class="reference internal" href="memory#pymalloc"><span class="std std-ref">Python pymalloc memory allocator</span></a> at exit.</p> <p>The option is ignored if Python is built using <code>--without-pymalloc</code>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.pythonpath_env">
+<code>wchar_t* pythonpath_env</code> </dt> <dd>
+<p>Module search paths as a string separated by <code>DELIM</code> (<code>os.path.pathsep</code>).</p> <p>Initialized from <a class="reference internal" href="../using/cmdline#envvar-PYTHONPATH" id="index-3"><code>PYTHONPATH</code></a> environment variable value by default.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.module_search_paths">
+<code>PyWideStringList module_search_paths</code> </dt> 
+</dl> <dl class="member"> <dt id="c.PyConfig.module_search_paths_set">
+<code>int module_search_paths_set</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>. If <a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code>module_search_paths_set</code></a> is equal to 0, the <a class="reference internal" href="#c.PyConfig.module_search_paths" title="PyConfig.module_search_paths"><code>module_search_paths</code></a> is overridden by the function calculating the <a class="reference internal" href="#init-path-config"><span class="std std-ref">Path Configuration</span></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.optimization_level">
+<code>int optimization_level</code> </dt> <dd>
+<p>Compilation optimization level:</p> <ul class="simple"> <li>0: Peephole optimizer (and <code>__debug__</code> is set to <code>True</code>)</li> <li>1: Remove assertions, set <code>__debug__</code> to <code>False</code>
+</li> <li>2: Strip docstrings</li> </ul> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.parse_argv">
+<code>int parse_argv</code> </dt> <dd>
+<p>If non-zero, parse <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code>argv</code></a> the same way the regular Python command line arguments, and strip Python arguments from <a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code>argv</code></a>: see <a class="reference internal" href="../using/cmdline#using-on-cmdline"><span class="std std-ref">Command Line Arguments</span></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.parser_debug">
+<code>int parser_debug</code> </dt> <dd>
+<p>If non-zero, turn on parser debugging output (for expert only, depending on compilation options).</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.pathconfig_warnings">
+<code>int pathconfig_warnings</code> </dt> <dd>
+<p>If equal to 0, suppress warnings when calculating the <a class="reference internal" href="#init-path-config"><span class="std std-ref">Path Configuration</span></a> (Unix only, Windows does not log any warning). Otherwise, warnings are written into <code>stderr</code>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.prefix">
+<code>wchar_t* prefix</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.prefix" title="sys.prefix"><code>sys.prefix</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.program_name">
+<code>wchar_t* program_name</code> </dt> <dd>
+<p>Program name. Used to initialize <a class="reference internal" href="#c.PyConfig.executable" title="PyConfig.executable"><code>executable</code></a>, and in early error messages.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.pycache_prefix">
+<code>wchar_t* pycache_prefix</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.pycache_prefix" title="sys.pycache_prefix"><code>sys.pycache_prefix</code></a>: <code>.pyc</code> cache prefix.</p> <p>If <code>NULL</code>, <a class="reference internal" href="../library/sys#sys.pycache_prefix" title="sys.pycache_prefix"><code>sys.pycache_prefix</code></a> is set to <code>None</code>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.quiet">
+<code>int quiet</code> </dt> <dd>
+<p>Quiet mode. For example, don’t display the copyright and version messages in interactive mode.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.run_command">
+<code>wchar_t* run_command</code> </dt> <dd>
+<p><code>python3 -c COMMAND</code> argument. Used by <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code>Py_RunMain()</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.run_filename">
+<code>wchar_t* run_filename</code> </dt> <dd>
+<p><code>python3 FILENAME</code> argument. Used by <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code>Py_RunMain()</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.run_module">
+<code>wchar_t* run_module</code> </dt> <dd>
+<p><code>python3 -m MODULE</code> argument. Used by <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code>Py_RunMain()</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.show_alloc_count">
+<code>int show_alloc_count</code> </dt> <dd>
+<p>Show allocation counts at exit?</p> <p>Set to 1 by <a class="reference internal" href="../using/cmdline#id5"><code>-X showalloccount</code></a> command line option.</p> <p>Need a special Python build with <code>COUNT_ALLOCS</code> macro defined.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.show_ref_count">
+<code>int show_ref_count</code> </dt> <dd>
+<p>Show total reference count at exit?</p> <p>Set to 1 by <a class="reference internal" href="../using/cmdline#id5"><code>-X showrefcount</code></a> command line option.</p> <p>Need a debug build of Python (<code>Py_REF_DEBUG</code> macro must be defined).</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.site_import">
+<code>int site_import</code> </dt> <dd>
+<p>Import the <a class="reference internal" href="../library/site#module-site" title="site: Module responsible for site-specific configuration."><code>site</code></a> module at startup?</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.skip_source_first_line">
+<code>int skip_source_first_line</code> </dt> <dd>
+<p>Skip the first line of the source?</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.stdio_encoding">
+<code>wchar_t* stdio_encoding</code> </dt> 
+</dl> <dl class="member"> <dt id="c.PyConfig.stdio_errors">
+<code>wchar_t* stdio_errors</code> </dt> <dd>
+<p>Encoding and encoding errors of <a class="reference internal" href="../library/sys#sys.stdin" title="sys.stdin"><code>sys.stdin</code></a>, <a class="reference internal" href="../library/sys#sys.stdout" title="sys.stdout"><code>sys.stdout</code></a> and <a class="reference internal" href="../library/sys#sys.stderr" title="sys.stderr"><code>sys.stderr</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.tracemalloc">
+<code>int tracemalloc</code> </dt> <dd>
+<p>If non-zero, call <a class="reference internal" href="../library/tracemalloc#tracemalloc.start" title="tracemalloc.start"><code>tracemalloc.start()</code></a> at startup.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.use_environment">
+<code>int use_environment</code> </dt> <dd>
+<p>If greater than 0, use <a class="reference internal" href="../using/cmdline#using-on-envvars"><span class="std std-ref">environment variables</span></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.user_site_directory">
+<code>int user_site_directory</code> </dt> <dd>
+<p>If non-zero, add user site directory to <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.verbose">
+<code>int verbose</code> </dt> <dd>
+<p>If non-zero, enable verbose mode.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.warnoptions">
+<code>PyWideStringList warnoptions</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys.warnoptions" title="sys.warnoptions"><code>sys.warnoptions</code></a>: options of the <a class="reference internal" href="../library/warnings#module-warnings" title="warnings: Issue warning messages and control their disposition."><code>warnings</code></a> module to build warnings filters: lowest to highest priority.</p> <p>The <a class="reference internal" href="../library/warnings#module-warnings" title="warnings: Issue warning messages and control their disposition."><code>warnings</code></a> module adds <a class="reference internal" href="../library/sys#sys.warnoptions" title="sys.warnoptions"><code>sys.warnoptions</code></a> in the reverse order: the last <a class="reference internal" href="#c.PyConfig.warnoptions" title="PyConfig.warnoptions"><code>PyConfig.warnoptions</code></a> item becomes the first item of <code>warnings.filters</code> which is checked first (highest priority).</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.write_bytecode">
+<code>int write_bytecode</code> </dt> <dd>
+<p>If non-zero, write <code>.pyc</code> files.</p> <p><a class="reference internal" href="../library/sys#sys.dont_write_bytecode" title="sys.dont_write_bytecode"><code>sys.dont_write_bytecode</code></a> is initialized to the inverted value of <a class="reference internal" href="#c.PyConfig.write_bytecode" title="PyConfig.write_bytecode"><code>write_bytecode</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyConfig.xoptions">
+<code>PyWideStringList xoptions</code> </dt> <dd>
+<p><a class="reference internal" href="../library/sys#sys._xoptions" title="sys._xoptions"><code>sys._xoptions</code></a>.</p> </dd>
+</dl> </dd>
+</dl> <p>If <code>parse_argv</code> is non-zero, <code>argv</code> arguments are parsed the same way the regular Python parses command line arguments, and Python arguments are stripped from <code>argv</code>: see <a class="reference internal" href="../using/cmdline#using-on-cmdline"><span class="std std-ref">Command Line Arguments</span></a>.</p> <p>The <code>xoptions</code> options are parsed to set other options: see <a class="reference internal" href="../using/cmdline#id5"><code>-X</code></a> option.</p> </section> <section id="initialization-with-pyconfig"> <h2>Initialization with PyConfig</h2> <p>Function to initialize Python:</p> <dl class="function"> <dt id="c.Py_InitializeFromConfig">
+<code>PyStatus Py_InitializeFromConfig(const PyConfig *config)</code> </dt> <dd>
+<p>Initialize Python from <em>config</em> configuration.</p> </dd>
+</dl> <p>The caller is responsible to handle exceptions (error or exit) using <a class="reference internal" href="#c.PyStatus_Exception" title="PyStatus_Exception"><code>PyStatus_Exception()</code></a> and <a class="reference internal" href="#c.Py_ExitStatusException" title="Py_ExitStatusException"><code>Py_ExitStatusException()</code></a>.</p> <p>If <code>PyImport_FrozenModules</code>, <code>PyImport_AppendInittab()</code> or <code>PyImport_ExtendInittab()</code> are used, they must be set or called after Python preinitialization and before the Python initialization.</p> <p>Example setting the program name:</p> <pre data-language="c">void init_python(void)
+{
+    PyStatus status;
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&amp;config);
+
+    /* Set the program name. Implicitly preinitialize Python. */
+    status = PyConfig_SetString(&amp;config, &amp;config.program_name,
+                                L"/path/to/my_program");
+    if (PyStatus_Exception(status)) {
+        goto fail;
+    }
+
+    status = Py_InitializeFromConfig(&amp;config);
+    if (PyStatus_Exception(status)) {
+        goto fail;
+    }
+    PyConfig_Clear(&amp;config);
+    return;
+
+fail:
+    PyConfig_Clear(&amp;config);
+    Py_ExitStatusException(status);
+}
+</pre> <p>More complete example modifying the default configuration, read the configuration, and then override some parameters:</p> <pre data-language="c">PyStatus init_python(const char *program_name)
+{
+    PyStatus status;
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&amp;config);
+
+    /* Set the program name before reading the configuration
+       (decode byte string from the locale encoding).
+
+       Implicitly preinitialize Python. */
+    status = PyConfig_SetBytesString(&amp;config, &amp;config.program_name,
+                                  program_name);
+    if (PyStatus_Exception(status)) {
+        goto done;
+    }
+
+    /* Read all configuration at once */
+    status = PyConfig_Read(&amp;config);
+    if (PyStatus_Exception(status)) {
+        goto done;
+    }
+
+    /* Append our custom search path to sys.path */
+    status = PyWideStringList_Append(&amp;config.module_search_paths,
+                                     L"/path/to/more/modules");
+    if (PyStatus_Exception(status)) {
+        goto done;
+    }
+
+    /* Override executable computed by PyConfig_Read() */
+    status = PyConfig_SetString(&amp;config, &amp;config.executable,
+                                L"/path/to/my_executable");
+    if (PyStatus_Exception(status)) {
+        goto done;
+    }
+
+    status = Py_InitializeFromConfig(&amp;config);
+
+done:
+    PyConfig_Clear(&amp;config);
+    return status;
+}
+</pre> </section> <section id="isolated-configuration"> <h2 id="init-isolated-conf">Isolated Configuration</h2> <p><a class="reference internal" href="#c.PyPreConfig_InitIsolatedConfig" title="PyPreConfig_InitIsolatedConfig"><code>PyPreConfig_InitIsolatedConfig()</code></a> and <a class="reference internal" href="#c.PyConfig_InitIsolatedConfig" title="PyConfig_InitIsolatedConfig"><code>PyConfig_InitIsolatedConfig()</code></a> functions create a configuration to isolate Python from the system. For example, to embed Python into an application.</p> <p>This configuration ignores global configuration variables, environments variables, command line arguments (<a class="reference internal" href="#c.PyConfig.argv" title="PyConfig.argv"><code>PyConfig.argv</code></a> is not parsed) and user site directory. The C standard streams (ex: <code>stdout</code>) and the LC_CTYPE locale are left unchanged. Signal handlers are not installed.</p> <p>Configuration files are still used with this configuration. Set the <a class="reference internal" href="#init-path-config"><span class="std std-ref">Path Configuration</span></a> (“output fields”) to ignore these configuration files and avoid the function computing the default path configuration.</p> </section> <section id="python-configuration"> <h2 id="init-python-config">Python Configuration</h2> <p><a class="reference internal" href="#c.PyPreConfig_InitPythonConfig" title="PyPreConfig_InitPythonConfig"><code>PyPreConfig_InitPythonConfig()</code></a> and <a class="reference internal" href="#c.PyConfig_InitPythonConfig" title="PyConfig_InitPythonConfig"><code>PyConfig_InitPythonConfig()</code></a> functions create a configuration to build a customized Python which behaves as the regular Python.</p> <p>Environments variables and command line arguments are used to configure Python, whereas global configuration variables are ignored.</p> <p>This function enables C locale coercion (<a class="pep reference external" href="https://www.python.org/dev/peps/pep-0538" id="index-4"><strong>PEP 538</strong></a>) and UTF-8 Mode (<a class="pep reference external" href="https://www.python.org/dev/peps/pep-0540" id="index-5"><strong>PEP 540</strong></a>) depending on the LC_CTYPE locale, <a class="reference internal" href="../using/cmdline#envvar-PYTHONUTF8" id="index-6"><code>PYTHONUTF8</code></a> and <a class="reference internal" href="../using/cmdline#envvar-PYTHONCOERCECLOCALE" id="index-7"><code>PYTHONCOERCECLOCALE</code></a> environment variables.</p> <p>Example of customized Python always running in isolated mode:</p> <pre data-language="c">int main(int argc, char **argv)
+{
+    PyStatus status;
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&amp;config);
+    config.isolated = 1;
+
+    /* Decode command line arguments.
+       Implicitly preinitialize Python (in isolated mode). */
+    status = PyConfig_SetBytesArgv(&amp;config, argc, argv);
+    if (PyStatus_Exception(status)) {
+        goto fail;
+    }
+
+    status = Py_InitializeFromConfig(&amp;config);
+    if (PyStatus_Exception(status)) {
+        goto fail;
+    }
+    PyConfig_Clear(&amp;config);
+
+    return Py_RunMain();
+
+fail:
+    PyConfig_Clear(&amp;config);
+    if (PyStatus_IsExit(status)) {
+        return status.exitcode;
+    }
+    /* Display the error message and exit the process with
+       non-zero exit code */
+    Py_ExitStatusException(status);
+}
+</pre> </section> <section id="path-configuration"> <h2 id="init-path-config">Path Configuration</h2> <p><a class="reference internal" href="#c.PyConfig" title="PyConfig"><code>PyConfig</code></a> contains multiple fields for the path configuration:</p> <ul class="simple"> <li>
+<p>Path configuration inputs:</p> <ul> <li><a class="reference internal" href="#c.PyConfig.home" title="PyConfig.home"><code>PyConfig.home</code></a></li> <li><a class="reference internal" href="#c.PyConfig.pathconfig_warnings" title="PyConfig.pathconfig_warnings"><code>PyConfig.pathconfig_warnings</code></a></li> <li><a class="reference internal" href="#c.PyConfig.program_name" title="PyConfig.program_name"><code>PyConfig.program_name</code></a></li> <li><a class="reference internal" href="#c.PyConfig.pythonpath_env" title="PyConfig.pythonpath_env"><code>PyConfig.pythonpath_env</code></a></li> <li>current working directory: to get absolute paths</li> <li>
+<code>PATH</code> environment variable to get the program full path (from <a class="reference internal" href="#c.PyConfig.program_name" title="PyConfig.program_name"><code>PyConfig.program_name</code></a>)</li> <li>
+<code>__PYVENV_LAUNCHER__</code> environment variable</li> <li>(Windows only) Application paths in the registry under “SoftwarePythonPythonCoreX.YPythonPath” of HKEY_CURRENT_USER and HKEY_LOCAL_MACHINE (where X.Y is the Python version).</li> </ul> </li> <li>
+<p>Path configuration output fields:</p> <ul> <li><a class="reference internal" href="#c.PyConfig.base_exec_prefix" title="PyConfig.base_exec_prefix"><code>PyConfig.base_exec_prefix</code></a></li> <li><a class="reference internal" href="#c.PyConfig.base_executable" title="PyConfig.base_executable"><code>PyConfig.base_executable</code></a></li> <li><a class="reference internal" href="#c.PyConfig.base_prefix" title="PyConfig.base_prefix"><code>PyConfig.base_prefix</code></a></li> <li><a class="reference internal" href="#c.PyConfig.exec_prefix" title="PyConfig.exec_prefix"><code>PyConfig.exec_prefix</code></a></li> <li><a class="reference internal" href="#c.PyConfig.executable" title="PyConfig.executable"><code>PyConfig.executable</code></a></li> <li>
+<a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code>PyConfig.module_search_paths_set</code></a>, <a class="reference internal" href="#c.PyConfig.module_search_paths" title="PyConfig.module_search_paths"><code>PyConfig.module_search_paths</code></a>
+</li> <li><a class="reference internal" href="#c.PyConfig.prefix" title="PyConfig.prefix"><code>PyConfig.prefix</code></a></li> </ul> </li> </ul> <p>If at least one “output field” is not set, Python calculates the path configuration to fill unset fields. If <a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code>module_search_paths_set</code></a> is equal to 0, <a class="reference internal" href="#c.PyConfig.module_search_paths" title="PyConfig.module_search_paths"><code>module_search_paths</code></a> is overridden and <a class="reference internal" href="#c.PyConfig.module_search_paths_set" title="PyConfig.module_search_paths_set"><code>module_search_paths_set</code></a> is set to 1.</p> <p>It is possible to completely ignore the function calculating the default path configuration by setting explicitly all path configuration output fields listed above. A string is considered as set even if it is non-empty. <code>module_search_paths</code> is considered as set if <code>module_search_paths_set</code> is set to 1. In this case, path configuration input fields are ignored as well.</p> <p>Set <a class="reference internal" href="#c.PyConfig.pathconfig_warnings" title="PyConfig.pathconfig_warnings"><code>pathconfig_warnings</code></a> to 0 to suppress warnings when calculating the path configuration (Unix only, Windows does not log any warning).</p> <p>If <a class="reference internal" href="#c.PyConfig.base_prefix" title="PyConfig.base_prefix"><code>base_prefix</code></a> or <a class="reference internal" href="#c.PyConfig.base_exec_prefix" title="PyConfig.base_exec_prefix"><code>base_exec_prefix</code></a> fields are not set, they inherit their value from <a class="reference internal" href="#c.PyConfig.prefix" title="PyConfig.prefix"><code>prefix</code></a> and <a class="reference internal" href="#c.PyConfig.exec_prefix" title="PyConfig.exec_prefix"><code>exec_prefix</code></a> respectively.</p> <p><a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code>Py_RunMain()</code></a> and <a class="reference internal" href="veryhigh#c.Py_Main" title="Py_Main"><code>Py_Main()</code></a> modify <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>:</p> <ul class="simple"> <li>If <a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code>run_filename</code></a> is set and is a directory which contains a <code>__main__.py</code> script, prepend <a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code>run_filename</code></a> to <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>.</li> <li>
+<p>If <a class="reference internal" href="#c.PyConfig.isolated" title="PyConfig.isolated"><code>isolated</code></a> is zero:</p> <ul> <li>If <a class="reference internal" href="#c.PyConfig.run_module" title="PyConfig.run_module"><code>run_module</code></a> is set, prepend the current directory to <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>. Do nothing if the current directory cannot be read.</li> <li>If <a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code>run_filename</code></a> is set, prepend the directory of the filename to <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>.</li> <li>Otherwise, prepend an empty string to <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>.</li> </ul> </li> </ul> <p>If <a class="reference internal" href="#c.PyConfig.site_import" title="PyConfig.site_import"><code>site_import</code></a> is non-zero, <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a> can be modified by the <a class="reference internal" href="../library/site#module-site" title="site: Module responsible for site-specific configuration."><code>site</code></a> module. If <a class="reference internal" href="#c.PyConfig.user_site_directory" title="PyConfig.user_site_directory"><code>user_site_directory</code></a> is non-zero and the user’s site-package directory exists, the <a class="reference internal" href="../library/site#module-site" title="site: Module responsible for site-specific configuration."><code>site</code></a> module appends the user’s site-package directory to <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>.</p> <p>The following configuration files are used by the path configuration:</p> <ul class="simple"> <li><code>pyvenv.cfg</code></li> <li>
+<code>python._pth</code> (Windows only)</li> <li>
+<code>pybuilddir.txt</code> (Unix only)</li> </ul> <p>The <code>__PYVENV_LAUNCHER__</code> environment variable is used to set <a class="reference internal" href="#c.PyConfig.base_executable" title="PyConfig.base_executable"><code>PyConfig.base_executable</code></a></p> </section> <section id="py-runmain"> <h2>Py_RunMain()</h2> <dl class="function"> <dt id="c.Py_RunMain">
+<code>int Py_RunMain(void)</code> </dt> <dd>
+<p>Execute the command (<a class="reference internal" href="#c.PyConfig.run_command" title="PyConfig.run_command"><code>PyConfig.run_command</code></a>), the script (<a class="reference internal" href="#c.PyConfig.run_filename" title="PyConfig.run_filename"><code>PyConfig.run_filename</code></a>) or the module (<a class="reference internal" href="#c.PyConfig.run_module" title="PyConfig.run_module"><code>PyConfig.run_module</code></a>) specified on the command line or in the configuration.</p> <p>By default and when if <a class="reference internal" href="../using/cmdline#cmdoption-i"><code>-i</code></a> option is used, run the REPL.</p> <p>Finally, finalizes Python and returns an exit status that can be passed to the <code>exit()</code> function.</p> </dd>
+</dl> <p>See <a class="reference internal" href="#init-python-config"><span class="std std-ref">Python Configuration</span></a> for an example of customized Python always running in isolated mode using <a class="reference internal" href="#c.Py_RunMain" title="Py_RunMain"><code>Py_RunMain()</code></a>.</p> </section> <section id="multi-phase-initialization-private-provisional-api"> <h2>Multi-Phase Initialization Private Provisional API</h2> <p>This section is a private provisional API introducing multi-phase initialization, the core feature of the <a class="pep reference external" href="https://www.python.org/dev/peps/pep-0432" id="index-8"><strong>PEP 432</strong></a>:</p> <ul class="simple"> <li>
+<p>“Core” initialization phase, “bare minimum Python”:</p> <ul> <li>Builtin types;</li> <li>Builtin exceptions;</li> <li>Builtin and frozen modules;</li> <li>The <a class="reference internal" href="../library/sys#module-sys" title="sys: Access system-specific parameters and functions."><code>sys</code></a> module is only partially initialized (ex: <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a> doesn’t exist yet).</li> </ul> </li> <li>
+<p>“Main” initialization phase, Python is fully initialized:</p> <ul> <li>Install and configure <a class="reference internal" href="../library/importlib#module-importlib" title="importlib: The implementation of the import machinery."><code>importlib</code></a>;</li> <li>Apply the <a class="reference internal" href="#init-path-config"><span class="std std-ref">Path Configuration</span></a>;</li> <li>Install signal handlers;</li> <li>Finish <a class="reference internal" href="../library/sys#module-sys" title="sys: Access system-specific parameters and functions."><code>sys</code></a> module initialization (ex: create <a class="reference internal" href="../library/sys#sys.stdout" title="sys.stdout"><code>sys.stdout</code></a> and <a class="reference internal" href="../library/sys#sys.path" title="sys.path"><code>sys.path</code></a>);</li> <li>Enable optional features like <a class="reference internal" href="../library/faulthandler#module-faulthandler" title="faulthandler: Dump the Python traceback."><code>faulthandler</code></a> and <a class="reference internal" href="../library/tracemalloc#module-tracemalloc" title="tracemalloc: Trace memory allocations."><code>tracemalloc</code></a>;</li> <li>Import the <a class="reference internal" href="../library/site#module-site" title="site: Module responsible for site-specific configuration."><code>site</code></a> module;</li> <li>etc.</li> </ul> </li> </ul> <p>Private provisional API:</p> <ul class="simple"> <li>
+<code>PyConfig._init_main</code>: if set to 0, <a class="reference internal" href="#c.Py_InitializeFromConfig" title="Py_InitializeFromConfig"><code>Py_InitializeFromConfig()</code></a> stops at the “Core” initialization phase.</li> </ul> <dl class="function"> <dt id="c._Py_InitializeMain">
+<code>PyStatus _Py_InitializeMain(void)</code> </dt> <dd>
+<p>Move to the “Main” initialization phase, finish the Python initialization.</p> </dd>
+</dl> <p>No module is imported during the “Core” phase and the <code>importlib</code> module is not configured: the <a class="reference internal" href="#init-path-config"><span class="std std-ref">Path Configuration</span></a> is only applied during the “Main” phase. It may allow to customize Python in Python to override or tune the <a class="reference internal" href="#init-path-config"><span class="std std-ref">Path Configuration</span></a>, maybe install a custom <a class="reference internal" href="../library/sys#sys.meta_path" title="sys.meta_path"><code>sys.meta_path</code></a> importer or an import hook, etc.</p> <p>It may become possible to calculatin the <a class="reference internal" href="#init-path-config"><span class="std std-ref">Path Configuration</span></a> in Python, after the Core phase and before the Main phase, which is one of the <a class="pep reference external" href="https://www.python.org/dev/peps/pep-0432" id="index-9"><strong>PEP 432</strong></a> motivation.</p> <p>The “Core” phase is not properly defined: what should be and what should not be available at this phase is not specified yet. The API is marked as private and provisional: the API can be modified or even be removed anytime until a proper public API is designed.</p> <p>Example running Python code between “Core” and “Main” initialization phases:</p> <pre data-language="c">void init_python(void)
+{
+    PyStatus status;
+
+    PyConfig config;
+    PyConfig_InitPythonConfig(&amp;config);
+    config._init_main = 0;
+
+    /* ... customize 'config' configuration ... */
+
+    status = Py_InitializeFromConfig(&amp;config);
+    PyConfig_Clear(&amp;config);
+    if (PyStatus_Exception(status)) {
+        Py_ExitStatusException(status);
+    }
+
+    /* Use sys.stderr because sys.stdout is only created
+       by _Py_InitializeMain() */
+    int res = PyRun_SimpleString(
+        "import sys; "
+        "print('Run Python code before _Py_InitializeMain', "
+               "file=sys.stderr)");
+    if (res &lt; 0) {
+        exit(1);
+    }
+
+    /* ... put more configuration code here ... */
+
+    status = _Py_InitializeMain();
+    if (PyStatus_Exception(status)) {
+        Py_ExitStatusException(status);
+    }
+}
+</pre> </section><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/init_config.html" class="_attribution-link">https://docs.python.org/3.8/c-api/init_config.html</a>
+  </p>
+</div>

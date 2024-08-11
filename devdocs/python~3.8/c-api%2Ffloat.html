@@ -1,0 +1,42 @@
+<h1 id="floatobjects">Floating Point Objects</h1> <dl class="type" id="index-0"> <dt id="c.PyFloatObject">
+<code>PyFloatObject</code> </dt> <dd>
+<p>This subtype of <a class="reference internal" href="structures#c.PyObject" title="PyObject"><code>PyObject</code></a> represents a Python floating point object.</p> </dd>
+</dl> <dl class="var"> <dt id="c.PyFloat_Type">
+<code>PyTypeObject PyFloat_Type</code> </dt> <dd>
+<p>This instance of <a class="reference internal" href="type#c.PyTypeObject" title="PyTypeObject"><code>PyTypeObject</code></a> represents the Python floating point type. This is the same object as <a class="reference internal" href="../library/functions#float" title="float"><code>float</code></a> in the Python layer.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_Check">
+<code>int PyFloat_Check(PyObject *p)</code> </dt> <dd>
+<p>Return true if its argument is a <a class="reference internal" href="#c.PyFloatObject" title="PyFloatObject"><code>PyFloatObject</code></a> or a subtype of <a class="reference internal" href="#c.PyFloatObject" title="PyFloatObject"><code>PyFloatObject</code></a>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_CheckExact">
+<code>int PyFloat_CheckExact(PyObject *p)</code> </dt> <dd>
+<p>Return true if its argument is a <a class="reference internal" href="#c.PyFloatObject" title="PyFloatObject"><code>PyFloatObject</code></a>, but not a subtype of <a class="reference internal" href="#c.PyFloatObject" title="PyFloatObject"><code>PyFloatObject</code></a>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_FromString">
+<code>PyObject* PyFloat_FromString(PyObject *str)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Create a <a class="reference internal" href="#c.PyFloatObject" title="PyFloatObject"><code>PyFloatObject</code></a> object based on the string value in <em>str</em>, or <code>NULL</code> on failure.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_FromDouble">
+<code>PyObject* PyFloat_FromDouble(double v)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Create a <a class="reference internal" href="#c.PyFloatObject" title="PyFloatObject"><code>PyFloatObject</code></a> object from <em>v</em>, or <code>NULL</code> on failure.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_AsDouble">
+<code>double PyFloat_AsDouble(PyObject *pyfloat)</code> </dt> <dd>
+<p>Return a C <code>double</code> representation of the contents of <em>pyfloat</em>. If <em>pyfloat</em> is not a Python floating point object but has a <a class="reference internal" href="../reference/datamodel#object.__float__" title="object.__float__"><code>__float__()</code></a> method, this method will first be called to convert <em>pyfloat</em> into a float. If <code>__float__()</code> is not defined then it falls back to <a class="reference internal" href="../reference/datamodel#object.__index__" title="object.__index__"><code>__index__()</code></a>. This method returns <code>-1.0</code> upon failure, so one should call <a class="reference internal" href="exceptions#c.PyErr_Occurred" title="PyErr_Occurred"><code>PyErr_Occurred()</code></a> to check for errors.</p> <div class="versionchanged"> <p><span class="versionmodified changed">Changed in version 3.8: </span>Use <a class="reference internal" href="../reference/datamodel#object.__index__" title="object.__index__"><code>__index__()</code></a> if available.</p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_AS_DOUBLE">
+<code>double PyFloat_AS_DOUBLE(PyObject *pyfloat)</code> </dt> <dd>
+<p>Return a C <code>double</code> representation of the contents of <em>pyfloat</em>, but without error checking.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_GetInfo">
+<code>PyObject* PyFloat_GetInfo(void)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a structseq instance which contains information about the precision, minimum and maximum values of a float. It’s a thin wrapper around the header file <code>float.h</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_GetMax">
+<code>double PyFloat_GetMax()</code> </dt> <dd>
+<p>Return the maximum representable finite float <em>DBL_MAX</em> as C <code>double</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_GetMin">
+<code>double PyFloat_GetMin()</code> </dt> <dd>
+<p>Return the minimum normalized positive float <em>DBL_MIN</em> as C <code>double</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyFloat_ClearFreeList">
+<code>int PyFloat_ClearFreeList()</code> </dt> <dd>
+<p>Clear the float free list. Return the number of items that could not be freed.</p> </dd>
+</dl><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/float.html" class="_attribution-link">https://docs.python.org/3.8/c-api/float.html</a>
+  </p>
+</div>

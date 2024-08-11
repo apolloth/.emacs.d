@@ -1,0 +1,2 @@
+(1 (name . "Clojure") (slug . "clojure~1.10") (type . "clojure") (links (home . "https://clojure.org") (code . "https://github.com/clojure/clojure")) (version . "1.10") (release . "1.10.3") (mtime . 1654203157) (db_size . 568238) (attribution . "&copy; Rich Hickey<br>
+      Licensed under the Eclipse Public License 1.0."))

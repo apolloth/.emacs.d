@@ -1,0 +1,21 @@
+<h1 id="reference"> Command Reference</h1> <div class="admonition note"> <p class="admonition-title">Note</p> <p>This document is being retained solely until the <code>setuptools</code> documentation at <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/setuptools.html">https://setuptools.readthedocs.io/en/latest/setuptools.html</a> independently covers all of the relevant information currently included here.</p> </div> <section id="installing-modules-the-install-command-family"> <h2 id="install-cmd">
+<span class="section-number">8.1. </span>Installing modules: the <strong class="command">install</strong> command family</h2> <p>The install command ensures that the build commands have been run and then runs the subcommands <strong class="command">install_lib</strong>, <strong class="command">install_data</strong> and <strong class="command">install_scripts</strong>.</p> <section id="install-data"> <h3 id="install-data-cmd">
+<span class="section-number">8.1.1. </span><strong class="command">install_data</strong>
+</h3> <p>This command installs all data files provided with the distribution.</p> </section> <section id="install-scripts"> <h3 id="install-scripts-cmd">
+<span class="section-number">8.1.2. </span><strong class="command">install_scripts</strong>
+</h3> <p>This command installs all (Python) scripts in the distribution.</p> </section> </section> <section id="creating-a-source-distribution-the-sdist-command"> <h2 id="sdist-cmd">
+<span class="section-number">8.2. </span>Creating a source distribution: the <strong class="command">sdist</strong> command</h2> <p>The manifest template commands are:</p> <table class="docutils align-default">  <thead> <tr>
+<th class="head"><p>Command</p></th> <th class="head"><p>Description</p></th> </tr> </thead>  <tr>
+<td><p><strong class="command">include pat1 pat2 ...</strong></p></td> <td><p>include all files matching any of the listed patterns</p></td> </tr> <tr>
+<td><p><strong class="command">exclude pat1 pat2 ...</strong></p></td> <td><p>exclude all files matching any of the listed patterns</p></td> </tr> <tr>
+<td><p><strong class="command">recursive-include dir pat1 pat2 ...</strong></p></td> <td><p>include all files under <em>dir</em> matching any of the listed patterns</p></td> </tr> <tr>
+<td><p><strong class="command">recursive-exclude dir pat1 pat2 ...</strong></p></td> <td><p>exclude all files under <em>dir</em> matching any of the listed patterns</p></td> </tr> <tr>
+<td><p><strong class="command">global-include pat1 pat2 ...</strong></p></td> <td><p>include all files anywhere in the source tree matching — &amp; any of the listed patterns</p></td> </tr> <tr>
+<td><p><strong class="command">global-exclude pat1 pat2 ...</strong></p></td> <td><p>exclude all files anywhere in the source tree matching — &amp; any of the listed patterns</p></td> </tr> <tr>
+<td><p><strong class="command">prune dir</strong></p></td> <td><p>exclude all files under <em>dir</em></p></td> </tr> <tr>
+<td><p><strong class="command">graft dir</strong></p></td> <td><p>include all files under <em>dir</em></p></td> </tr>  </table> <p>The patterns here are Unix-style “glob” patterns: <code>*</code> matches any sequence of regular filename characters, <code>?</code> matches any single regular filename character, and <code>[range]</code> matches any of the characters in <em>range</em> (e.g., <code>a-z</code>, <code>a-zA-Z</code>, <code>a-f0-9_.</code>). The definition of “regular filename character” is platform-specific: on Unix it is anything except slash; on Windows anything except backslash or colon.</p> </section><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/distutils/commandref.html" class="_attribution-link">https://docs.python.org/3.8/distutils/commandref.html</a>
+  </p>
+</div>

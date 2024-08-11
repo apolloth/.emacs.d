@@ -1,0 +1,146 @@
+<h1 id="id1"> Distutils Examples</h1> <div class="admonition note"> <p class="admonition-title">Note</p> <p>This document is being retained solely until the <code>setuptools</code> documentation at <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/setuptools.html">https://setuptools.readthedocs.io/en/latest/setuptools.html</a> independently covers all of the relevant information currently included here.</p> </div> <p>This chapter provides a number of basic examples to help get started with distutils. Additional information about using distutils can be found in the Distutils Cookbook.</p> <div class="admonition seealso"> <p class="admonition-title">See also</p> <dl class="simple"> <dt><a class="reference external" href="https://wiki.python.org/moin/Distutils/Cookbook">Distutils Cookbook</a></dt>
+<dd>
+<p>Collection of recipes showing how to achieve more control over distutils.</p> </dd> </dl> </div> <section id="pure-python-distribution-by-module"> <h2 id="pure-mod">
+<span class="section-number">6.1. </span>Pure Python distribution (by module)</h2> <p>If you’re just distributing a couple of modules, especially if they don’t live in a particular package, you can specify them individually using the <code>py_modules</code> option in the setup script.</p> <p>In the simplest case, you’ll have two files to worry about: a setup script and the single module you’re distributing, <code>foo.py</code> in this example:</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        foo.py
+</pre> <p>(In all diagrams in this section, <em>&lt;root&gt;</em> will refer to the distribution root directory.) A minimal setup script to describe this situation would be:</p> <pre data-language="python">from distutils.core import setup
+setup(name='foo',
+      version='1.0',
+      py_modules=['foo'],
+      )
+</pre> <p>Note that the name of the distribution is specified independently with the <code>name</code> option, and there’s no rule that says it has to be the same as the name of the sole module in the distribution (although that’s probably a good convention to follow). However, the distribution name is used to generate filenames, so you should stick to letters, digits, underscores, and hyphens.</p> <p>Since <code>py_modules</code> is a list, you can of course specify multiple modules, eg. if you’re distributing modules <code>foo</code> and <code>bar</code>, your setup might look like this:</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        foo.py
+        bar.py
+</pre> <p>and the setup script might be</p> <pre data-language="python">from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      py_modules=['foo', 'bar'],
+      )
+</pre> <p>You can put module source files into another directory, but if you have enough modules to do that, it’s probably easier to specify modules by package rather than listing them individually.</p> </section> <section id="pure-python-distribution-by-package"> <h2 id="pure-pkg">
+<span class="section-number">6.2. </span>Pure Python distribution (by package)</h2> <p>If you have more than a couple of modules to distribute, especially if they are in multiple packages, it’s probably easier to specify whole packages rather than individual modules. This works even if your modules are not in a package; you can just tell the Distutils to process modules from the root package, and that works the same as any other package (except that you don’t have to have an <code>__init__.py</code> file).</p> <p>The setup script from the last example could also be written as</p> <pre data-language="python">from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      packages=[''],
+      )
+</pre> <p>(The empty string stands for the root package.)</p> <p>If those two files are moved into a subdirectory, but remain in the root package, e.g.:</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        src/      foo.py
+                  bar.py
+</pre> <p>then you would still specify the root package, but you have to tell the Distutils where source files in the root package live:</p> <pre data-language="python">from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      package_dir={'': 'src'},
+      packages=[''],
+      )
+</pre> <p>More typically, though, you will want to distribute multiple modules in the same package (or in sub-packages). For example, if the <code>foo</code> and <code>bar</code> modules belong in package <code>foobar</code>, one way to layout your source tree is</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        foobar/
+                 __init__.py
+                 foo.py
+                 bar.py
+</pre> <p>This is in fact the default layout expected by the Distutils, and the one that requires the least work to describe in your setup script:</p> <pre data-language="python">from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      packages=['foobar'],
+      )
+</pre> <p>If you want to put modules in directories not named for their package, then you need to use the <code>package_dir</code> option again. For example, if the <code>src</code> directory holds modules in the <code>foobar</code> package:</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        src/
+                 __init__.py
+                 foo.py
+                 bar.py
+</pre> <p>an appropriate setup script would be</p> <pre data-language="python">from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      package_dir={'foobar': 'src'},
+      packages=['foobar'],
+      )
+</pre> <p>Or, you might put modules from your main package right in the distribution root:</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        __init__.py
+        foo.py
+        bar.py
+</pre> <p>in which case your setup script would be</p> <pre data-language="python">from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      package_dir={'foobar': ''},
+      packages=['foobar'],
+      )
+</pre> <p>(The empty string also stands for the current directory.)</p> <p>If you have sub-packages, they must be explicitly listed in <code>packages</code>, but any entries in <code>package_dir</code> automatically extend to sub-packages. (In other words, the Distutils does <em>not</em> scan your source tree, trying to figure out which directories correspond to Python packages by looking for <code>__init__.py</code> files.) Thus, if the default layout grows a sub-package:</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        foobar/
+                 __init__.py
+                 foo.py
+                 bar.py
+                 subfoo/
+                           __init__.py
+                           blah.py
+</pre> <p>then the corresponding setup script would be</p> <pre data-language="python">from distutils.core import setup
+setup(name='foobar',
+      version='1.0',
+      packages=['foobar', 'foobar.subfoo'],
+      )
+</pre> </section> <section id="single-extension-module"> <h2 id="single-ext">
+<span class="section-number">6.3. </span>Single extension module</h2> <p>Extension modules are specified using the <code>ext_modules</code> option. <code>package_dir</code> has no effect on where extension source files are found; it only affects the source for pure Python modules. The simplest case, a single extension module in a single C source file, is:</p> <pre data-language="python">&lt;root&gt;/
+        setup.py
+        foo.c
+</pre> <p>If the <code>foo</code> extension belongs in the root package, the setup script for this could be</p> <pre data-language="python">from distutils.core import setup
+from distutils.extension import Extension
+setup(name='foobar',
+      version='1.0',
+      ext_modules=[Extension('foo', ['foo.c'])],
+      )
+</pre> <p>If the extension actually belongs in a package, say <code>foopkg</code>, then</p> <p>With exactly the same source tree layout, this extension can be put in the <code>foopkg</code> package simply by changing the name of the extension:</p> <pre data-language="python">from distutils.core import setup
+from distutils.extension import Extension
+setup(name='foobar',
+      version='1.0',
+      ext_modules=[Extension('foopkg.foo', ['foo.c'])],
+      )
+</pre> </section> <section id="checking-a-package"> <h2>
+<span class="section-number">6.4. </span>Checking a package</h2> <p>The <code>check</code> command allows you to verify if your package meta-data meet the minimum requirements to build a distribution.</p> <p>To run it, just call it using your <code>setup.py</code> script. If something is missing, <code>check</code> will display a warning.</p> <p>Let’s take an example with a simple script:</p> <pre data-language="python">from distutils.core import setup
+
+setup(name='foobar')
+</pre> <p>Running the <code>check</code> command will display some warnings:</p> <pre data-language="shell">$ python setup.py check
+running check
+warning: check: missing required meta-data: version, url
+warning: check: missing meta-data: either (author and author_email) or
+         (maintainer and maintainer_email) must be supplied
+</pre> <p>If you use the reStructuredText syntax in the <code>long_description</code> field and <a class="reference external" href="http://docutils.sourceforge.net">docutils</a> is installed you can check if the syntax is fine with the <code>check</code> command, using the <code>restructuredtext</code> option.</p> <p>For example, if the <code>setup.py</code> script is changed like this:</p> <pre data-language="python">from distutils.core import setup
+
+desc = """\
+My description
+==============
+
+This is the description of the ``foobar`` package.
+"""
+
+setup(name='foobar', version='1', author='tarek',
+    author_email='tarek@ziade.org',
+    url='http://example.com', long_description=desc)
+</pre> <p>Where the long description is broken, <code>check</code> will be able to detect it by using the <code>docutils</code> parser:</p> <pre data-language="shell">$ python setup.py check --restructuredtext
+running check
+warning: check: Title underline too short. (line 2)
+warning: check: Could not finish the parsing.
+</pre> </section> <section id="reading-the-metadata"> <h2>
+<span class="section-number">6.5. </span>Reading the metadata</h2> <p>The <a class="reference internal" href="apiref#distutils.core.setup" title="distutils.core.setup"><code>distutils.core.setup()</code></a> function provides a command-line interface that allows you to query the metadata fields of a project through the <code>setup.py</code> script of a given project:</p> <pre data-language="shell">$ python setup.py --name
+distribute
+</pre> <p>This call reads the <code>name</code> metadata by running the <a class="reference internal" href="apiref#distutils.core.setup" title="distutils.core.setup"><code>distutils.core.setup()</code></a> function. Although, when a source or binary distribution is created with Distutils, the metadata fields are written in a static file called <code>PKG-INFO</code>. When a Distutils-based project is installed in Python, the <code>PKG-INFO</code> file is copied alongside the modules and packages of the distribution under <code>NAME-VERSION-pyX.X.egg-info</code>, where <code>NAME</code> is the name of the project, <code>VERSION</code> its version as defined in the Metadata, and <code>pyX.X</code> the major and minor version of Python like <code>2.7</code> or <code>3.2</code>.</p> <p>You can read back this static file, by using the <code>distutils.dist.DistributionMetadata</code> class and its <code>read_pkg_file()</code> method:</p> <pre data-language="python">&gt;&gt;&gt; from distutils.dist import DistributionMetadata
+&gt;&gt;&gt; metadata = DistributionMetadata()
+&gt;&gt;&gt; metadata.read_pkg_file(open('distribute-0.6.8-py2.7.egg-info'))
+&gt;&gt;&gt; metadata.name
+'distribute'
+&gt;&gt;&gt; metadata.version
+'0.6.8'
+&gt;&gt;&gt; metadata.description
+'Easily download, build, install, upgrade, and uninstall Python packages'
+</pre> <p>Notice that the class can also be instantiated with a metadata file path to loads its values:</p> <pre data-language="python">&gt;&gt;&gt; pkg_info_path = 'distribute-0.6.8-py2.7.egg-info'
+&gt;&gt;&gt; DistributionMetadata(pkg_info_path).name
+'distribute'
+</pre> </section><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/distutils/examples.html" class="_attribution-link">https://docs.python.org/3.8/distutils/examples.html</a>
+  </p>
+</div>

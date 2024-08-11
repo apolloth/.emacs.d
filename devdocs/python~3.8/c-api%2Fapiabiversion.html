@@ -1,0 +1,12 @@
+<h1 id="apiabiversion">API and ABI Versioning</h1> <p><code>PY_VERSION_HEX</code> is the Python version number encoded in a single integer.</p> <p>For example if the <code>PY_VERSION_HEX</code> is set to <code>0x030401a2</code>, the underlying version information can be found by treating it as a 32 bit number in the following manner:</p>  <table class="docutils align-default">  <thead> <tr>
+<th class="head"><p>Bytes</p></th> <th class="head"><p>Bits (big endian order)</p></th> <th class="head"><p>Meaning</p></th> </tr> </thead>  <tr>
+<td><p><code>1</code></p></td> <td><p><code>1-8</code></p></td> <td><p><code>PY_MAJOR_VERSION</code> (the <code>3</code> in <code>3.4.1a2</code>)</p></td> </tr> <tr>
+<td><p><code>2</code></p></td> <td><p><code>9-16</code></p></td> <td><p><code>PY_MINOR_VERSION</code> (the <code>4</code> in <code>3.4.1a2</code>)</p></td> </tr> <tr>
+<td><p><code>3</code></p></td> <td><p><code>17-24</code></p></td> <td><p><code>PY_MICRO_VERSION</code> (the <code>1</code> in <code>3.4.1a2</code>)</p></td> </tr> <tr>
+<td><p><code>4</code></p></td> <td><p><code>25-28</code></p></td> <td><p><code>PY_RELEASE_LEVEL</code> (<code>0xA</code> for alpha, <code>0xB</code> for beta, <code>0xC</code> for release candidate and <code>0xF</code> for final), in this case it is alpha.</p></td> </tr> <tr>
+<td></td> <td><p><code>29-32</code></p></td> <td><p><code>PY_RELEASE_SERIAL</code> (the <code>2</code> in <code>3.4.1a2</code>, zero for final releases)</p></td> </tr>  </table>  <p>Thus <code>3.4.1a2</code> is hexversion <code>0x030401a2</code>.</p> <p>All the given macros are defined in <a class="reference external" href="https://github.com/python/cpython/tree/3.8/Include/patchlevel.h">Include/patchlevel.h</a>.</p><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/apiabiversion.html" class="_attribution-link">https://docs.python.org/3.8/c-api/apiabiversion.html</a>
+  </p>
+</div>

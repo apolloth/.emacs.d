@@ -1,0 +1,34 @@
+<h1 id="iterator">Iterator Protocol</h1> <p>There are two functions specifically for working with iterators.</p> <dl class="function"> <dt id="c.PyIter_Check">
+<code>int PyIter_Check(PyObject *o)</code> </dt> <dd>
+<p>Return true if the object <em>o</em> supports the iterator protocol.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyIter_Next">
+<code>PyObject* PyIter_Next(PyObject *o)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return the next value from the iteration <em>o</em>. The object must be an iterator (it is up to the caller to check this). If there are no remaining values, returns <code>NULL</code> with no exception set. If an error occurs while retrieving the item, returns <code>NULL</code> and passes along the exception.</p> </dd>
+</dl> <p>To write a loop which iterates over an iterator, the C code should look something like this:</p> <pre data-language="c">PyObject *iterator = PyObject_GetIter(obj);
+PyObject *item;
+
+if (iterator == NULL) {
+    /* propagate error */
+}
+
+while ((item = PyIter_Next(iterator))) {
+    /* do something with item */
+    ...
+    /* release reference when done */
+    Py_DECREF(item);
+}
+
+Py_DECREF(iterator);
+
+if (PyErr_Occurred()) {
+    /* propagate error */
+}
+else {
+    /* continue doing useful work */
+}
+</pre><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/iter.html" class="_attribution-link">https://docs.python.org/3.8/c-api/iter.html</a>
+  </p>
+</div>

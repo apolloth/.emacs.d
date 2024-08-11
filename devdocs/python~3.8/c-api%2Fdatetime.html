@@ -1,0 +1,117 @@
+<h1 id="datetimeobjects">DateTime Objects</h1> <p>Various date and time objects are supplied by the <a class="reference internal" href="../library/datetime#module-datetime" title="datetime: Basic date and time types."><code>datetime</code></a> module. Before using any of these functions, the header file <code>datetime.h</code> must be included in your source (note that this is not included by <code>Python.h</code>), and the macro <code>PyDateTime_IMPORT</code> must be invoked, usually as part of the module initialisation function. The macro puts a pointer to a C structure into a static variable, <code>PyDateTimeAPI</code>, that is used by the following macros.</p> <p>Macro for access to the UTC singleton:</p> <dl class="var"> <dt id="c.PyDateTime_TimeZone_UTC">
+<code>PyObject* PyDateTime_TimeZone_UTC</code> </dt> <dd>
+<p>Returns the time zone singleton representing UTC, the same object as <a class="reference internal" href="../library/datetime#datetime.timezone.utc" title="datetime.timezone.utc"><code>datetime.timezone.utc</code></a>.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.7.</span></p> </div> </dd>
+</dl> <p>Type-check macros:</p> <dl class="function"> <dt id="c.PyDate_Check">
+<code>int PyDate_Check(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_DateType</code> or a subtype of <code>PyDateTime_DateType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDate_CheckExact">
+<code>int PyDate_CheckExact(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_DateType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_Check">
+<code>int PyDateTime_Check(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_DateTimeType</code> or a subtype of <code>PyDateTime_DateTimeType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_CheckExact">
+<code>int PyDateTime_CheckExact(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_DateTimeType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyTime_Check">
+<code>int PyTime_Check(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_TimeType</code> or a subtype of <code>PyDateTime_TimeType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyTime_CheckExact">
+<code>int PyTime_CheckExact(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_TimeType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDelta_Check">
+<code>int PyDelta_Check(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_DeltaType</code> or a subtype of <code>PyDateTime_DeltaType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDelta_CheckExact">
+<code>int PyDelta_CheckExact(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_DeltaType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyTZInfo_Check">
+<code>int PyTZInfo_Check(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_TZInfoType</code> or a subtype of <code>PyDateTime_TZInfoType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyTZInfo_CheckExact">
+<code>int PyTZInfo_CheckExact(PyObject *ob)</code> </dt> <dd>
+<p>Return true if <em>ob</em> is of type <code>PyDateTime_TZInfoType</code>. <em>ob</em> must not be <code>NULL</code>.</p> </dd>
+</dl> <p>Macros to create objects:</p> <dl class="function"> <dt id="c.PyDate_FromDate">
+<code>PyObject* PyDate_FromDate(int year, int month, int day)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.date" title="datetime.date"><code>datetime.date</code></a> object with the specified year, month and day.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_FromDateAndTime">
+<code>PyObject* PyDateTime_FromDateAndTime(int year, int month, int day, int hour, int minute, int second, int usecond)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.datetime" title="datetime.datetime"><code>datetime.datetime</code></a> object with the specified year, month, day, hour, minute, second and microsecond.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_FromDateAndTimeAndFold">
+<code>PyObject* PyDateTime_FromDateAndTimeAndFold(int year, int month, int day, int hour, int minute, int second, int usecond, int fold)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.datetime" title="datetime.datetime"><code>datetime.datetime</code></a> object with the specified year, month, day, hour, minute, second, microsecond and fold.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.6.</span></p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyTime_FromTime">
+<code>PyObject* PyTime_FromTime(int hour, int minute, int second, int usecond)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.time" title="datetime.time"><code>datetime.time</code></a> object with the specified hour, minute, second and microsecond.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyTime_FromTimeAndFold">
+<code>PyObject* PyTime_FromTimeAndFold(int hour, int minute, int second, int usecond, int fold)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.time" title="datetime.time"><code>datetime.time</code></a> object with the specified hour, minute, second, microsecond and fold.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.6.</span></p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyDelta_FromDSU">
+<code>PyObject* PyDelta_FromDSU(int days, int seconds, int useconds)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.timedelta" title="datetime.timedelta"><code>datetime.timedelta</code></a> object representing the given number of days, seconds and microseconds. Normalization is performed so that the resulting number of microseconds and seconds lie in the ranges documented for <a class="reference internal" href="../library/datetime#datetime.timedelta" title="datetime.timedelta"><code>datetime.timedelta</code></a> objects.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyTimeZone_FromOffset">
+<code>PyObject* PyTimeZone_FromOffset(PyDateTime_DeltaType* offset)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.timezone" title="datetime.timezone"><code>datetime.timezone</code></a> object with an unnamed fixed offset represented by the <em>offset</em> argument.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.7.</span></p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyTimeZone_FromOffsetAndName">
+<code>PyObject* PyTimeZone_FromOffsetAndName(PyDateTime_DeltaType* offset, PyUnicode* name)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a <a class="reference internal" href="../library/datetime#datetime.timezone" title="datetime.timezone"><code>datetime.timezone</code></a> object with a fixed offset represented by the <em>offset</em> argument and with tzname <em>name</em>.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.7.</span></p> </div> </dd>
+</dl> <p>Macros to extract fields from date objects. The argument must be an instance of <code>PyDateTime_Date</code>, including subclasses (such as <code>PyDateTime_DateTime</code>). The argument must not be <code>NULL</code>, and the type is not checked:</p> <dl class="function"> <dt id="c.PyDateTime_GET_YEAR">
+<code>int PyDateTime_GET_YEAR(PyDateTime_Date *o)</code> </dt> <dd>
+<p>Return the year, as a positive int.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_GET_MONTH">
+<code>int PyDateTime_GET_MONTH(PyDateTime_Date *o)</code> </dt> <dd>
+<p>Return the month, as an int from 1 through 12.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_GET_DAY">
+<code>int PyDateTime_GET_DAY(PyDateTime_Date *o)</code> </dt> <dd>
+<p>Return the day, as an int from 1 through 31.</p> </dd>
+</dl> <p>Macros to extract fields from datetime objects. The argument must be an instance of <code>PyDateTime_DateTime</code>, including subclasses. The argument must not be <code>NULL</code>, and the type is not checked:</p> <dl class="function"> <dt id="c.PyDateTime_DATE_GET_HOUR">
+<code>int PyDateTime_DATE_GET_HOUR(PyDateTime_DateTime *o)</code> </dt> <dd>
+<p>Return the hour, as an int from 0 through 23.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_DATE_GET_MINUTE">
+<code>int PyDateTime_DATE_GET_MINUTE(PyDateTime_DateTime *o)</code> </dt> <dd>
+<p>Return the minute, as an int from 0 through 59.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_DATE_GET_SECOND">
+<code>int PyDateTime_DATE_GET_SECOND(PyDateTime_DateTime *o)</code> </dt> <dd>
+<p>Return the second, as an int from 0 through 59.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_DATE_GET_MICROSECOND">
+<code>int PyDateTime_DATE_GET_MICROSECOND(PyDateTime_DateTime *o)</code> </dt> <dd>
+<p>Return the microsecond, as an int from 0 through 999999.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_DATE_GET_FOLD">
+<code>int PyDateTime_DATE_GET_FOLD(PyDateTime_DateTime *o)</code> </dt> <dd>
+<p>Return the fold, as an int from 0 through 1.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.6.</span></p> </div> </dd>
+</dl> <p>Macros to extract fields from time objects. The argument must be an instance of <code>PyDateTime_Time</code>, including subclasses. The argument must not be <code>NULL</code>, and the type is not checked:</p> <dl class="function"> <dt id="c.PyDateTime_TIME_GET_HOUR">
+<code>int PyDateTime_TIME_GET_HOUR(PyDateTime_Time *o)</code> </dt> <dd>
+<p>Return the hour, as an int from 0 through 23.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_TIME_GET_MINUTE">
+<code>int PyDateTime_TIME_GET_MINUTE(PyDateTime_Time *o)</code> </dt> <dd>
+<p>Return the minute, as an int from 0 through 59.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_TIME_GET_SECOND">
+<code>int PyDateTime_TIME_GET_SECOND(PyDateTime_Time *o)</code> </dt> <dd>
+<p>Return the second, as an int from 0 through 59.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_TIME_GET_MICROSECOND">
+<code>int PyDateTime_TIME_GET_MICROSECOND(PyDateTime_Time *o)</code> </dt> <dd>
+<p>Return the microsecond, as an int from 0 through 999999.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_TIME_GET_FOLD">
+<code>int PyDateTime_TIME_GET_FOLD(PyDateTime_Time *o)</code> </dt> <dd>
+<p>Return the fold, as an int from 0 through 1.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.6.</span></p> </div> </dd>
+</dl> <p>Macros to extract fields from time delta objects. The argument must be an instance of <code>PyDateTime_Delta</code>, including subclasses. The argument must not be <code>NULL</code>, and the type is not checked:</p> <dl class="function"> <dt id="c.PyDateTime_DELTA_GET_DAYS">
+<code>int PyDateTime_DELTA_GET_DAYS(PyDateTime_Delta *o)</code> </dt> <dd>
+<p>Return the number of days, as an int from -999999999 to 999999999.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.3.</span></p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_DELTA_GET_SECONDS">
+<code>int PyDateTime_DELTA_GET_SECONDS(PyDateTime_Delta *o)</code> </dt> <dd>
+<p>Return the number of seconds, as an int from 0 through 86399.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.3.</span></p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyDateTime_DELTA_GET_MICROSECONDS">
+<code>int PyDateTime_DELTA_GET_MICROSECONDS(PyDateTime_Delta *o)</code> </dt> <dd>
+<p>Return the number of microseconds, as an int from 0 through 999999.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.3.</span></p> </div> </dd>
+</dl> <p>Macros for the convenience of modules implementing the DB API:</p> <dl class="function"> <dt id="c.PyDateTime_FromTimestamp">
+<code>PyObject* PyDateTime_FromTimestamp(PyObject *args)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Create and return a new <a class="reference internal" href="../library/datetime#datetime.datetime" title="datetime.datetime"><code>datetime.datetime</code></a> object given an argument tuple suitable for passing to <a class="reference internal" href="../library/datetime#datetime.datetime.fromtimestamp" title="datetime.datetime.fromtimestamp"><code>datetime.datetime.fromtimestamp()</code></a>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyDate_FromTimestamp">
+<code>PyObject* PyDate_FromTimestamp(PyObject *args)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Create and return a new <a class="reference internal" href="../library/datetime#datetime.date" title="datetime.date"><code>datetime.date</code></a> object given an argument tuple suitable for passing to <a class="reference internal" href="../library/datetime#datetime.date.fromtimestamp" title="datetime.date.fromtimestamp"><code>datetime.date.fromtimestamp()</code></a>.</p> </dd>
+</dl><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/datetime.html" class="_attribution-link">https://docs.python.org/3.8/c-api/datetime.html</a>
+  </p>
+</div>

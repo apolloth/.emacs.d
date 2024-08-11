@@ -1,0 +1,86 @@
+<h1 id="typeobjects">Type Objects</h1> <dl class="type" id="index-0"> <dt id="c.PyTypeObject">
+<code>PyTypeObject</code> </dt> <dd>
+<p>The C structure of the objects used to describe built-in types.</p> </dd>
+</dl> <dl class="var"> <dt id="c.PyType_Type">
+<code>PyObject* PyType_Type</code> </dt> <dd>
+<p>This is the type object for type objects; it is the same object as <a class="reference internal" href="../library/functions#type" title="type"><code>type</code></a> in the Python layer.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_Check">
+<code>int PyType_Check(PyObject *o)</code> </dt> <dd>
+<p>Return true if the object <em>o</em> is a type object, including instances of types derived from the standard type object. Return false in all other cases.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_CheckExact">
+<code>int PyType_CheckExact(PyObject *o)</code> </dt> <dd>
+<p>Return true if the object <em>o</em> is a type object, but not a subtype of the standard type object. Return false in all other cases.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_ClearCache">
+<code>unsigned int PyType_ClearCache()</code> </dt> <dd>
+<p>Clear the internal lookup cache. Return the current version tag.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_GetFlags">
+<code>unsigned long PyType_GetFlags(PyTypeObject* type)</code> </dt> <dd>
+<p>Return the <a class="reference internal" href="typeobj#c.PyTypeObject.tp_flags" title="PyTypeObject.tp_flags"><code>tp_flags</code></a> member of <em>type</em>. This function is primarily meant for use with <code>Py_LIMITED_API</code>; the individual flag bits are guaranteed to be stable across Python releases, but access to <a class="reference internal" href="typeobj#c.PyTypeObject.tp_flags" title="PyTypeObject.tp_flags"><code>tp_flags</code></a> itself is not part of the limited API.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.2.</span></p> </div> <div class="versionchanged"> <p><span class="versionmodified changed">Changed in version 3.4: </span>The return type is now <code>unsigned long</code> rather than <code>long</code>.</p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_Modified">
+<code>void PyType_Modified(PyTypeObject *type)</code> </dt> <dd>
+<p>Invalidate the internal lookup cache for the type and all of its subtypes. This function must be called after any manual modification of the attributes or base classes of the type.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_HasFeature">
+<code>int PyType_HasFeature(PyTypeObject *o, int feature)</code> </dt> <dd>
+<p>Return true if the type object <em>o</em> sets the feature <em>feature</em>. Type features are denoted by single bit flags.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_IS_GC">
+<code>int PyType_IS_GC(PyTypeObject *o)</code> </dt> <dd>
+<p>Return true if the type object includes support for the cycle detector; this tests the type flag <a class="reference internal" href="typeobj#Py_TPFLAGS_HAVE_GC" title="Py_TPFLAGS_HAVE_GC"><code>Py_TPFLAGS_HAVE_GC</code></a>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_IsSubtype">
+<code>int PyType_IsSubtype(PyTypeObject *a, PyTypeObject *b)</code> </dt> <dd>
+<p>Return true if <em>a</em> is a subtype of <em>b</em>.</p> <p>This function only checks for actual subtypes, which means that <a class="reference internal" href="../reference/datamodel#class.__subclasscheck__" title="class.__subclasscheck__"><code>__subclasscheck__()</code></a> is not called on <em>b</em>. Call <a class="reference internal" href="object#c.PyObject_IsSubclass" title="PyObject_IsSubclass"><code>PyObject_IsSubclass()</code></a> to do the same check that <a class="reference internal" href="../library/functions#issubclass" title="issubclass"><code>issubclass()</code></a> would do.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_GenericAlloc">
+<code>PyObject* PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Generic handler for the <a class="reference internal" href="typeobj#c.PyTypeObject.tp_alloc" title="PyTypeObject.tp_alloc"><code>tp_alloc</code></a> slot of a type object. Use Python’s default memory allocation mechanism to allocate a new instance and initialize all its contents to <code>NULL</code>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_GenericNew">
+<code>PyObject* PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Generic handler for the <a class="reference internal" href="typeobj#c.PyTypeObject.tp_new" title="PyTypeObject.tp_new"><code>tp_new</code></a> slot of a type object. Create a new instance using the type’s <a class="reference internal" href="typeobj#c.PyTypeObject.tp_alloc" title="PyTypeObject.tp_alloc"><code>tp_alloc</code></a> slot.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_Ready">
+<code>int PyType_Ready(PyTypeObject *type)</code> </dt> <dd>
+<p>Finalize a type object. This should be called on all type objects to finish their initialization. This function is responsible for adding inherited slots from a type’s base class. Return <code>0</code> on success, or return <code>-1</code> and sets an exception on error.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_GetSlot">
+<code>void* PyType_GetSlot(PyTypeObject *type, int slot)</code> </dt> <dd>
+<p>Return the function pointer stored in the given slot. If the result is <code>NULL</code>, this indicates that either the slot is <code>NULL</code>, or that the function was called with invalid parameters. Callers will typically cast the result pointer into the appropriate function type.</p> <p>See <code>PyType_Slot.slot</code> for possible values of the <em>slot</em> argument.</p> <p>An exception is raised if <em>type</em> is not a heap type.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.4.</span></p> </div> </dd>
+</dl> <section id="creating-heap-allocated-types"> <h2>Creating Heap-Allocated Types</h2> <p>The following functions and structs are used to create <a class="reference internal" href="typeobj#heap-types"><span class="std std-ref">heap types</span></a>.</p> <dl class="function"> <dt id="c.PyType_FromSpecWithBases">
+<code>PyObject* PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Creates and returns a heap type object from the <em>spec</em> (<a class="reference internal" href="typeobj#Py_TPFLAGS_HEAPTYPE" title="Py_TPFLAGS_HEAPTYPE"><code>Py_TPFLAGS_HEAPTYPE</code></a>).</p> <p>If <em>bases</em> is a tuple, the created heap type contains all types contained in it as base types.</p> <p>If <em>bases</em> is <code>NULL</code>, the <em>Py_tp_bases</em> slot is used instead. If that also is <code>NULL</code>, the <em>Py_tp_base</em> slot is used instead. If that also is <code>NULL</code>, the new type derives from <a class="reference internal" href="../library/functions#object" title="object"><code>object</code></a>.</p> <p>This function calls <a class="reference internal" href="#c.PyType_Ready" title="PyType_Ready"><code>PyType_Ready()</code></a> on the new type.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.3.</span></p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyType_FromSpec">
+<code>PyObject* PyType_FromSpec(PyType_Spec *spec)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Equivalent to <code>PyType_FromSpecWithBases(spec, NULL)</code>.</p> </dd>
+</dl> <dl class="type"> <dt id="c.PyType_Spec">
+<code>PyType_Spec</code> </dt> <dd>
+<p>Structure defining a type’s behavior.</p> <dl class="member"> <dt id="c.PyType_Spec.PyType_Spec.name">
+<code>const char* PyType_Spec.name</code> </dt> <dd>
+<p>Name of the type, used to set <a class="reference internal" href="typeobj#c.PyTypeObject.tp_name" title="PyTypeObject.tp_name"><code>PyTypeObject.tp_name</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyType_Spec.PyType_Spec.basicsize">
+<code>int PyType_Spec.basicsize</code> </dt> 
+</dl> <dl class="member"> <dt id="c.PyType_Spec.PyType_Spec.itemsize">
+<code>int PyType_Spec.itemsize</code> </dt> <dd>
+<p>Size of the instance in bytes, used to set <a class="reference internal" href="typeobj#c.PyTypeObject.tp_basicsize" title="PyTypeObject.tp_basicsize"><code>PyTypeObject.tp_basicsize</code></a> and <a class="reference internal" href="typeobj#c.PyTypeObject.tp_itemsize" title="PyTypeObject.tp_itemsize"><code>PyTypeObject.tp_itemsize</code></a>.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyType_Spec.PyType_Spec.flags">
+<code>int PyType_Spec.flags</code> </dt> <dd>
+<p>Type flags, used to set <a class="reference internal" href="typeobj#c.PyTypeObject.tp_flags" title="PyTypeObject.tp_flags"><code>PyTypeObject.tp_flags</code></a>.</p> <p>If the <code>Py_TPFLAGS_HEAPTYPE</code> flag is not set, <a class="reference internal" href="#c.PyType_FromSpecWithBases" title="PyType_FromSpecWithBases"><code>PyType_FromSpecWithBases()</code></a> sets it automatically.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyType_Spec.PyType_Spec.slots">
+<code>PyType_Slot *PyType_Spec.slots</code> </dt> <dd>
+<p>Array of <a class="reference internal" href="#c.PyType_Slot" title="PyType_Slot"><code>PyType_Slot</code></a> structures. Terminated by the special slot value <code>{0, NULL}</code>.</p> </dd>
+</dl> </dd>
+</dl> <dl class="type"> <dt id="c.PyType_Slot">
+<code>PyType_Slot</code> </dt> <dd>
+<p>Structure defining optional functionality of a type, containing a slot ID and a value pointer.</p> <dl class="member"> <dt id="c.PyType_Slot.PyType_Slot.slot">
+<code>int PyType_Slot.slot</code> </dt> <dd>
+<p>A slot ID.</p> <p>Slot IDs are named like the field names of the structures <a class="reference internal" href="#c.PyTypeObject" title="PyTypeObject"><code>PyTypeObject</code></a>, <a class="reference internal" href="typeobj#c.PyNumberMethods" title="PyNumberMethods"><code>PyNumberMethods</code></a>, <a class="reference internal" href="typeobj#c.PySequenceMethods" title="PySequenceMethods"><code>PySequenceMethods</code></a>, <a class="reference internal" href="typeobj#c.PyMappingMethods" title="PyMappingMethods"><code>PyMappingMethods</code></a> and <a class="reference internal" href="typeobj#c.PyAsyncMethods" title="PyAsyncMethods"><code>PyAsyncMethods</code></a> with an added <code>Py_</code> prefix. For example, use:</p> <ul class="simple"> <li>
+<code>Py_tp_dealloc</code> to set <a class="reference internal" href="typeobj#c.PyTypeObject.tp_dealloc" title="PyTypeObject.tp_dealloc"><code>PyTypeObject.tp_dealloc</code></a>
+</li> <li>
+<code>Py_nb_add</code> to set <a class="reference internal" href="typeobj#c.PyNumberMethods.nb_add" title="PyNumberMethods.nb_add"><code>PyNumberMethods.nb_add</code></a>
+</li> <li>
+<code>Py_sq_length</code> to set <a class="reference internal" href="typeobj#c.PySequenceMethods.sq_length" title="PySequenceMethods.sq_length"><code>PySequenceMethods.sq_length</code></a>
+</li> </ul> <p>The following fields cannot be set using <a class="reference internal" href="#c.PyType_Spec" title="PyType_Spec"><code>PyType_Spec</code></a> and <a class="reference internal" href="#c.PyType_Slot" title="PyType_Slot"><code>PyType_Slot</code></a>:</p> <ul class="simple"> <li><a class="reference internal" href="typeobj#c.PyTypeObject.tp_dict" title="PyTypeObject.tp_dict"><code>tp_dict</code></a></li> <li><a class="reference internal" href="typeobj#c.PyTypeObject.tp_mro" title="PyTypeObject.tp_mro"><code>tp_mro</code></a></li> <li><a class="reference internal" href="typeobj#c.PyTypeObject.tp_cache" title="PyTypeObject.tp_cache"><code>tp_cache</code></a></li> <li><a class="reference internal" href="typeobj#c.PyTypeObject.tp_subclasses" title="PyTypeObject.tp_subclasses"><code>tp_subclasses</code></a></li> <li><a class="reference internal" href="typeobj#c.PyTypeObject.tp_weaklist" title="PyTypeObject.tp_weaklist"><code>tp_weaklist</code></a></li> <li><code>tp_print</code></li> <li><a class="reference internal" href="typeobj#c.PyTypeObject.tp_weaklistoffset" title="PyTypeObject.tp_weaklistoffset"><code>tp_weaklistoffset</code></a></li> <li><a class="reference internal" href="typeobj#c.PyTypeObject.tp_dictoffset" title="PyTypeObject.tp_dictoffset"><code>tp_dictoffset</code></a></li> <li><a class="reference internal" href="typeobj#c.PyBufferProcs.bf_getbuffer" title="PyBufferProcs.bf_getbuffer"><code>bf_getbuffer</code></a></li> <li><a class="reference internal" href="typeobj#c.PyBufferProcs.bf_releasebuffer" title="PyBufferProcs.bf_releasebuffer"><code>bf_releasebuffer</code></a></li> </ul> <p>Setting <code>Py_tp_bases</code> or <code>Py_tp_base</code> may be problematic on some platforms. To avoid issues, use the <em>bases</em> argument of <code>PyType_FromSpecWithBases()</code> instead.</p> </dd>
+</dl> <dl class="member"> <dt id="c.PyType_Slot.PyType_Slot.pfunc">
+<code>void *PyType_Slot.pfunc</code> </dt> <dd>
+<p>The desired value of the slot. In most cases, this is a pointer to a function.</p> <p>May not be <code>NULL</code>.</p> </dd>
+</dl> </dd>
+</dl> </section><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/type.html" class="_attribution-link">https://docs.python.org/3.8/c-api/type.html</a>
+  </p>
+</div>

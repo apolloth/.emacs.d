@@ -1,0 +1,27 @@
+<h1 id="index-0">Code Objects</h1> <p>Code objects are a low-level detail of the CPython implementation. Each one represents a chunk of executable code that hasn’t yet been bound into a function.</p> <dl class="type"> <dt id="c.PyCodeObject">
+<code>PyCodeObject</code> </dt> <dd>
+<p>The C structure of the objects used to describe code objects. The fields of this type are subject to change at any time.</p> </dd>
+</dl> <dl class="var"> <dt id="c.PyCode_Type">
+<code>PyTypeObject PyCode_Type</code> </dt> <dd>
+<p>This is an instance of <a class="reference internal" href="type#c.PyTypeObject" title="PyTypeObject"><code>PyTypeObject</code></a> representing the Python <a class="reference internal" href="../library/code#module-code" title="code: Facilities to implement read-eval-print loops."><code>code</code></a> type.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyCode_Check">
+<code>int PyCode_Check(PyObject *co)</code> </dt> <dd>
+<p>Return true if <em>co</em> is a <a class="reference internal" href="../library/code#module-code" title="code: Facilities to implement read-eval-print loops."><code>code</code></a> object.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyCode_GetNumFree">
+<code>int PyCode_GetNumFree(PyCodeObject *co)</code> </dt> <dd>
+<p>Return the number of free variables in <em>co</em>.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyCode_New">
+<code>PyCodeObject* PyCode_New(int argcount, int kwonlyargcount, int nlocals, int stacksize, int flags, PyObject *code, PyObject *consts, PyObject *names, PyObject *varnames, PyObject *freevars, PyObject *cellvars, PyObject *filename, PyObject *name, int firstlineno, PyObject *lnotab)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a new code object. If you need a dummy code object to create a frame, use <a class="reference internal" href="#c.PyCode_NewEmpty" title="PyCode_NewEmpty"><code>PyCode_NewEmpty()</code></a> instead. Calling <a class="reference internal" href="#c.PyCode_New" title="PyCode_New"><code>PyCode_New()</code></a> directly can bind you to a precise Python version since the definition of the bytecode changes often.</p> </dd>
+</dl> <dl class="function"> <dt id="c.PyCode_NewWithPosOnlyArgs">
+<code>PyCodeObject* PyCode_NewWithPosOnlyArgs(int argcount, int posonlyargcount, int kwonlyargcount, int nlocals, int stacksize, int flags, PyObject *code, PyObject *consts, PyObject *names, PyObject *varnames, PyObject *freevars, PyObject *cellvars, PyObject *filename, PyObject *name, int firstlineno, PyObject *lnotab)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Similar to <a class="reference internal" href="#c.PyCode_New" title="PyCode_New"><code>PyCode_New()</code></a>, but with an extra “posonlyargcount” for positional-only arguments.</p> <div class="versionadded"> <p><span class="versionmodified added">New in version 3.8.</span></p> </div> </dd>
+</dl> <dl class="function"> <dt id="c.PyCode_NewEmpty">
+<code>PyCodeObject* PyCode_NewEmpty(const char *filename, const char *funcname, int firstlineno)</code> </dt> <dd>
+<em class="refcount">Return value: New reference.</em><p>Return a new empty code object with the specified filename, function name, and first line number. It is illegal to <a class="reference internal" href="../library/functions#exec" title="exec"><code>exec()</code></a> or <a class="reference internal" href="../library/functions#eval" title="eval"><code>eval()</code></a> the resulting code object.</p> </dd>
+</dl><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/c-api/code.html" class="_attribution-link">https://docs.python.org/3.8/c-api/code.html</a>
+  </p>
+</div>

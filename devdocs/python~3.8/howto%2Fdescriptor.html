@@ -1,0 +1,188 @@
+<h1>Descriptor HowTo Guide</h1> <dl class="field-list simple"> <dt class="field-odd">Author</dt> <dd class="field-odd">
+<p>Raymond Hettinger</p> </dd> <dt class="field-even">Contact</dt> <dd class="field-even">
+<p>&lt;python at rcn dot com&gt;</p> </dd> </dl>   <ul> <li><a class="reference internal" href="#abstract" id="id2">Abstract</a></li> <li><a class="reference internal" href="#definition-and-introduction" id="id3">Definition and Introduction</a></li> <li><a class="reference internal" href="#descriptor-protocol" id="id4">Descriptor Protocol</a></li> <li><a class="reference internal" href="#invoking-descriptors" id="id5">Invoking Descriptors</a></li> <li><a class="reference internal" href="#descriptor-example" id="id6">Descriptor Example</a></li> <li><a class="reference internal" href="#properties" id="id7">Properties</a></li> <li><a class="reference internal" href="#functions-and-methods" id="id8">Functions and Methods</a></li> <li><a class="reference internal" href="#static-methods-and-class-methods" id="id9">Static Methods and Class Methods</a></li> </ul>
+  <section id="abstract"> <h2>Abstract</h2> <p>Defines descriptors, summarizes the protocol, and shows how descriptors are called. Examines a custom descriptor and several built-in Python descriptors including functions, properties, static methods, and class methods. Shows how each works by giving a pure Python equivalent and a sample application.</p> <p>Learning about descriptors not only provides access to a larger toolset, it creates a deeper understanding of how Python works and an appreciation for the elegance of its design.</p> </section> <section id="definition-and-introduction"> <h2>Definition and Introduction</h2> <p>In general, a descriptor is an object attribute with “binding behavior”, one whose attribute access has been overridden by methods in the descriptor protocol. Those methods are <a class="reference internal" href="../reference/datamodel#object.__get__" title="object.__get__"><code>__get__()</code></a>, <a class="reference internal" href="../reference/datamodel#object.__set__" title="object.__set__"><code>__set__()</code></a>, and <a class="reference internal" href="../reference/datamodel#object.__delete__" title="object.__delete__"><code>__delete__()</code></a>. If any of those methods are defined for an object, it is said to be a descriptor.</p> <p>The default behavior for attribute access is to get, set, or delete the attribute from an object’s dictionary. For instance, <code>a.x</code> has a lookup chain starting with <code>a.__dict__['x']</code>, then <code>type(a).__dict__['x']</code>, and continuing through the base classes of <code>type(a)</code> excluding metaclasses. If the looked-up value is an object defining one of the descriptor methods, then Python may override the default behavior and invoke the descriptor method instead. Where this occurs in the precedence chain depends on which descriptor methods were defined.</p> <p>Descriptors are a powerful, general purpose protocol. They are the mechanism behind properties, methods, static methods, class methods, and <a class="reference internal" href="../library/functions#super" title="super"><code>super()</code></a>. They are used throughout Python itself to implement the new style classes introduced in version 2.2. Descriptors simplify the underlying C-code and offer a flexible set of new tools for everyday Python programs.</p> </section> <section id="descriptor-protocol"> <h2>Descriptor Protocol</h2> <p><code>descr.__get__(self, obj, type=None) -&gt; value</code></p> <p><code>descr.__set__(self, obj, value) -&gt; None</code></p> <p><code>descr.__delete__(self, obj) -&gt; None</code></p> <p>That is all there is to it. Define any of these methods and an object is considered a descriptor and can override default behavior upon being looked up as an attribute.</p> <p>If an object defines <a class="reference internal" href="../reference/datamodel#object.__set__" title="object.__set__"><code>__set__()</code></a> or <a class="reference internal" href="../reference/datamodel#object.__delete__" title="object.__delete__"><code>__delete__()</code></a>, it is considered a data descriptor. Descriptors that only define <a class="reference internal" href="../reference/datamodel#object.__get__" title="object.__get__"><code>__get__()</code></a> are called non-data descriptors (they are typically used for methods but other uses are possible).</p> <p>Data and non-data descriptors differ in how overrides are calculated with respect to entries in an instance’s dictionary. If an instance’s dictionary has an entry with the same name as a data descriptor, the data descriptor takes precedence. If an instance’s dictionary has an entry with the same name as a non-data descriptor, the dictionary entry takes precedence.</p> <p>To make a read-only data descriptor, define both <a class="reference internal" href="../reference/datamodel#object.__get__" title="object.__get__"><code>__get__()</code></a> and <a class="reference internal" href="../reference/datamodel#object.__set__" title="object.__set__"><code>__set__()</code></a> with the <a class="reference internal" href="../reference/datamodel#object.__set__" title="object.__set__"><code>__set__()</code></a> raising an <a class="reference internal" href="../library/exceptions#AttributeError" title="AttributeError"><code>AttributeError</code></a> when called. Defining the <a class="reference internal" href="../reference/datamodel#object.__set__" title="object.__set__"><code>__set__()</code></a> method with an exception raising placeholder is enough to make it a data descriptor.</p> </section> <section id="invoking-descriptors"> <h2>Invoking Descriptors</h2> <p>A descriptor can be called directly by its method name. For example, <code>d.__get__(obj)</code>.</p> <p>Alternatively, it is more common for a descriptor to be invoked automatically upon attribute access. For example, <code>obj.d</code> looks up <code>d</code> in the dictionary of <code>obj</code>. If <code>d</code> defines the method <a class="reference internal" href="../reference/datamodel#object.__get__" title="object.__get__"><code>__get__()</code></a>, then <code>d.__get__(obj)</code> is invoked according to the precedence rules listed below.</p> <p>The details of invocation depend on whether <code>obj</code> is an object or a class.</p> <p>For objects, the machinery is in <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>object.__getattribute__()</code></a> which transforms <code>b.x</code> into <code>type(b).__dict__['x'].__get__(b, type(b))</code>. The implementation works through a precedence chain that gives data descriptors priority over instance variables, instance variables priority over non-data descriptors, and assigns lowest priority to <a class="reference internal" href="../reference/datamodel#object.__getattr__" title="object.__getattr__"><code>__getattr__()</code></a> if provided. The full C implementation can be found in <a class="reference internal" href="../c-api/object#c.PyObject_GenericGetAttr" title="PyObject_GenericGetAttr"><code>PyObject_GenericGetAttr()</code></a> in <a class="reference external" href="https://github.com/python/cpython/tree/3.8/Objects/object.c">Objects/object.c</a>.</p> <p>For classes, the machinery is in <code>type.__getattribute__()</code> which transforms <code>B.x</code> into <code>B.__dict__['x'].__get__(None, B)</code>. In pure Python, it looks like:</p> <pre data-language="python">def __getattribute__(self, key):
+    "Emulate type_getattro() in Objects/typeobject.c"
+    v = object.__getattribute__(self, key)
+    if hasattr(v, '__get__'):
+        return v.__get__(None, self)
+    return v
+</pre> <p>The important points to remember are:</p> <ul class="simple"> <li>descriptors are invoked by the <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>__getattribute__()</code></a> method</li> <li>overriding <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>__getattribute__()</code></a> prevents automatic descriptor calls</li> <li>
+<a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>object.__getattribute__()</code></a> and <code>type.__getattribute__()</code> make different calls to <a class="reference internal" href="../reference/datamodel#object.__get__" title="object.__get__"><code>__get__()</code></a>.</li> <li>data descriptors always override instance dictionaries.</li> <li>non-data descriptors may be overridden by instance dictionaries.</li> </ul> <p>The object returned by <code>super()</code> also has a custom <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>__getattribute__()</code></a> method for invoking descriptors. The attribute lookup <code>super(B, obj).m</code> searches <code>obj.__class__.__mro__</code> for the base class <code>A</code> immediately following <code>B</code> and then returns <code>A.__dict__['m'].__get__(obj, B)</code>. If not a descriptor, <code>m</code> is returned unchanged. If not in the dictionary, <code>m</code> reverts to a search using <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>object.__getattribute__()</code></a>.</p> <p>The implementation details are in <code>super_getattro()</code> in <a class="reference external" href="https://github.com/python/cpython/tree/3.8/Objects/typeobject.c">Objects/typeobject.c</a>. and a pure Python equivalent can be found in <a class="reference external" href="https://www.python.org/download/releases/2.2.3/descrintro/#cooperation">Guido’s Tutorial</a>.</p> <p>The details above show that the mechanism for descriptors is embedded in the <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>__getattribute__()</code></a> methods for <a class="reference internal" href="../library/functions#object" title="object"><code>object</code></a>, <a class="reference internal" href="../library/functions#type" title="type"><code>type</code></a>, and <a class="reference internal" href="../library/functions#super" title="super"><code>super()</code></a>. Classes inherit this machinery when they derive from <a class="reference internal" href="../library/functions#object" title="object"><code>object</code></a> or if they have a meta-class providing similar functionality. Likewise, classes can turn-off descriptor invocation by overriding <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>__getattribute__()</code></a>.</p> </section> <section id="descriptor-example"> <h2>Descriptor Example</h2> <p>The following code creates a class whose objects are data descriptors which print a message for each get or set. Overriding <a class="reference internal" href="../reference/datamodel#object.__getattribute__" title="object.__getattribute__"><code>__getattribute__()</code></a> is alternate approach that could do this for every attribute. However, this descriptor is useful for monitoring just a few chosen attributes:</p> <pre data-language="python">class RevealAccess(object):
+    """A data descriptor that sets and returns values
+       normally and prints a message logging their access.
+    """
+
+    def __init__(self, initval=None, name='var'):
+        self.val = initval
+        self.name = name
+
+    def __get__(self, obj, objtype):
+        print('Retrieving', self.name)
+        return self.val
+
+    def __set__(self, obj, val):
+        print('Updating', self.name)
+        self.val = val
+
+&gt;&gt;&gt; class MyClass(object):
+...     x = RevealAccess(10, 'var "x"')
+...     y = 5
+...
+&gt;&gt;&gt; m = MyClass()
+&gt;&gt;&gt; m.x
+Retrieving var "x"
+10
+&gt;&gt;&gt; m.x = 20
+Updating var "x"
+&gt;&gt;&gt; m.x
+Retrieving var "x"
+20
+&gt;&gt;&gt; m.y
+5
+</pre> <p>The protocol is simple and offers exciting possibilities. Several use cases are so common that they have been packaged into individual function calls. Properties, bound methods, static methods, and class methods are all based on the descriptor protocol.</p> </section> <section id="properties"> <h2>Properties</h2> <p>Calling <a class="reference internal" href="../library/functions#property" title="property"><code>property()</code></a> is a succinct way of building a data descriptor that triggers function calls upon access to an attribute. Its signature is:</p> <pre data-language="python">property(fget=None, fset=None, fdel=None, doc=None) -&gt; property attribute
+</pre> <p>The documentation shows a typical use to define a managed attribute <code>x</code>:</p> <pre data-language="python">class C(object):
+    def getx(self): return self.__x
+    def setx(self, value): self.__x = value
+    def delx(self): del self.__x
+    x = property(getx, setx, delx, "I'm the 'x' property.")
+</pre> <p>To see how <a class="reference internal" href="../library/functions#property" title="property"><code>property()</code></a> is implemented in terms of the descriptor protocol, here is a pure Python equivalent:</p> <pre data-language="python">class Property(object):
+    "Emulate PyProperty_Type() in Objects/descrobject.c"
+
+    def __init__(self, fget=None, fset=None, fdel=None, doc=None):
+        self.fget = fget
+        self.fset = fset
+        self.fdel = fdel
+        if doc is None and fget is not None:
+            doc = fget.__doc__
+        self.__doc__ = doc
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        if self.fget is None:
+            raise AttributeError("unreadable attribute")
+        return self.fget(obj)
+
+    def __set__(self, obj, value):
+        if self.fset is None:
+            raise AttributeError("can't set attribute")
+        self.fset(obj, value)
+
+    def __delete__(self, obj):
+        if self.fdel is None:
+            raise AttributeError("can't delete attribute")
+        self.fdel(obj)
+
+    def getter(self, fget):
+        return type(self)(fget, self.fset, self.fdel, self.__doc__)
+
+    def setter(self, fset):
+        return type(self)(self.fget, fset, self.fdel, self.__doc__)
+
+    def deleter(self, fdel):
+        return type(self)(self.fget, self.fset, fdel, self.__doc__)
+</pre> <p>The <a class="reference internal" href="../library/functions#property" title="property"><code>property()</code></a> builtin helps whenever a user interface has granted attribute access and then subsequent changes require the intervention of a method.</p> <p>For instance, a spreadsheet class may grant access to a cell value through <code>Cell('b10').value</code>. Subsequent improvements to the program require the cell to be recalculated on every access; however, the programmer does not want to affect existing client code accessing the attribute directly. The solution is to wrap access to the value attribute in a property data descriptor:</p> <pre data-language="python">class Cell(object):
+    . . .
+    def getvalue(self):
+        "Recalculate the cell before returning value"
+        self.recalc()
+        return self._value
+    value = property(getvalue)
+</pre> </section> <section id="functions-and-methods"> <h2>Functions and Methods</h2> <p>Python’s object oriented features are built upon a function based environment. Using non-data descriptors, the two are merged seamlessly.</p> <p>Class dictionaries store methods as functions. In a class definition, methods are written using <a class="reference internal" href="../reference/compound_stmts#def"><code>def</code></a> or <a class="reference internal" href="../reference/expressions#lambda"><code>lambda</code></a>, the usual tools for creating functions. Methods only differ from regular functions in that the first argument is reserved for the object instance. By Python convention, the instance reference is called <em>self</em> but may be called <em>this</em> or any other variable name.</p> <p>To support method calls, functions include the <a class="reference internal" href="../reference/datamodel#object.__get__" title="object.__get__"><code>__get__()</code></a> method for binding methods during attribute access. This means that all functions are non-data descriptors which return bound methods when they are invoked from an object. In pure Python, it works like this:</p> <pre data-language="python">class Function(object):
+    . . .
+    def __get__(self, obj, objtype=None):
+        "Simulate func_descr_get() in Objects/funcobject.c"
+        if obj is None:
+            return self
+        return types.MethodType(self, obj)
+</pre> <p>Running the interpreter shows how the function descriptor works in practice:</p> <pre data-language="python">&gt;&gt;&gt; class D(object):
+...     def f(self, x):
+...         return x
+...
+&gt;&gt;&gt; d = D()
+
+# Access through the class dictionary does not invoke __get__.
+# It just returns the underlying function object.
+&gt;&gt;&gt; D.__dict__['f']
+&lt;function D.f at 0x00C45070&gt;
+
+# Dotted access from a class calls __get__() which just returns
+# the underlying function unchanged.
+&gt;&gt;&gt; D.f
+&lt;function D.f at 0x00C45070&gt;
+
+# The function has a __qualname__ attribute to support introspection
+&gt;&gt;&gt; D.f.__qualname__
+'D.f'
+
+# Dotted access from an instance calls __get__() which returns the
+# function wrapped in a bound method object
+&gt;&gt;&gt; d.f
+&lt;bound method D.f of &lt;__main__.D object at 0x00B18C90&gt;&gt;
+
+# Internally, the bound method stores the underlying function and
+# the bound instance.
+&gt;&gt;&gt; d.f.__func__
+&lt;function D.f at 0x1012e5ae8&gt;
+&gt;&gt;&gt; d.f.__self__
+&lt;__main__.D object at 0x1012e1f98&gt;
+</pre> </section> <section id="static-methods-and-class-methods"> <h2>Static Methods and Class Methods</h2> <p>Non-data descriptors provide a simple mechanism for variations on the usual patterns of binding functions into methods.</p> <p>To recap, functions have a <a class="reference internal" href="../reference/datamodel#object.__get__" title="object.__get__"><code>__get__()</code></a> method so that they can be converted to a method when accessed as attributes. The non-data descriptor transforms an <code>obj.f(*args)</code> call into <code>f(obj, *args)</code>. Calling <code>klass.f(*args)</code> becomes <code>f(*args)</code>.</p> <p>This chart summarizes the binding and its two most useful variants:</p>  <table class="docutils align-default">  <thead> <tr>
+<th class="head"><p>Transformation</p></th> <th class="head"><p>Called from an Object</p></th> <th class="head"><p>Called from a Class</p></th> </tr> </thead>  <tr>
+<td><p>function</p></td> <td><p>f(obj, *args)</p></td> <td><p>f(*args)</p></td> </tr> <tr>
+<td><p>staticmethod</p></td> <td><p>f(*args)</p></td> <td><p>f(*args)</p></td> </tr> <tr>
+<td><p>classmethod</p></td> <td><p>f(type(obj), *args)</p></td> <td><p>f(klass, *args)</p></td> </tr>  </table>  <p>Static methods return the underlying function without changes. Calling either <code>c.f</code> or <code>C.f</code> is the equivalent of a direct lookup into <code>object.__getattribute__(c, "f")</code> or <code>object.__getattribute__(C, "f")</code>. As a result, the function becomes identically accessible from either an object or a class.</p> <p>Good candidates for static methods are methods that do not reference the <code>self</code> variable.</p> <p>For instance, a statistics package may include a container class for experimental data. The class provides normal methods for computing the average, mean, median, and other descriptive statistics that depend on the data. However, there may be useful functions which are conceptually related but do not depend on the data. For instance, <code>erf(x)</code> is handy conversion routine that comes up in statistical work but does not directly depend on a particular dataset. It can be called either from an object or the class: <code>s.erf(1.5) --&gt; .9332</code> or <code>Sample.erf(1.5) --&gt; .9332</code>.</p> <p>Since staticmethods return the underlying function with no changes, the example calls are unexciting:</p> <pre data-language="python">&gt;&gt;&gt; class E(object):
+...     def f(x):
+...         print(x)
+...     f = staticmethod(f)
+...
+&gt;&gt;&gt; E.f(3)
+3
+&gt;&gt;&gt; E().f(3)
+3
+</pre> <p>Using the non-data descriptor protocol, a pure Python version of <a class="reference internal" href="../library/functions#staticmethod" title="staticmethod"><code>staticmethod()</code></a> would look like this:</p> <pre data-language="python">class StaticMethod(object):
+    "Emulate PyStaticMethod_Type() in Objects/funcobject.c"
+
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, obj, objtype=None):
+        return self.f
+</pre> <p>Unlike static methods, class methods prepend the class reference to the argument list before calling the function. This format is the same for whether the caller is an object or a class:</p> <pre data-language="python">&gt;&gt;&gt; class E(object):
+...     def f(klass, x):
+...         return klass.__name__, x
+...     f = classmethod(f)
+...
+&gt;&gt;&gt; print(E.f(3))
+('E', 3)
+&gt;&gt;&gt; print(E().f(3))
+('E', 3)
+</pre> <p>This behavior is useful whenever the function only needs to have a class reference and does not care about any underlying data. One use for classmethods is to create alternate class constructors. In Python 2.3, the classmethod <a class="reference internal" href="../library/stdtypes#dict.fromkeys" title="dict.fromkeys"><code>dict.fromkeys()</code></a> creates a new dictionary from a list of keys. The pure Python equivalent is:</p> <pre data-language="python">class Dict(object):
+    . . .
+    def fromkeys(klass, iterable, value=None):
+        "Emulate dict_fromkeys() in Objects/dictobject.c"
+        d = klass()
+        for key in iterable:
+            d[key] = value
+        return d
+    fromkeys = classmethod(fromkeys)
+</pre> <p>Now a new dictionary of unique keys can be constructed like this:</p> <pre data-language="python">&gt;&gt;&gt; Dict.fromkeys('abracadabra')
+{'a': None, 'r': None, 'b': None, 'c': None, 'd': None}
+</pre> <p>Using the non-data descriptor protocol, a pure Python version of <a class="reference internal" href="../library/functions#classmethod" title="classmethod"><code>classmethod()</code></a> would look like this:</p> <pre data-language="python">class ClassMethod(object):
+    "Emulate PyClassMethod_Type() in Objects/funcobject.c"
+
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, obj, klass=None):
+        if klass is None:
+            klass = type(obj)
+        def newfunc(*args):
+            return self.f(klass, *args)
+        return newfunc
+</pre> </section><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/howto/descriptor.html" class="_attribution-link">https://docs.python.org/3.8/howto/descriptor.html</a>
+  </p>
+</div>

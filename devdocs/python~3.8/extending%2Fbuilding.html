@@ -1,0 +1,54 @@
+<h1 id="building"> Building C and C++ Extensions</h1> <p>A C extension for CPython is a shared library (e.g. a <code>.so</code> file on Linux, <code>.pyd</code> on Windows), which exports an <em>initialization function</em>.</p> <p>To be importable, the shared library must be available on <a class="reference internal" href="../using/cmdline#envvar-PYTHONPATH" id="index-0"><code>PYTHONPATH</code></a>, and must be named after the module name, with an appropriate extension. When using distutils, the correct filename is generated automatically.</p> <p>The initialization function has the signature:</p> <dl class="function"> <dt id="c.PyInit_modulename">
+<code>PyObject* PyInit_modulename(void)</code> </dt> 
+</dl> <p>It returns either a fully-initialized module, or a <a class="reference internal" href="../c-api/module#c.PyModuleDef" title="PyModuleDef"><code>PyModuleDef</code></a> instance. See <a class="reference internal" href="../c-api/module#initializing-modules"><span class="std std-ref">Initializing C modules</span></a> for details.</p> <p>For modules with ASCII-only names, the function must be named <code>PyInit_&lt;modulename&gt;</code>, with <code>&lt;modulename&gt;</code> replaced by the name of the module. When using <a class="reference internal" href="../c-api/module#multi-phase-initialization"><span class="std std-ref">Multi-phase initialization</span></a>, non-ASCII module names are allowed. In this case, the initialization function name is <code>PyInitU_&lt;modulename&gt;</code>, with <code>&lt;modulename&gt;</code> encoded using Python’s <em>punycode</em> encoding with hyphens replaced by underscores. In Python:</p> <pre data-language="python">def initfunc_name(name):
+    try:
+        suffix = b'_' + name.encode('ascii')
+    except UnicodeEncodeError:
+        suffix = b'U_' + name.encode('punycode').replace(b'-', b'_')
+    return b'PyInit' + suffix
+</pre> <p>It is possible to export multiple modules from a single shared library by defining multiple initialization functions. However, importing them requires using symbolic links or a custom importer, because by default only the function corresponding to the filename is found. See the <em>“Multiple modules in one library”</em> section in <a class="pep reference external" href="https://www.python.org/dev/peps/pep-0489" id="index-1"><strong>PEP 489</strong></a> for details.</p> <section id="building-c-and-c-extensions-with-distutils"> <h2>
+<span class="section-number">4.1. </span>Building C and C++ Extensions with distutils</h2> <p>Extension modules can be built using distutils, which is included in Python. Since distutils also supports creation of binary packages, users don’t necessarily need a compiler and distutils to install the extension.</p> <p>A distutils package contains a driver script, <code>setup.py</code>. This is a plain Python file, which, in the most simple case, could look like this:</p> <pre data-language="python">from distutils.core import setup, Extension
+
+module1 = Extension('demo',
+                    sources = ['demo.c'])
+
+setup (name = 'PackageName',
+       version = '1.0',
+       description = 'This is a demo package',
+       ext_modules = [module1])
+</pre> <p>With this <code>setup.py</code>, and a file <code>demo.c</code>, running</p> <pre data-language="c">python setup.py build
+</pre> <p>will compile <code>demo.c</code>, and produce an extension module named <code>demo</code> in the <code>build</code> directory. Depending on the system, the module file will end up in a subdirectory <code>build/lib.system</code>, and may have a name like <code>demo.so</code> or <code>demo.pyd</code>.</p> <p>In the <code>setup.py</code>, all execution is performed by calling the <code>setup</code> function. This takes a variable number of keyword arguments, of which the example above uses only a subset. Specifically, the example specifies meta-information to build packages, and it specifies the contents of the package. Normally, a package will contain additional modules, like Python source modules, documentation, subpackages, etc. Please refer to the distutils documentation in <a class="reference internal" href="../distutils/index#distutils-index"><span class="std std-ref">Distributing Python Modules (Legacy version)</span></a> to learn more about the features of distutils; this section explains building extension modules only.</p> <p>It is common to pre-compute arguments to <code>setup()</code>, to better structure the driver script. In the example above, the <code>ext_modules</code> argument to <a class="reference internal" href="../distutils/apiref#distutils.core.setup" title="distutils.core.setup"><code>setup()</code></a> is a list of extension modules, each of which is an instance of the <code>Extension</code>. In the example, the instance defines an extension named <code>demo</code> which is build by compiling a single source file, <code>demo.c</code>.</p> <p>In many cases, building an extension is more complex, since additional preprocessor defines and libraries may be needed. This is demonstrated in the example below.</p> <pre data-language="python">from distutils.core import setup, Extension
+
+module1 = Extension('demo',
+                    define_macros = [('MAJOR_VERSION', '1'),
+                                     ('MINOR_VERSION', '0')],
+                    include_dirs = ['/usr/local/include'],
+                    libraries = ['tcl83'],
+                    library_dirs = ['/usr/local/lib'],
+                    sources = ['demo.c'])
+
+setup (name = 'PackageName',
+       version = '1.0',
+       description = 'This is a demo package',
+       author = 'Martin v. Loewis',
+       author_email = 'martin@v.loewis.de',
+       url = 'https://docs.python.org/extending/building',
+       long_description = '''
+This is really just a demo package.
+''',
+       ext_modules = [module1])
+</pre> <p>In this example, <a class="reference internal" href="../distutils/apiref#distutils.core.setup" title="distutils.core.setup"><code>setup()</code></a> is called with additional meta-information, which is recommended when distribution packages have to be built. For the extension itself, it specifies preprocessor defines, include directories, library directories, and libraries. Depending on the compiler, distutils passes this information in different ways to the compiler. For example, on Unix, this may result in the compilation commands</p> <pre data-language="c">gcc -DNDEBUG -g -O3 -Wall -Wstrict-prototypes -fPIC -DMAJOR_VERSION=1 -DMINOR_VERSION=0 -I/usr/local/include -I/usr/local/include/python2.2 -c demo.c -o build/temp.linux-i686-2.2/demo.o
+
+gcc -shared build/temp.linux-i686-2.2/demo.o -L/usr/local/lib -ltcl83 -o build/lib.linux-i686-2.2/demo.so
+</pre> <p>These lines are for demonstration purposes only; distutils users should trust that distutils gets the invocations right.</p> </section> <section id="distributing-your-extension-modules"> <h2 id="distributing">
+<span class="section-number">4.2. </span>Distributing your extension modules</h2> <p>When an extension has been successfully built, there are three ways to use it.</p> <p>End-users will typically want to install the module, they do so by running</p> <pre data-language="c">python setup.py install
+</pre> <p>Module maintainers should produce source packages; to do so, they run</p> <pre data-language="c">python setup.py sdist
+</pre> <p>In some cases, additional files need to be included in a source distribution; this is done through a <code>MANIFEST.in</code> file; see <a class="reference internal" href="../distutils/sourcedist#manifest"><span class="std std-ref">Specifying the files to distribute</span></a> for details.</p> <p>If the source distribution has been built successfully, maintainers can also create binary distributions. Depending on the platform, one of the following commands can be used to do so.</p> <pre data-language="c">python setup.py bdist_wininst
+python setup.py bdist_rpm
+python setup.py bdist_dumb
+</pre> </section><div class="_attribution">
+  <p class="_attribution-p">
+    &copy; 2001&ndash;2022 Python Software Foundation<br>Licensed under the PSF License.<br>
+    <a href="https://docs.python.org/3.8/extending/building.html" class="_attribution-link">https://docs.python.org/3.8/extending/building.html</a>
+  </p>
+</div>
