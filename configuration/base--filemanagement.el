@@ -1,53 +1,4 @@
-(use-package
-  counsel-projectile
-  :diminish projectile-mode
-
-  :config
-  (setq
-   projectile-completion-system 'ivy
-   projectile-file-exists-remote-cache-expire 300
-   projectile-file-exists-local-cache-expire nil
-   projectile-enable-idle-timer t
-   projectile-mode-line-prefix " ")
-  (counsel-projectile-mode)
-  (add-to-list 'projectile-globally-ignored-directories "node_modules")
-  (add-to-list 'projectile-globally-ignored-directories "dist")
-  (add-to-list 'projectile-globally-ignored-directories "elpa")
-  (add-to-list 'projectile-globally-ignored-directories "cache")
-  (add-to-list 'projectile-globally-ignored-directories ".cache")
-
-  (defun save-all-buffers ()
-    (interactive)
-    (save-some-buffers t))
-
-  :bind
-  (("C-S-X bb" . counsel-switch-buffer)
-   ("C-S-X bp" . counsel-projectile-switch-to-buffer)
-
-   ("C-S-X ff" . counsel-find-file)
-   ("C-S-X fp" . counsel-projectile-find-file)
-
-   ("C-S-X fr" . counsel-recentf)
-   ;;("C-x C-S-F" . projectile-recentf)
-
-   ;;("C-x d" . projectile-dired)
-   ("C-S-X d" . counsel-projectile-find-dir)
-
-   ;;("C-x C-d" . nil)
-
-   ("C-S-X p" . counsel-projectile-switch-project)
-   ("C-S-X x" . counsel-projectile)
-
-   ("C-q" . switch-to-prev-buffer)
-
-   ("C-x C-s" . save-buffer)
-   ("C-x C-S-S" . save-all-buffers)
-
-   ("C-x k" . kill-buffer)
-   ("C-x K" . projectile-kill-buffers)))
-
-(use-package
-  git-auto-commit-mode
+(use-package git-auto-commit-mode
   :diminish git-auto-commit-mode
 
   :config
@@ -55,8 +6,7 @@
    gac-ask-for-summary-p nil
    gac-debounce-interval (* 10 60)))
 
-(use-package
-  treemacs
+(use-package treemacs
   :config
   (defun treemacs-hide ()
     (interactive)
@@ -134,8 +84,7 @@
 (use-package treemacs-magit
   :after treemacs magit)
 
-(use-package
-  simple-bookmarks
+(use-package simple-bookmarks
 
   :config
   (defun sql-mysql-for (user password database server &optional buffername)
