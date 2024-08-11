@@ -1,83 +1,49 @@
-(use-package
-  spaceline
-  :demand t
-  :config
-  (require 'spaceline-segments)
-  (setq powerline-default-separator 'wave)
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
 
-  (spaceline-define-segment ide-window
-    "IDE-Window marker."
-    (let* ((window
-            (selected-window))
+  :custom
+  (doom-modeline-support-imenu t))
 
-           (ide-window?
-            (window-parameter window 'ide)))
+(use-package display-line-numbers
+  :diminish display-line-numbers
+  :init
+  (unbind-key "C-M-,")
 
-      (when ide-window?
-        "IDE")))
+  ;;WATCHOUT This works because display-line-numbers is initialized with t.
+  ;;         Other values ('visual or 'relative) are also excepted, but are
+  ;;         not currently needed by me.
+  (defun my-toggle-line-numbers ()
+    (interactive)
+    (setq display-line-numbers (not display-line-numbers)))
 
-  (spaceline-compile
-    '((buffer-id
-       :priority 99
-       :when (and active buffer-file-name (buffer-modified-p))
-       :face highlight-face)
-      ((buffer-id "~")
-       :priority 99
-       :when (and (not active) buffer-file-name (buffer-modified-p))
-       :face highlight-face)
-      ((buffer-id)
-       :priority 99
-       :when (not (and buffer-file-name (buffer-modified-p))))
-      (projectile-root
-       :priority 80)
-      (major-mode
-       :priority 70)
-      ((flycheck-error flycheck-warning flycheck-info)
-       :priority 80
-       :when active)
-      (version-control
-       :priority 60)
-      (buffer-encoding
-       :when (and active vc-mode)
-       :priority 50))
+  :custom
+  (display-line-numbers-grow-only t)
 
-    '((process
-       :priority 60)
-      (line-column
-       :separator " | "
-       :priority 50
-       :when active)
-      (buffer-position
-       :priority 40
-       :when active)
-      (hud
-       :priority 40)))
+  :hook
+  ((prog-mode . display-line-numbers-mode))
 
-  (setq-default
-   mode-line-format
-   '("%e" (:eval (spaceline-ml-main)))))
+  :bind
+  (("C-M-, t" . my-toggle-line-numbers)))
 
-(use-package
-  linum
-  :hook (prog-mode . linum-mode)
-  :config (setq linum-format "%3d"))
-
-(use-package
-  rainbow-mode
+(use-package rainbow-mode
   :diminish rainbow-mode
 
   :hook
   ((prog-mode . rainbow-mode)
    (cider-repl-mode . rainbow-mode)))
 
-(use-package
-  rainbow-delimiters
+(use-package rainbow-delimiters
   :hook
   ((prog-mode . rainbow-delimiters-mode)
    (cider-repl-mode . rainbow-delimiters-mode)))
 
 (use-package all-the-icons
+  :ensure t
   :if (display-graphic-p))
+
+(use-package nerd-icons
+  :ensure t)
 
 (use-package doom-themes
   :ensure t
@@ -122,10 +88,14 @@
 (show-paren-mode 1)
 (custom-set-variables '(show-paren-delay 0))
 
-(custom-set-variables '(frame-title-format (quote ((:eval (when (fboundp 'projectile-project-root)
-                                                            (when (projectile-project-root)
-                                                              (concat (projectile-project-name) " - "))))
-                                                   "%b"))))
+(custom-set-variables
+ '(frame-title-format
+   (quote
+    ((:eval
+      (when (fboundp 'projectile-project-root)
+        (when (projectile-project-root)
+          (concat (projectile-project-name) " - "))))
+     "%b"))))
 
 (global-hl-line-mode 1)
 
@@ -136,11 +106,6 @@
     nil
     '(("\\<\\(HACK\\|NOTE\\|FIXME\\|TODO\\|TEST\\|WATCHOUT\\|REVIEW\\|BUG\\)"
        1 font-lock-warning-face t)))))
-
-;; (load-theme 'spacemacs-dark t)
-;; (load-theme 'doom-one t)
-
-;; (load-theme 'doom-dracula t)
 
 (toggle-frame-maximized)
 
