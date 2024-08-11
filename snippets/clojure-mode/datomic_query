@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: datomic-query
+# key: dq
+# --
+(d/q '[:find
+       :in $
+       :where
+       []]
+     db)

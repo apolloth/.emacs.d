@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
 # name: debug
 # key: debug
+# condition: (equal major-mode 'clojure-mode)
 # --
 (#(do (clojure.pprint/pprint %) %))

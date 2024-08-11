@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: Pretty Print
-# key: pp
+# name: debug
+# key: debug
 # condition: (equal major-mode 'clojurescript-mode)
 # --
-(cljs.pprint/pprint $1)
+(#(do (cljs.pprint/pprint %) %))

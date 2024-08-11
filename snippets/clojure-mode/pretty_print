@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
 # name: Pretty Print
 # key: pp
+# condition: (equal major-mode 'clojure-mode)
 # --
 (clojure.pprint/pprint $0)
