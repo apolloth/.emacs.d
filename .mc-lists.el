@@ -18,12 +18,15 @@
         cljr-slash
         clojure-cycle-privacy
         comment-dwim
+        corfu-insert-separator
         counsel-M-x
         counsel-switch-buffer
         counsel-yank-pop
         electric-newline-and-maybe-indent
+        forward-sexp
         haml-electric-backspace
         indent-for-tab-command
+        ivy-switch-buffer
         kill-region
         kmacro-call-macro
         mc/reverse-region
@@ -33,12 +36,14 @@
         org-ctrl-c-ctrl-c
         org-ctrl-c-star
         org-delete-char
+        org-end-of-line
         org-fill-paragraph
         org-forward-element-with-end
         org-insert-heading-respect-content
         org-meta-return
         org-metaleft
         org-metaright
+        org-return-and-maybe-indent
         org-self-insert-command
         org-shiftleft
         org-shiftright
@@ -47,6 +52,7 @@
         platformio-build
         sp-backward-barf-sexp
         sp-backward-sexp
+        sp-backward-slurp-sexp
         sp-backward-transpose-sexp
         sp-backward-up-sexp
         sp-convolute-sexp
@@ -76,6 +82,7 @@
         ace-mc-add-single-cursor
         ace-mc-do-keyboard-reset
         ace-mc-quick-exchange
+        ace-window
         add-fake-cursor-newline
         add-multiple-cursors-between
         add-multiple-cursors-line-mode

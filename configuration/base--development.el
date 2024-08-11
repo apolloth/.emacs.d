@@ -1,5 +1,29 @@
-(use-package
-  smartparens
+(use-package treesit-auto
+  :ensure t
+
+  :functions
+  (treesit-auto-add-to-auto-mode-alist
+   global-treesit-auto-mode)
+
+  :custom
+  (treesit-auto-install 'prompt)
+
+  :config
+  (treesit-auto-add-to-auto-mode-alist '(org clojure python html css xml))
+  (global-treesit-auto-mode 1)
+  ;;(treesit-inspect-mode 1)
+  ;; (setq
+  ;;  major-mode-remap-alist
+  ;;  '((clojure-mode . clojure-ts-mode)
+  ;;    (bash-mode . bash-ts-mode)
+  ;;    (js2-mode . js-ts-mode)
+  ;;    (json-mode . json-ts-mode)
+  ;;    (css-mode . css-ts-mode)
+  ;;    (python-mode . python-ts-mode)
+  ;;    (org-mode . org-ts-mode)))
+  )
+
+(use-package smartparens
   :diminish smartparens-mode
 
   :config
@@ -35,20 +59,20 @@
   ((prog-mode . smartparens-mode)
    (cider-repl-mode . smartparens-mode)))
 
-(use-package
-  newcomment
+(use-package newcomment
   :ensure nil
   :bind
   (("C-;" . comment-dwim)))
 
-(use-package
-  simple
+(use-package simple
   :ensure nil
   :hook
   ((before-save . delete-trailing-whitespace)))
 
-(use-package
-  aggressive-indent
+(use-package devdocs
+  :ensure t)
+
+(use-package aggressive-indent
 
   :diminish
   aggressive-indent-mode
@@ -60,32 +84,15 @@
   (add-to-list 'aggressive-indent-excluded-modes 'sass-mode)
   (add-to-list 'aggressive-indent-excluded-modes 'cider-repl-mode))
 
-(use-package
-  company
-  :diminish (company-mode eldoc-mode)
-  :hook
-  ((prog-mode . company-mode)
-   (cider-repl-mode . company-mode))
-  :config
-  (setq company-tooltip-align-annotations t))
-
-(use-package
-  company-quickhelp
-  :after company
-  :hook
-  ((prog-mode . company-quickhelp-mode)
-   (cider-repl-mode . company-quickhelp-mode))
-  :config (setq company-quickhelp-delay 0.2))
-
-(use-package
-  magit
-  :requires (ivy fullframe)
+(use-package magit
+  :requires (fullframe)
   :bind*
   (("C-v" . nil)
    ("M-v g" . magit-status)
    ("M-v l" . magit-log-current)
    ("M-v L" . magit-log-all)
-   ("M-v b" . magit-blame))
+   ("M-v b" . magit-blame)
+   ("M-v r" . magit-list-repositories))
   :init
   (defun magit-push-to-gerrit-local-branch-or-commit (source)
     "Push an arbitrary branch or commit to gerrit. The source is read in the minibuffer."
@@ -100,7 +107,9 @@
     (magit-push-to-gerrit-local-branch-or-commit (magit-get-current-branch)))
 
   :config
+  ;;FIXME: Use corfu/orderless instead of ivy
   (setq magit-completing-read-function 'ivy-completing-read)
+  (setq magit-repository-directories '(("/~" . 1)))
   (transient-append-suffix 'magit-push "e"
     '("P" "Push current branch to Gerrit" magit-push-to-gerrit-current-branch))
   (transient-append-suffix 'magit-push "e"
@@ -109,8 +118,7 @@
   (fullframe magit-log-all magit-mode-quit-window)
   (fullframe magit-log-current magit-mode-quit-window))
 
-(use-package
-  flycheck
+(use-package flycheck
   :diminish
   flycheck-mode
 
@@ -120,12 +128,10 @@
   :config
   (set-default 'flycheck-disabled-checkers '(sass)))
 
-(use-package
-  yasnippet-snippets
+(use-package yasnippet-snippets
   :defer t)
 
-(use-package
-  yasnippet
+(use-package yasnippet
   :diminish yas-minor-mode
   :hook
   ((prog-mode . yas-minor-mode-on)
@@ -139,8 +145,7 @@
   (:map yas-minor-mode-map
         ("C-c" . nil)))
 
-(use-package
-  prog-mode
+(use-package prog-mode
   :ensure nil
 
   :config
@@ -155,10 +160,12 @@
   ((prog-mode . enable-prettify-symbols)
    (cider-repl-mode . enable-prettify-symbols)))
 
-(use-package
-  highlight-symbol
+(use-package highlight-symbol
   :demand t
   :diminish highlight-symbol-mode
+
+  :init
+  (defvar highlight-symbol-mode)
 
   :commands
   (highlight-symbol)
@@ -167,33 +174,28 @@
   ((prog-mode . highlight-symbol-mode)
    (cider-repl-mode . highlight-symbol-mode))
 
+  :bind
+  ((:map highlight-symbol-nav-mode-map
+         ("m" . highlight-symbol)
+         ("n" . highlight-symbol-next)
+         ("p" . highlight-symbol-prev)
+         ("r" . highlight-symbol-query-replace)
+         ("q" . highlight-symbol-remove-all)))
+
   :config
   (setq highlight-symbol-idle-delay 1.5)
-  ;;(define-key input-decode-map [?\C-m] [C-m])
-  ;;(global-set-key (kbd "<C-m>") #'highlight-symbol)
-  (global-unset-key (kbd "M-m"))
+  (bind-key "M-m" highlight-symbol-nav-mode-map))
 
-  (smartrep-define-key
-      global-map "M-m"
-    '(("m" . (highlight-symbol))
-      ("n" . (highlight-symbol-next))
-      ("p" . (highlight-symbol-prev))
-      ("r" . (highlight-symbol-query-replace))
-      ("q" . (highlight-symbol-remove-all)))))
-
-(use-package
-  restclient
+(use-package restclient
   :mode ("\\.rest\\'" . restclient-mode))
 
-(use-package
-  sql
+(use-package sql
   :commands (sql-mysql)
   :config
   (when (equal system-type 'windows-nt)
     (setq sql-mysql-options '("-C" "-t" "-f" "-n"))))
 
-(use-package
-  simple-httpd
+(use-package simple-httpd
 
   :config
   (defun httpd/start (&optional root port)
@@ -223,16 +225,14 @@
    projectile-httpd/start
    projectile-httpd/stop))
 
-(use-package
-  markdown-mode
+(use-package markdown-mode
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
-(use-package
-  pkg--ide
+(use-package pkg--ide
   :load-path "configuration/"
   :config
   (ide/configure-frame-layout ide/default-layout)

@@ -1,12 +1,17 @@
 elpa/
 transient/
 recentf
+tramp
 projectile.cache
 projectile-bookmarks.eld
+projects
 auto-save-list/
+configuration/configuration.el.rej
 /simple-bookmarks
 /bookmarks
 /.cache/
+eln-cache/
+org-roam.db
 custom.el
 eshell/history
 eshell/lastdir
