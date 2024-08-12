@@ -18,13 +18,28 @@
   ;; (package-install 'doom-themes)
   (package-install 'exec-path-from-shell))
 
+(defun normalized-shell-command-to-string (shell-command)
+  "Trims newlines of the output of SHELL-COMMAND."
+  (thread-last shell-command
+               (shell-command-to-string)
+               (replace-regexp-in-string "\n\\'" "")))
+
 (when (memq window-system '(mac ns x))
 
-  (let ((path (shell-command-to-string "echo -n $PATH")))
-    (setenv "PATH" path)
-    (setq exec-path (split-string-and-unquote path ":")))
+  (let* ((default-shell-path
+          (normalized-shell-command-to-string "echo $SHELL"))
 
-  (setq shell-file-name "/bin/bash"))
+         (default-shell
+          (thread-last default-shell-path
+                       (replace-regexp-in-string ".*/" "")))
+
+         ;;TODO: Implement general solution for default-shell
+         (path
+          (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
+
+    (setenv "PATH" path)
+    (setq exec-path (split-string-and-unquote path ":")
+          shell-file-name default-shell-path)))
 
 (setq custom-file "~/.emacs.d/custom.el")
 
@@ -39,7 +54,9 @@
 
  make-backup-files nil
  auto-save-default nil
- create-lockfiles nil)
+ create-lockfiles nil
+
+ warning-minimum-level :error)
 
 (require 'base--apperance)
 (require 'base--interface)
