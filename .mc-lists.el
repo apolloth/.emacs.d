@@ -4,6 +4,7 @@
 (setq mc/cmds-to-run-for-all
       '(
         ace-jump-char-mode
+        ace-jump-mode-pop-mark
         ace-mc-add-multiple-cursors
         ace-mc-do-keyboard-reset
         ace-mc-quick-exchange

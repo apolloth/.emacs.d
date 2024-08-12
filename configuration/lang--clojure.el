@@ -1,12 +1,13 @@
 (use-package
   clojure-mode
+  :after smartparens-clojure
 
   :mode
   (("\\.clj\\'" . clojure-mode)
    ("\\.cljs\\'" . clojurescript-mode))
 
   :config
-  ;; (require 'smartparens-clojure)
+
   :bind*
   (:map clojure-mode-map
         ("C-<left>" . sp-backward-sexp)
@@ -55,12 +56,12 @@
 
   :config
   (setq cljr-warn-on-eval nil)
-  (cljr-add-keybindings-with-prefix "C-,")
+  (cljr-add-keybindings-with-prefix "C-#")
   (clj-refactor-mode 1)
 
   ;;cljr-debug
   :bind-keymap*
-  ("C-," . clj-refactor-map))
+  ("C-#" . clj-refactor-map))
 
 (use-package
   parseedn)
@@ -95,13 +96,13 @@
 
   (defun lein-project-clj-filepath ()
     (thread-first
-        (projectile-project-root)
+      (projectile-project-root)
       (concat "project.clj")))
 
   (defun lein-project-clj-content (filepath)
     (let* ((data
             (thread-first
-                filepath
+              filepath
               (get-file-content)
               (parseedn-read-str)))
 
@@ -128,14 +129,23 @@
   (defun lein-project-clj-profiles (filepath)
     (let* ((profiles
             (thread-last filepath
-              (lein-project-clj-content)
-              (gethash :profiles))))
+                         (lein-project-clj-content)
+                         (gethash :profiles))))
 
       (when profiles
         (thread-last profiles
-          (hash-table-keys)
-          (mapcar 'symbol-name)
-          (mapcar (lambda (profile) (substring profile 1)))))))
+                     (hash-table-keys)
+                     (mapcar 'symbol-name)
+                     (mapcar (lambda (profile) (substring profile 1)))))))
+
+  (defun my-cider-switch-to-repl-buffer (&optional set-namespace)
+    (interactive "P")
+    (cider--switch-to-repl-buffer
+     (if (and (equal (cider-repl-type-for-buffer) 'cljs)
+              (not (cider-repls 'cljs nil)))
+         (cider-current-repl 'clj t)
+       (cider-current-repl (cider-repl-type-for-buffer) t))
+     set-namespace))
 
   (defun cider-jack-in-with-args (args)
     (interactive "sjack-in repl with args: ")
@@ -149,7 +159,7 @@
 
   (defun lein-project-clj-jack-in-profiles ()
     (thread-last
-        (lein-project-clj-filepath)
+      (lein-project-clj-filepath)
       (lein-project-clj-profiles)
       (seq-filter (lambda (profile) (not (member profile '("dev" "repl" "provided" "uberjar")))))
       (seq-map (lambda (profile) (list profile (concat "+" profile))))
@@ -197,12 +207,22 @@
     (interactive)
     (cider-interactive-eval
      "(if-let [system-go (resolve 'user/system-go!)]
-        (if (nil? (resolve 'user/emacs-system-go-executed))
-          (do
-            (intern 'user 'emacs-system-go-executed)
-            (system-go))
-          (user/system-restart!))
-        (user/system-restart!))"))
+         (if (nil? (resolve 'user/emacs-system-go-executed))
+           (do
+             (intern 'user 'emacs-system-go-executed)
+             (system-go))
+           (user/system-restart!))
+         (user/system-restart!))"))
+
+  (defun cider-repl-user-system-restart ()
+    (interactive)
+    (cider-interactive-eval
+     "(user/system-restart!)"))
+
+  ;; (defun cider-repl-user-system-start ()
+  ;;   (interactive)
+  ;;   (cider-interactive-eval
+  ;;    "(user/system-go!)"))
 
   (defun cider-repl-user-system-stop ()
     (interactive)
@@ -211,7 +231,7 @@
 
   (defun cider-figwheel-main-profiles ()
     (thread-last
-        (projectile-project-root)
+      (projectile-project-root)
       (directory-files)
       (seq-filter (lambda (filename) (s-ends-with? ".cljs.edn" filename)))
       (seq-map (lambda (build-filename) (substring build-filename 0 (- 0 (length ".cljs.edn")))))))
@@ -277,6 +297,7 @@
     (call-interactively 'cider-switch-to-repl-buffer))
 
   (setq
+   cider-jack-in-default 'clojure-cli
    cider-default-cljs-repl 'figwheel-main
 
    cider-repl-pop-to-buffer-on-connect nil
@@ -301,66 +322,66 @@
    cider-error-highlight-face 'error-face)
 
   (define-clojure-indent
-    (defroutes 'defun)
-    (println 'defun)
-    (pprint 'defun)
-    (lazy-seq'defun)
-    (routes 'defun)
-    (render 'defun)
-    (go 'defun)
-    (html 'defun)
-    (doall 'defun)
-    (dosync 'defun)
-    (log/spy 'defun)
-    ;; (swap! 'defun)
-    ;; (reset! 'defun)
-    (is 'defun)
-    (testing 'defun)
-    (element 'defun)
-    (match 'defun)
-    (->files 'defun)
-    (->dir 'defun)
+   (defroutes 'defun)
+   (println 'defun)
+   (pprint 'defun)
+   (lazy-seq'defun)
+   (routes 'defun)
+   (render 'defun)
+   (go 'defun)
+   (html 'defun)
+   (doall 'defun)
+   (dosync 'defun)
+   (log/spy 'defun)
+   ;; (swap! 'defun)
+   ;; (reset! 'defun)
+   (is 'defun)
+   (testing 'defun)
+   (element 'defun)
+   (match 'defun)
+   (->files 'defun)
+   (->dir 'defun)
 
-    ;; Custom
-    (interval 'defun)
-    (routes 'defun)
-    (context 'defun)
-    (letk 'defun)
-    (for-file 'defun)
-    (entity 'defun)
-    (type 'defun)
-    (usage 'defun)
-    (<with-transaction 'defun)
-    (<with-temporary-db-file 'defun)
-    (<with-attached-db 'defun)
-    (<with-keep-awake 'defun)
-    (<with-resource 'defun)
-    (<!with-resource 'defun)
-    (some-interact 'defun)
+   ;; Custom
+   (interval 'defun)
+   (routes 'defun)
+   (context 'defun)
+   (letk 'defun)
+   (for-file 'defun)
+   (entity 'defun)
+   (type 'defun)
+   (usage 'defun)
+   (<with-transaction 'defun)
+   (<with-temporary-db-file 'defun)
+   (<with-attached-db 'defun)
+   (<with-keep-awake 'defun)
+   (<with-resource 'defun)
+   (<!with-resource 'defun)
+   (some-interact 'defun)
 
-    ;; Compojure
-    (GET 'defun)
-    (PUT 'defun)
-    (POST 'defun)
-    (cp/GET 'defun)
-    (cp/PUT 'defun)
-    (cp/POST 'defun)
-    (where 'defun)
-    (add-watch 'defun)
-    (listen! 'defun)
+   ;; Compojure
+   (GET 'defun)
+   (PUT 'defun)
+   (POST 'defun)
+   (cp/GET 'defun)
+   (cp/PUT 'defun)
+   (cp/POST 'defun)
+   (where 'defun)
+   (add-watch 'defun)
+   (listen! 'defun)
 
-    ;; Reframe
-    (register-handler 'defun)
-    (register-sub 'defun)
-    (reg-sub-raw 'defun)
-    (reg-sub 'defun)
-    (reg-event-fx 'defun)
-    (reg-event-db 'defun)
-    (reg-fx 'defun)
-    (reg-cofx 'defun)
-    (reg-acofx 'defun)
-    (reg-acofx-by-fx 'defun)
-    )
+   ;; Reframe
+   (register-handler 'defun)
+   (register-sub 'defun)
+   (reg-sub-raw 'defun)
+   (reg-sub 'defun)
+   (reg-event-fx 'defun)
+   (reg-event-db 'defun)
+   (reg-fx 'defun)
+   (reg-cofx 'defun)
+   (reg-acofx 'defun)
+   (reg-acofx-by-fx 'defun)
+   )
 
   :bind*
   (:map clojure-mode-map
@@ -388,15 +409,15 @@
 	("C-h h" . cider-doc)
 	("C-h H" . cider-javadoc)
 
-	("M-j d" . cider-find-var)
-	("M-j D" . cider-grimoire)
-	("M-j r" . cider-apropos)
-	("M-j f" . cider-find-resource)
-	("M-j n" . cider-find-ns)
-	("M-J" . cider-pop-back)
+	("M-f d" . cider-find-var)
+	("M-f D" . cider-grimoire)
+	("M-f r" . cider-apropos)
+	("M-f f" . cider-find-resource)
+	("M-f n" . cider-find-ns)
+	("M-F" . cider-pop-back)
 
 	("C-c M-j" . nil)
-        ("C-c C-M-j" . cider-switch-to-repl-buffer)
+        ("C-c C-M-j" . my-cider-switch-to-repl-buffer)
         ("C-c C-M-S-J" . cider-repl-switch-to-repl-buffer-and-ns)
 
 	("C-c M-q" . cider-quit)
@@ -406,6 +427,7 @@
 
         ("M-u" . nil)
         ("M-u s" . cider-repl-user-system-start)
+        ("M-u r" . cider-repl-user-system-restart)
         ("M-u S" . cider-repl-user-system-stop)
         ("M-u f" . cider-repl-user-fig-init)
         ("M-u w" . cider-repl-user-switch-cljs-repl)
@@ -521,5 +543,12 @@
 	("C-r" . nil)
 
 	("C-_" . cider-repl-history-undo-other-window)))
+
+;;FIXME: vega-view/:catch: Invalid face box: :line-width, -1, :color, base5
+;; (use-package
+;;   vega-view
+
+;;   :config
+;;   (setq vega-view-prefer-png t))
 
 (provide 'lang--clojure)

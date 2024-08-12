@@ -1,5 +1,6 @@
 (use-package
   elisp-mode
+  ;; :after el-smartparens
   :ensure nil
 
   :mode
@@ -21,8 +22,11 @@
 	("C-<down>" . sp-down-sexp)
 	("M-<down>" . sp-raise-sexp)
 
+        ("C-S-<down>" . sp-next-sexp)
+        ("C-S-<up>" . sp-previous-sexp)
+
 	("C-M-<up>" . sp-backward-transpose-sexp)
-	("C-M-<down>" . sp-forward-transpose-sexp)
+        ("C-M-<down>" . sp-forward-transpose-sexp)
 
 	("M-\"" . sp-wrap-doublequote)
 	("C-(" . sp-wrap-round)
@@ -34,16 +38,16 @@
 	("C-k" . sp-kill-sexp)
 	("C-S-K" . sp-unwrap-sexp)
 
-	("M-k" . sp-splice-sexp-killing-forward)
+	("M-k" . sp-splice-sexp)
 	("M-K" . sp-splice-sexp-killing-backward)
 	("C-M-k" . sp-splice-sexp-killing-around)
-
-	("M-j f" . find-function-at-point)
 
 	("C-;" . comment-dwim)
 
         ("C-c C-c" . eval-defun)
 	("C-M-x" . eval-last-sexp)
-	("C-c M-k" . eval-buffer)))
+	("C-c M-k" . eval-buffer)
+
+        ("C-c ." . sp-trim-whitespace-of-sexp)))
 
 (provide 'lang--elisp)

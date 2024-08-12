@@ -28,20 +28,21 @@
                     company-quickhelp consult-denote
                     consult-projectile consult-todo consult-yasnippet
                     corfu counsel-projectile csv-mode dashboard
-                    devdocs diminish doom-themes elpy elscreen
-                    embark-consult esh-autosuggest eshell-up
+                    devdocs diminish doom-modeline doom-themes elpy
+                    elscreen embark-consult esh-autosuggest eshell-up
                     exec-path-from-shell expand-region
                     flycheck-clj-kondo fullframe git-auto-commit-mode
                     gnu-elpa-keyring-update golden-ratio helm-lsp
                     highlight-symbol hyperbole impatient-mode indium
                     lsp-ivy lsp-java lsp-ui marginalia mc-extras
-                    nerd-icons npm-mode orderless org-roam
-                    platformio-mode quickrun rainbow-delimiters
-                    rainbow-mode restclient sass-mode scss-mode
-                    simple-bookmarks smartparens smartrep spaceline
-                    tide transpose-frame treemacs-icons-dired
-                    treemacs-magit treemacs-projectile treesit-auto
-                    undo-tree use-package vega-view vertico
+                    npm-mode orderless org-roam platformio-mode
+                    quickrun rainbow-delimiters rainbow-mode
+                    repl-driven-development restclient sass-mode
+                    scss-mode simple-bookmarks smartparens smartrep
+                    spaceline tide transpose-frame
+                    treemacs-icons-dired treemacs-magit
+                    treemacs-projectile treesit-auto undo-tree
+                    use-package vega-view vertico
                     web-mode-edit-element which-key xref-js2
                     yasnippet-snippets ztree))
  '(query-replace-highlight t)

@@ -23,6 +23,19 @@
   ;;    (org-mode . org-ts-mode)))
   )
 
+(use-package repl-driven-development
+  :ensure t
+
+  ;; :init
+  ;; (unbind-key "C-r")
+  ;; :config
+  ;; (repl-driven-development [C-r j] java :blink nil)
+  ;; (repl-driven-development [C-r p] python :blink nil)
+  ;; (repl-driven-development [C-r c] "lein repl" :prompt "user=>" :blink nil)
+  ;; (repl-driven-development [C-r t] terminal :blink nil)
+
+  )
+
 (use-package smartparens
   :diminish smartparens-mode
 
@@ -87,7 +100,7 @@
 (use-package magit
   :requires (fullframe)
   :bind*
-  (("C-v" . nil)
+  (("C-x g" . magit)
    ("M-v g" . magit-status)
    ("M-v l" . magit-log-current)
    ("M-v L" . magit-log-all)
