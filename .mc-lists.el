@@ -65,12 +65,14 @@
         sp-kill-sexp
         sp-raise-sexp
         sp-unwrap-sexp
+        sp-wrap-doublequote
         sp-wrap-round
         sp-wrap-square
         upcase-region
         web-mode-element-content-select
         web-mode-element-rename
         web-mode-element-wrap
+        wgrep-mark-deletion
         yas-expand
         ))
 
@@ -95,6 +97,7 @@
         mouse-set-region
         my-freeze-fake-cursors
         my-swiper
+        overwrite-mode
         platformio-build
         view-order-manuals
         ))

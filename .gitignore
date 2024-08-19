@@ -1,7 +1,6 @@
 elpa/
 transient/
 recentf
-tramp
 projectile.cache
 projectile-bookmarks.eld
 projects
@@ -14,3 +13,6 @@ eln-cache/
 custom.el
 eshell/history
 eshell/lastdir
+*.~undo-tree~
+tramp
+url/

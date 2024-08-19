@@ -22,32 +22,38 @@
  '(initial-major-mode 'fundamental-mode)
  '(next-error-highlight t)
  '(next-error-highlight-no-select t)
+ '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(ac-emacs-eclim ace-mc aggressive-indent all-the-icons buffer-move
-                    cape clj-refactor company-emacs-eclim
-                    company-quickhelp consult-denote
-                    consult-projectile consult-todo consult-yasnippet
-                    corfu counsel-projectile csv-mode dashboard
-                    devdocs diminish doom-modeline doom-themes elpy
-                    elscreen embark-consult esh-autosuggest eshell-up
-                    exec-path-from-shell expand-region
-                    flycheck-clj-kondo fullframe git-auto-commit-mode
-                    gnu-elpa-keyring-update golden-ratio helm-lsp
-                    highlight-symbol hyperbole impatient-mode indium
-                    lsp-ivy lsp-java lsp-ui marginalia mc-extras
-                    npm-mode orderless org-roam platformio-mode
-                    quickrun rainbow-delimiters rainbow-mode
-                    repl-driven-development restclient sass-mode
-                    scss-mode simple-bookmarks smartparens smartrep
-                    spaceline tide transpose-frame
-                    treemacs-icons-dired treemacs-magit
-                    treemacs-projectile treesit-auto undo-tree
-                    use-package vega-view vertico
-                    web-mode-edit-element which-key xref-js2
-                    yasnippet-snippets ztree))
+   '(a ac-emacs-eclim ace-mc aggressive-indent all-the-icons buffer-move
+       cape clj-refactor consult-denote consult-projectile
+       consult-todo consult-yasnippet corfu csv-mode dashboard
+       diminish doom-modeline doom-themes elpy elscreen emacsql-sqlite
+       embark-consult esh-autosuggest eshell-up exec-path-from-shell
+       expand-region flycheck-clj-kondo fullframe git-auto-commit-mode
+       gnu-elpa-keyring-update golden-ratio highlight-symbol hyperbole
+       impatient-mode indium kaolin-themes marginalia markdown-mode
+       mc-extras nerd-icons-corfu npm-mode orderless org-roam
+       platformio-mode quickrun rainbow-delimiters rainbow-mode
+       repl-driven-development restclient sass-mode scss-mode
+       simple-bookmarks smartparens smartrep spaceline tide
+       transpose-frame treemacs-icons-dired treemacs-magit
+       treemacs-projectile treesit-auto typescript-mode undo-tree
+       vega-view vertico web-mode-edit-element wgrep xref-js2
+       yasnippet-snippets ztree))
  '(query-replace-highlight t)
  '(require-final-newline t)
  '(ring-bell-function 'ignore)
+ '(safe-local-variable-values
+   '((eval font-lock-add-keywords nil
+           `
+           ((,(concat "("
+                      (regexp-opt
+                       '("sp-do-move-op" "sp-do-move-cl"
+                         "sp-do-put-op" "sp-do-put-cl" "sp-do-del-op"
+                         "sp-do-del-cl")
+                       t)
+                      "\\_>")
+             1 'font-lock-variable-name-face)))))
  '(select-enable-clipboard t)
  '(shift-select-mode t)
  '(show-paren-delay 0)

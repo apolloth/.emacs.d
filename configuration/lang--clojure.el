@@ -1,43 +1,49 @@
-(use-package
-  clojure-mode
-  :after smartparens-clojure
+(use-package clojure-mode
+  :after smartparens
 
   :mode
   (("\\.clj\\'" . clojure-mode)
    ("\\.cljs\\'" . clojurescript-mode))
 
   :config
+  (sp-with-modes sp-clojure-modes
+    (sp-local-pair "'" "'"
+                   :when '(sp-in-string-p
+                           sp-in-comment-p))
+
+    (sp-local-pair "`" "`"
+                   :when '(sp-in-string-p
+                           sp-in-comment-p)))
+
 
   :bind*
   (:map clojure-mode-map
         ("C-<left>" . sp-backward-sexp)
-        ("M-<left>" . sp-forward-barf-sexp)
-        ("C-M-<right>" . sp-backward-barf-sexp)
-
         ("C-<right>" . sp-forward-sexp)
-        ("M-<right>" . sp-forward-slurp-sexp)
-        ("C-M-<left>" . sp-backward-slurp-sexp)
 
         ("C-<up>" . sp-backward-up-sexp)
-        ("M-<up>" . sp-convolute-sexp)
-
         ("C-<down>" . sp-down-sexp)
-        ("M-<down>" . sp-raise-sexp)
+
+        ("M-<left>" . sp-forward-barf-sexp)
+        ("M-<right>" . sp-forward-slurp-sexp)
+
+        ("C-c M-<left>" . sp-add-to-next-sexp)
+        ("C-c M-<right>" . sp-add-to-previous-sexp)
 
         ("C-M-<up>" . sp-backward-transpose-sexp)
         ("C-M-<down>" . sp-forward-transpose-sexp)
 
         ("M-\"" . sp-wrap-doublequote)
-        ("C-(" . sp-wrap-round)
-        ("C-M-8" . sp-wrap-square)
-        ("C-M-7" . sp-wrap-curly)
 
-        ("C-M-(" . sp-rewrap-sexp)
+        ("C-c j" . sp-wrap-round)
+        ("C-c k" . sp-wrap-curly)
+        ("C-c l" . sp-wrap-square)
+        ("C-c J" . sp-rewrap-sexp)
 
         ("C-k" . sp-kill-sexp)
         ("C-S-K" . sp-unwrap-sexp)
 
-        ("M-k" . sp-splice-sexp-killing-forward)
+        ("M-k" . sp-splice-sexp)
         ("M-K" . sp-splice-sexp-killing-backward)
         ("C-M-k" . sp-splice-sexp-killing-around)
 
@@ -46,28 +52,58 @@
         ("C-c ." . sp-trim-whitespace-of-sexp)
         ("C-;" . comment-dwim)))
 
-(use-package
-  flycheck-clj-kondo
+(use-package flycheck-clj-kondo
   :after clojure-mode)
 
-(use-package
-  clj-refactor
+(use-package clj-refactor
   :after clojure-mode
 
   :config
+  (require 'embark)
+
   (setq cljr-warn-on-eval nil)
-  (cljr-add-keybindings-with-prefix "C-#")
   (clj-refactor-mode 1)
 
-  ;;cljr-debug
-  :bind-keymap*
-  ("C-#" . clj-refactor-map))
+  (defun my-clojure-symbol-at-point ()
+    "Return symbol at point when in clojure mode. Otherwise nil."
+    (when (derived-mode-p 'clojure-mode)
+      (let ((symbol (thing-at-point 'symbol)))
+        (when symbol
+          (cons 'clojure-symbol symbol)))))
 
-(use-package
-  parseedn)
+  (defun embark-create-clj-refactor-flat-map ()
+    "Create a flat keymap with all refactor bindings from `clj-refactor-map`,
+     excluding paredit remaps."
+    (let ((flat-map (make-sparse-keymap)))
+      (map-keymap
+       (lambda (key binding)
+         (when (and (commandp binding)
+                    (not (member binding
+                                 '(cljr-raise-sexp
+                                   cljr-splice-sexp-killing-backward
+                                   cljr-splice-sexp-killing-forward))))
+           (define-key flat-map
+                       (if (integerp key)
+                           (vector key)
+                         key)
+                       binding)))
+       clj-refactor-map)
+      ;; Add the dynamically generated bindings from cljr--all-helpers
+      (dolist (details cljr--all-helpers)
+        (let ((key (car details))
+              (fn (cadr details)))
+          (define-key flat-map (kbd key) fn)))
+      flat-map))
 
-(use-package
-  cider
+  (defvar my-embark-cljr-keymap
+    (embark-create-clj-refactor-flat-map))
+
+  (add-to-list 'embark-target-finders 'my-clojure-symbol-at-point)
+  (add-to-list 'embark-keymap-alist '(clojure-symbol . my-embark-cljr-keymap)))
+
+(use-package parseedn)
+
+(use-package cider
 
   :commands
   (cider-jack-in-clj
@@ -544,11 +580,21 @@
 
 	("C-_" . cider-repl-history-undo-other-window)))
 
-;;FIXME: vega-view/:catch: Invalid face box: :line-width, -1, :color, base5
-;; (use-package
-;;   vega-view
+;; (use-package clojure-ts
+;;   :ensure t
+;;   :hook
+;;   ((cider-mode        .  clojure-ts-mode-hook)
+;;    (smartparens-mode  .  clojure-ts-mode-hook)
+;;    (clj-refactor-mode .  clojure-ts-mode-hook))
 
 ;;   :config
-;;   (setq vega-view-prefer-png t))
+;;   (setq clojure-ts-mode-map clojure-mode-map))
+
+(use-package
+  vega-view
+
+  :config
+  (setq vega-view-prefer-png t))
+
 
 (provide 'lang--clojure)

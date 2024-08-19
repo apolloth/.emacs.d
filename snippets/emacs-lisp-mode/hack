@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Hack
+# key: ;h
+# --
+;;HACK: $0
