@@ -64,6 +64,8 @@
         sp-forward-transpose-sexp
         sp-kill-sexp
         sp-raise-sexp
+        sp-splice-sexp-killing-around
+        sp-splice-sexp-killing-backward
         sp-unwrap-sexp
         sp-wrap-doublequote
         sp-wrap-round

@@ -66,7 +66,6 @@
 
   :bind*
   (:map org-mode-map
-        ("C--" . org-narrow-to-subtree)
         ("M-i l" . org-insert-link)
         ("M-i j" . org-insert-jira-issue)
         ("M-i d" . org-deadline)
@@ -83,7 +82,16 @@
         ("C-M-<down>" . org-drag-element-forward)
 
         ("C-k" .   org-kill-item)
-        ("C-S-k" . org-kill-line)))
+        ("C-S-k" . org-kill-line))
+
+  :config
+  (setq org-agenda-files '("~/Documents/org/agenda")
+        org-agenda-start-on-weekday 1
+        org-agenda-span 'week
+        org-agenda-show-all-dates t
+        org-agenda-skip-deadline-prewarning-if-scheduled t
+        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t))
 
 (use-package denote
   :ensure t
@@ -92,7 +100,7 @@
   (unbind-key "C-M--")
 
   :custom
-  (expand-file-name "~/Documents/notes/")
+  (expand-file-name "~/Documents/org/jira")
   (denote-known-keywords '("daily" "ticket"))
 
   :bind*
@@ -100,7 +108,27 @@
    ("C-M-- r" . denote-region)
    ("C-M-- z" . denote-signature)
    ("C-M-- l" . denote-link)
-   ("C-M-- f" . denote-link)))
+   ("C-M-- f" . denote-link)
 
+   ("C-M-- <return>" . org-capture))
+
+  :config
+  (setq org-capture-templates
+        '(("j" "Jira Ticket" entry
+           (file+headline (lambda ()
+                            (let ((ticket-id (read-string "JIRA-ID: ")))
+                              (expand-file-name (concat ticket-id ".org")
+                                                "~/Documents/org/jira")))
+                          "Tasks")
+           "* TODO %^{Summary}\n  CREATED: %U\n  %?"
+           :empty-lines 1)
+          ("d" "TODO for date" entry
+           (file (lambda ()
+                   (let ((date (org-read-date nil t nil "Select a date")))
+                     (expand-file-name
+                      (format-time-string "%Y-%m-%d.org" date)
+                      "~/Documents/org/agenda/"))))
+           "* TODO %?\n"
+           :empty-lines 1))))
 
 (provide 'base--organisation)

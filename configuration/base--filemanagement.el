@@ -6,6 +6,9 @@
    gac-ask-for-summary-p nil
    gac-debounce-interval (* 10 60)))
 
+(use-package wgrep
+  :ensure t)
+
 (use-package treemacs
   :config
   (defun treemacs-hide ()
