@@ -1,21 +1,18 @@
 (use-package doom-modeline
   :ensure t
-  :init (doom-modeline-mode 1)
+
+  :init
+  (line-number-mode -1)
+  (column-number-mode 1)
+  (doom-modeline-mode 1)
 
   :custom
-  (doom-modeline-support-imenu t))
+  (doom-modeline-support-imenu t)
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-column-zero-based nil))
 
 (use-package display-line-numbers
   :diminish display-line-numbers
-  :init
-  (unbind-key "C-M-,")
-
-  ;;WATCHOUT This works because display-line-numbers is initialized with t.
-  ;;         Other values ('visual or 'relative) are also excepted, but are
-  ;;         not currently needed by me.
-  (defun my-toggle-line-numbers ()
-    (interactive)
-    (setq display-line-numbers (not display-line-numbers)))
 
   :custom
   (display-line-numbers-grow-only t)
@@ -23,8 +20,26 @@
   :hook
   ((prog-mode . display-line-numbers-mode))
 
-  :bind
-  (("C-M-, t" . my-toggle-line-numbers)))
+  :bind*
+  (("C-M-, c" . my-toggle-fill-column-indicator)
+   ("C-M-, l" . my-toggle-line-numbers))
+
+  :config
+  (defun my-toggle-line-numbers ()
+    "Toggle display of line numbers in prog-mode."
+    (interactive)
+    (if (bound-and-true-p display-line-numbers-mode)
+        (display-line-numbers-mode -1)
+      (when (derived-mode-p 'prog-mode)
+        (display-line-numbers-mode 1))))
+
+  (defun my-toggle-fill-column-indicator ()
+    "Toggle display of line numbers in prog-mode."
+    (interactive)
+    (if (bound-and-true-p global-display-fill-column-indicator-mode)
+        (global-display-fill-column-indicator-mode -1)
+      (when (derived-mode-p 'prog-mode)
+        (global-display-fill-column-indicator-mode 1)))))
 
 (use-package rainbow-mode
   :diminish rainbow-mode
@@ -45,23 +60,22 @@
 (use-package nerd-icons
   :ensure t)
 
-(use-package doom-themes
-  :ensure t
+(use-package nerd-icons-corfu
+  :ensure t)
+
+(use-package kaolin-themes
   :config
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t
-        doom-themes-treemacs-theme "doom-colors"
-        doom-dracula-brighter-modeline t)
-  (load-theme 'doom-dracula t)
-  (doom-themes-visual-bell-config)
-  (doom-themes-treemacs-config)
-  (doom-themes-org-config))
+  (load-theme 'kaolin-ocean t)
+  (kaolin-treemacs-theme))
 
 (defface error-face
   '((t (:foreground "#CC5353"))) "Red Highlight")
 
 (defface success-face
   '((t (:foreground "yellow" :background "#555577"))) "Green Highlight")
+
+
+(setopt display-fill-column-indicator-column 80)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
