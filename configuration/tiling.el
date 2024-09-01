@@ -1,6 +1,9 @@
 ;;; tiling.el --- changing window layout
 
+
+;; Copyright (C) 2024  Fabian Fendt
 ;; Copyright (C) 2010  Fang lungang
+
 
 ;; Author: Fang lungang <fanglungang at 163.com>
 ;; Created: Fang lungang 11/14/2010
@@ -77,7 +80,6 @@
 ;; (define-key global-map (kbd "ESC M-[ d" ) 'tiling-tile-left)
 
 ;;; Code:
-
 (defvar tiling-layouts (list 'tiling-master-left
                              'tiling-master-top
                              'tiling-even-horizontal
@@ -152,7 +154,6 @@
   bottom half"
   (tiling-master bufs nil))
 
-;; even
 (defun tiling-even (bufs horizontal)
   (delete-other-windows)
   (set-window-buffer nil (car bufs))
@@ -176,7 +177,9 @@
 (defun tiling-even-vertical (bufs) (tiling-even bufs nil))
 
 
-;; cycling
+
+;; Cycling
+
 (defun tiling-cycle (&optional numOfWins)
   "cycling the among the preset layouts"
   (interactive "p")
@@ -216,7 +219,7 @@
       (funcall tiling-current-layout bufs))))
 
 
-;; tweak layout
+;; Tweak layout
 
 (defun tiling-tile-move (direction)
   (let ((other-win (windmove-find-other-window direction))
@@ -241,29 +244,33 @@
 
 (defun tiling-tile-right () (interactive) (tiling-tile-move 'right))
 
-(defun set-tiling-layout (layout)
-  (let ((bufs
-         (mapcar 'window-buffer
-                 (window-list nil -1 nil))))
-    (setq
-     tiling-current-layout layout
-     tiling-active? t)
-    (funcall layout bufs)))
+(defun set-tiling-layout (&optional layout)
+  (if (not layout)
+      (set-tiling-layout tiling-current-layout)
+    (let ((bufs
+           (mapcar 'window-buffer
+                   (window-list nil -1 nil))))
+      (setq
+       tiling-current-layout layout
+       tiling-active? t)
+      (funcall layout bufs))))
 
+;;;###autoload
 (defun create-tiling-window ()
   "Create a new window in your current tiling layout."
   (interactive)
   (split-window-vertically)
   (set-tiling-layout tiling-current-layout))
 
+;;;###autoload
 (defun delete-tiling-window ()
   "Delete current window, keeping your current tiling layout."
   (interactive)
   (delete-window)
   (set-tiling-layout tiling-current-layout))
 
+;;;###autoload
 (defun toggle-tiling ()
-  "Toggle tiling."
   (interactive)
 
   (if tiling-active?
@@ -275,33 +282,62 @@
       (set-window-configuration saved-window-configuration)
       (set-tiling-layout tiling-current-layout))))
 
-;; set certain layout
+;; Layouts
 
+;;;###autoload
 (defun tile-layout-master-left ()
   "Set layout to tiling-master-left."
   (interactive)
   (set-tiling-layout 'tiling-master-left))
 
+;;;###autoload
 (defun tile-layout-master-top ()
   "Set layout to tiling-master-top."
   (interactive)
   (set-tiling-layout 'tiling-master-top))
 
+;;;###autoload
 (defun tile-layout-even-horizontal ()
   "Set layout to tiling-even-horizontal."
   (interactive)
   (set-tiling-layout 'tiling-even-horizontal))
 
+;;;###autoload
 (defun tile-layout-even-vertical ()
   "Set layout to tiling-even-vertical."
   (interactive)
   (set-tiling-layout 'tiling-even-vertical))
 
+;;;###autoload
 (defun tile-layout-tiling-tile-4 ()
   "Set layout to tiling-tile-4."
   (interactive)
   (set-tiling-layout 'tiling-tile-4))
 
+
+;; Vertico Integration
+
+(defun my-tiling-capture-layout ()
+  "Capture the current tiling layout before Vertico."
+  (setq saved-window-configuration (current-window-configuration)))
+
+(defun my-tiling-restore-layout ()
+  "Restore the tiling layout after Vertico."
+  (when saved-window-configuration
+    (set-window-configuration saved-window-configuration)))
+
+(defun my-tiling-adjust-for-vertico ()
+  "Adjust tiling layout for Vertico."
+  ;; Adjust your tiling layout here without affecting the minibuffer
+  ;; For example, you can change the focus or resize other windows
+  (when (not (minibufferp))
+    (set-tiling-layout tiling-current-layout)))
+
+(add-hook 'minibuffer-setup-hook #'my-tiling-capture-layout)
+(add-hook 'minibuffer-setup-hook #'my-tiling-adjust-for-vertico)
+(add-hook 'minibuffer-exit-hook #'my-tiling-restore-layout)
+
+;; (add-hook 'emacs-startup-hook #'set-tiling-layout)
 
 (provide 'tiling)
 
