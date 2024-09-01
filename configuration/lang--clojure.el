@@ -15,7 +15,6 @@
                    :when '(sp-in-string-p
                            sp-in-comment-p)))
 
-
   :bind*
   (:map clojure-mode-map
         ("C-<left>" . sp-backward-sexp)
@@ -38,7 +37,6 @@
         ("C-c j" . sp-wrap-round)
         ("C-c k" . sp-wrap-curly)
         ("C-c l" . sp-wrap-square)
-        ("C-c J" . sp-rewrap-sexp)
 
         ("C-k" . sp-kill-sexp)
         ("C-S-K" . sp-unwrap-sexp)
@@ -58,48 +56,65 @@
 (use-package clj-refactor
   :after clojure-mode
 
+  :bind
+  (:map clojure-mode-map
+        ("C-c t n" . clojure-thread)
+        ("C-c t u" . clojure-unwind)
+        ("C-c t f" . clojure-thread-first-all)
+        ("C-c t l" . clojure-thread-last-all)
+        ("C-c c p" . clojure-cycle-privacy)
+        ("C-c c i" . clojure-cycle-if)
+        ("C-c c w" . clojure-cycle-when)
+        ("C-c c o" . clojure-cycle-not)
+        ("C-c c t" . cljr-cycle-thread)
+        ("C-c J"   . clojure-convert-collection-to-list)
+        ("C-c K"   . clojure-convert-collection-to-map)
+        ("C-c L"   . clojure-convert-collection-to-vector)
+        ("C-c '"   . clojure-convert-collection-to-quoted-list)
+        ("C-c #"   . clojure-convert-collection-to-set)
+        ("C-c n n"   . clojure-insert-ns-form)
+        ("C-c n ."   . clojure-insert-ns-form-at-point)
+        ("C-c n u"   . clojure-update-ns)
+        ("C-c n s"   . clojure-sort-ns)
+        ("C-c n m"   . cljr-require-macro)
+        ("C-c n a i" . cljr-add-import-to-ns)
+        ("C-c n a l" . cljr-add-missing-libspec)
+        ("C-c n a r" . cljr-add-require-to-ns)
+        ("C-c n a u" . cljr-add-use-to-ns)
+        ("C-c n c"   . cljr-clean-ns)
+        ("C-c n f"   . cljr-move-form)
+        ("C-c p d" . cljr-add-project-dependency)
+        ("C-c p s" . cljr-sort-project-dependencies)
+        ("C-c p u" . cljr-update-project-dependencies)
+        ("C-c p c" . cljr-project-clean)
+        ("C-c b i" . clojure-introduce-let)
+        ("C-c b m" . clojure-move-to-let)
+        ("C-c b n" . clojure-let-forward-slurp-sexp)
+        ("C-c b p" . clojure-let-backward-slurp-sexp)
+        ("C-c b e" . cljr-expand-let)
+        ("C-c b r" . cljr-remove-let)
+        ("C-c -"   . clojure-toggle-ignore)
+        ("C-c _"   . clojure-toggle-ignore-surrounding-form)
+        ("C-c f p" . cljr-promote-function)
+        ("C-c f s" . cljr-change-function-signature)
+        ("C-c f a" . clojure-add-arity)
+        ("C-c f e" . cljr-create-fn-from-example)
+        ("C-c e c" . cljr-extract-constant)
+        ("C-c e d" . cljr-extract-def)
+        ("C-c e f" . cljr-extract-function)
+        ("C-c r n" . clojure-rename-ns-alias)
+        ("C-c r f" . cljr-rename-file-or-dir)
+        ("C-c r s" . cljr-rename-symbol)
+        ("C-c s"   . cljr-find-usages)
+        ("C-c d"   . cljr-destructure-keys)
+        ("C-c h d" . cljr-hotload-dependency)
+        ("C-c i s" . cljr-inline-symbol)
+        ("C-c v r" . cljr-stop-referring)
+        ("C-c ?"   . cljr-describe-refactoring))
+
   :config
-  (require 'embark)
-
   (setq cljr-warn-on-eval nil)
-  (clj-refactor-mode 1)
-
-  (defun my-clojure-symbol-at-point ()
-    "Return symbol at point when in clojure mode. Otherwise nil."
-    (when (derived-mode-p 'clojure-mode)
-      (let ((symbol (thing-at-point 'symbol)))
-        (when symbol
-          (cons 'clojure-symbol symbol)))))
-
-  (defun embark-create-clj-refactor-flat-map ()
-    "Create a flat keymap with all refactor bindings from `clj-refactor-map`,
-     excluding paredit remaps."
-    (let ((flat-map (make-sparse-keymap)))
-      (map-keymap
-       (lambda (key binding)
-         (when (and (commandp binding)
-                    (not (member binding
-                                 '(cljr-raise-sexp
-                                   cljr-splice-sexp-killing-backward
-                                   cljr-splice-sexp-killing-forward))))
-           (define-key flat-map
-                       (if (integerp key)
-                           (vector key)
-                         key)
-                       binding)))
-       clj-refactor-map)
-      ;; Add the dynamically generated bindings from cljr--all-helpers
-      (dolist (details cljr--all-helpers)
-        (let ((key (car details))
-              (fn (cadr details)))
-          (define-key flat-map (kbd key) fn)))
-      flat-map))
-
-  (defvar my-embark-cljr-keymap
-    (embark-create-clj-refactor-flat-map))
-
-  (add-to-list 'embark-target-finders 'my-clojure-symbol-at-point)
-  (add-to-list 'embark-keymap-alist '(clojure-symbol . my-embark-cljr-keymap)))
+  (clj-refactor-mode 1))
 
 (use-package parseedn)
 
@@ -118,6 +133,7 @@
 
   :config
   (require 'parseedn)
+  (require 'projectile)
 
   (defun nil-blank-string (s)
     (when  s
@@ -318,7 +334,7 @@
       (cider-interactive-eval
        (format
         "(require 'figwheel.main.api)
-         (figwheel.main.api/cljs-repl \"%s\")"
+         (figwheel.main.api/cljs-repl \"%s\")"
         build build))
       ))
 
@@ -332,12 +348,72 @@
     (call-interactively 'cider-repl-set-ns)
     (call-interactively 'cider-switch-to-repl-buffer))
 
+  ;; TODO Fix automatic connect of REPLs
+
+  ;; (defun my/cider-project-connected-p ()
+  ;;   "Check if there is an active CIDER connection for the current project."
+  ;;   (let ((project-dir (projectile-project-root)))
+  ;;     (message "Checking connection for project: %s" project-dir)
+  ;;     (seq-find
+  ;;      (lambda (conn)
+  ;;        (message "Checking connection: %s" (with-current-buffer (cider-current-repl-buffer) default-directory))
+  ;;        (string-prefix-p project-dir
+  ;;                         (with-current-buffer (cider-current-repl-buffer)
+  ;;                           default-directory)))
+  ;;      (cider-connections))))
+
+  ;; (defun my/cider-jack-in-with-system-restart ()
+  ;;   "Jack in with CIDER and run the system restart if necessary."
+  ;;   (interactive)
+  ;;   (let ((default-directory (projectile-project-root)))
+  ;;     (unless (my/cider-project-connected-p)
+  ;;       (message "No REPL connected, jacking in...")
+  ;;       (cider-jack-in nil))
+  ;;     (run-at-time "2 sec" nil
+  ;;                  (lambda ()
+  ;;                    (when (my/cider-project-connected-p)
+  ;;                      (message "REPL connected, restarting system...")
+  ;;                      (cider-interactive-eval "(user/system-restart)"))))))
+
+  ;; (defun my/cider-maybe-jack-in ()
+  ;;   "Check if the current project has a REPL connected; if not, start it."
+  ;;   (when (and (projectile-project-p)
+  ;;              (not (my/cider-project-connected-p)))
+  ;;     (my/cider-jack-in-with-system-restart)))
+
+
+  ;; (defun my/cider-restart-project ()
+  ;;   "Restart the current Clojure project by closing REPLs, cleaning, and restarting."
+  ;;   (interactive)
+  ;;   (let ((project-dir (projectile-project-root)))
+  ;;     (when project-dir
+  ;;       ;; 1. Close all REPLs associated with the project using sesman
+  ;;       (dolist (session (sesman-current-sessions 'CIDER))
+  ;;         (let ((session-project-dir (with-current-buffer (car (cdr session))
+  ;;                                      default-directory)))
+  ;;           (when (string-prefix-p project-dir session-project-dir)
+  ;;             (message "Killing session: %s" (car session))
+  ;;             (sesman-quit (cdr session)))))
+
+  ;;       ;; 2. Run `lein clean` in the project root
+  ;;       (message "Running `lein clean` in %s" project-dir)
+  ;;       (let ((default-directory project-dir))
+  ;;         (shell-command "lein clean"))
+
+  ;;       ;; 3. Restart the REPLs and the system
+  ;;       (message "Restarting REPLs and system...")
+  ;;       (my/cider-jack-in-with-system-restart))))
+
+  ;; (add-hook 'find-file-hook #'my/cider-maybe-jack-in)
+
+  ;;(add-hook 'projectile-after-switch-project-hook #'my/cider-jack-in-with-system-restart)
+
   (setq
    cider-jack-in-default 'clojure-cli
    cider-default-cljs-repl 'figwheel-main
 
-   cider-repl-pop-to-buffer-on-connect nil
-   cider-show-error-buffer nil
+   cider-repl-pop-to-buffer-on-connect t
+   cider-show-error-buffer t
    cider-repl-result-prefix ";; => "
    cider-repl-display-help-banner nil
    cider-prompt-for-symbol nil
@@ -463,6 +539,7 @@
 
         ("M-u" . nil)
         ("M-u s" . cider-repl-user-system-start)
+        ;; ("M-u R" . my/cider-restart-project)
         ("M-u r" . cider-repl-user-system-restart)
         ("M-u S" . cider-repl-user-system-stop)
         ("M-u f" . cider-repl-user-fig-init)
@@ -580,6 +657,7 @@
 
 	("C-_" . cider-repl-history-undo-other-window)))
 
+;;TODO: Switch to clojure-ts
 ;; (use-package clojure-ts
 ;;   :ensure t
 ;;   :hook
