@@ -9,24 +9,15 @@
   (treesit-auto-install 'prompt)
 
   :config
-  (treesit-auto-add-to-auto-mode-alist '(org clojure python html css xml))
-  (global-treesit-auto-mode 1)
-  ;;(treesit-inspect-mode 1)
-  ;; (setq
-  ;;  major-mode-remap-alist
-  ;;  '((clojure-mode . clojure-ts-mode)
-  ;;    (bash-mode . bash-ts-mode)
-  ;;    (js2-mode . js-ts-mode)
-  ;;    (json-mode . json-ts-mode)
-  ;;    (css-mode . css-ts-mode)
-  ;;    (python-mode . python-ts-mode)
-  ;;    (org-mode . org-ts-mode)))
-  )
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode 1))
 
+;; TODO Add Wrappers to 'repl-driven-development'
+;;      Call Wrapped functions in own language modes
 (use-package repl-driven-development
   :ensure t
 
-  ;; :init
+  ;;:init
   ;; (unbind-key "C-r")
   ;; :config
   ;; (repl-driven-development [C-r j] java :blink nil)
@@ -34,6 +25,13 @@
   ;; (repl-driven-development [C-r c] "lein repl" :prompt "user=>" :blink nil)
   ;; (repl-driven-development [C-r t] terminal :blink nil)
 
+  ;;:config
+  ;; (defun my-wrap-repl-fn (keys cli
+  ;;                              &key name )
+  ;;   "docstring"
+  ;;   (lambda ()
+  ;;     (interactive)
+  ;;     ))
   )
 
 (use-package smartparens
@@ -55,6 +53,18 @@
     (sp-transpose-sexp)
     (sp-backward-sexp)
     (sp-backward-sexp))
+
+  (defun sp-kill-list ()
+    (interactive)
+    (save-excursion
+      (sp-backward-up-sexp)
+      (sp-kill-sexp)))
+
+  (defun sp-copy-list ()
+    (interactive )
+    (save-excursion
+      (sp-backward-up-sexp)
+      (sp-copy-sexp)))
 
   (defun sp-trim-whitespace-of-sexp ()
     (interactive)

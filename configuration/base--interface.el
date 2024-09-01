@@ -6,11 +6,28 @@
    ("M-! m S" . kmacro-end-macro)
    ("M-! m m" . kmacro-end-and-call-macro)))
 
-(use-package vertico
+(use-package embark
   :ensure t
-  :requires (vertico-auto-loads embark)
 
   :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :bind
+  (("C-,"   .   embark-act)
+   ("M-#"   .   embark-dwim)
+   ("C-h , ," . embark-bindings-at-point)
+   ("C-h , b" . embark-bindings))
+
+  :config
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+(use-package vertico
+  :ensure t
+  :init
+  (require 'vertico-autoloads)
   (vertico-mode 1)
   (vertico-multiform-mode 1)
 
@@ -18,34 +35,19 @@
   (vertico-resize t)
   (vertico-cycle t)
   (vertico-multiform-commands
-   '((execute-extended-command buffer)
-     (devdocs-lookup buffer)
-     (my-consult-line buffer)
-     (consult-buffer buffer)
-     (consult-recent-file buffer)
-     (consult-mode-command buffer)
-     (consult-complex-command buffer)
-     (embark-bindings buffer)
-     (embark-act buffer)
-     (consult-locate buffer)
-     (consult-projectile buffer)
-     (my-consult-git-grep buffer)
-     (my-consult-find buffer)
-     (my-consult-find-home-dir buffer)
-     (consult-locate buffer)
-     (consult-ripgrep buffer)
-     (imenu buffer)
-
-     (t reverse)))
+   '((embark-act grid)
+     (my-consult-outline reverse)
+     (consult-goto-line reverse)
+     (t buffer)))
 
   :bind*
-  ((:map vertico-map
-         ("M-n" . vertico-scroll-up)
-         ("M-p" . vertico-scroll-down)
-         ("M-j" . vertico-quick-exit)
+  (:map vertico-map
+        ("M-n" . vertico-scroll-up)
+        ("M-p" . vertico-scroll-down)
+        ("M-j" . vertico-quick-exit)
 
-         ("C-," . embark-act)
-         ("M-," . vertico-quick-embark)))
+        ("C-," . embark-act)
+        ("M-," . vertico-quick-embark))
 
   :config
   (defun vertico-quick-embark ()
@@ -56,7 +58,7 @@
 (use-package consult
   :ensure t
   :init
-  (defvar consult-keymap* (make-sparse-keymap))
+  (defvar consult-keymap* (make-sparse-keymap "consult"))
 
   :functions
   (region-to-text
@@ -81,7 +83,7 @@
 
   (defun my-consult-git-grep ()
     (interactive)
-    (wrap-region-text (apply-partially 'consult-git-grep "./")))
+    (wrap-region-text (apply-partially 'consult-git-grep ".")))
 
   (defun my-consult-line ()
     (interactive)
@@ -103,32 +105,38 @@
     (interactive)
     (my-consult-find "~/"))
 
+  (defvar-keymap my/consult-keymap
+    :doc "My custom Consult keymap."
+    "h"   #'my-consult-find-in-home-dir
+    "g"   #'my-consult-git-grep
+    "s"   #'my-consult-line
+    "m"   #'my-consult-line-multi
+    "o"   #'my-consult-outline
+    "b"   #'consult-buffer
+    "c c" #'consult-complex-command
+    "l"   #'consult-goto-line
+    "f"   #'my-consult-find
+    "F"   #'consult-locate
+    "c m" #'consult-mode-command
+    "p"   #'consult-projectile
+    "P"   #'consult-projectile-switch-project
+    "r"   #'consult-ripgrep
+    "t"   #'consult-todo-dir
+    "y s" #'consult-yasnippet
+    "y f" #'consult-yasnippet-visit-snippet-file
+    "n"   #'consult-denote-find
+    "d"   #'devdocs-lookup)
+
   :bind-keymap*
-  ("C-s" . consult-keymap*)
+  ("C-s" . my/consult-keymap))
 
-  :bind
-  (:map consult-keymap*
-        ("h"   . my-consult-find-in-home-dir)
-        ("g"   . my-consult-git-grep)
-        ("s"   . my-consult-line)
-        ("m"   . my-consult-line-multi)
-        ("o"   . my-consult-outline)
+(use-package projectile
+  :ensure t
+  :custom
+  (projectile-project-search-path '("~/projects"))
 
-        ("b"   . consult-buffer)
-        ("cc"  . consult-complex-command)
-        ("l"   . consult-goto-line)
-        ("f"   . my-consult-find)
-        ("F"   . consult-locate)
-        ("cm"  . consult-mode-command)
-        ("p"   . consult-projectile)
-        ("r"   . consult-ripgrep)
-
-        ("t"   . consult-todo-dir)
-        ("ys" .  consult-yasnippet)
-        ("yf" .  consult-yasnippet-visit-snippet-file)
-        ("n"   . consult-denote-find)
-
-        ("d"   . devdocs-lookup)))
+  :config
+  (projectile-discover-projects-in-search-path))
 
 (use-package consult-projectile
   :ensure t
@@ -170,35 +178,42 @@
 
 (use-package corfu
   :ensure t
+  :requires nerd-icons-corfu
+
   :init
   (global-corfu-mode)
 
   :custom
   ((corfu-separator ?\s)
    (corfu-cycle t)
-   (global-corfu-minibuffer nil)
    (tab-always-indent 'complete))
-
-  :config
-  (delete-selection-mode t)
 
   :bind
   (:map corfu-map
         ("SPC" . corfu-insert-separator)
+        ("M-h" . corfu-popupinfo-toggle)
         ("C-j" . corfu-insert)
-        ("C--" . corfu-expand)))
+        ("M-j" . corfu-quick-insert))
+
+  :config
+  (require 'corfu-popupinfo)
+
+  (advice-add #'corfu-quit :after #'corfu-popupinfo--hide)
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package cape
   :ensure t
-  :after corfu
 
   :hook
   ((completion-at-point-functions cape-dabbrev)
    (completion-at-point-functions cape-file))
 
-  :bind
-  ("C-ö" . completion-at-point)
-  ("C-S-ö" . cape-prefix-map))
+  :bind*
+  ("C-ö" . cape-prefix-map)
+
+  :config
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file))
 
 (use-package orderless
   :ensure t
@@ -245,36 +260,18 @@
   :config
   (marginalia-mode))
 
-(use-package embark
-  :ensure t
-
-  :bind
-  (("C-,"   .   embark-act)
-   ("M-#"   .   embark-dwim)
-   ("C-h , ," . embark-bindings-at-point)
-   ("C-h , b" . embark-bindings))
-
-  :init
-  (setq prefix-help-command #'embark-prefix-help-command)
-
-  :config
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
-
 (use-package embark-consult
   :ensure t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-;;TODO:  use this in tiling.el
 (use-package winner
   :ensure nil
   :demand t
   :init
   :config
   (winner-mode)
+
   :bind*
   (("C-M-#" . toggle-fullframe-window)))
 
@@ -285,7 +282,7 @@
 
 (use-package transpose-frame
   :init
-  (defvar transpose-frame-keymap* (make-sparse-keymap))
+  (defvar transpose-frame-keymap* (make-sparse-keymap "transpose-frame"))
 
   :bind-keymap*
   ("C-M-." . transpose-frame-keymap*)
@@ -392,21 +389,65 @@
 (use-package tiling
   :load-path "configuration/")
 
-(use-package ace-jump-mode
+(use-package avy
   :ensure t
 
+  :custom
+  (avy-dispatch-alist
+   '((?k . avy-action-kill-move)
+     (?K . avy-action-kill-stay)
+     (?t . avy-action-teleport)
+     (?m . avy-action-mark)
+     (?w . avy-action-copy)
+     (?y . avy-action-yank)
+     (?Y . avy-action-yank-line)
+     (?z . avy-action-zap-to-char)
+     (?x . avy-action-run-command)))
+
   :bind
-  (("M-j" . ace-jump-char-mode)
-   ("M-b" . ace-jump-mode-pop-mark)
-   ("M-l" . ace-jump-line-mode)))
+  (("M-j" . avy-goto-char-timer))
+
+  :config
+  (defun avy-action-run-command (pt)
+    (save-excursion
+      (goto-char pt)
+      (let ((command (read-key-sequence "Press keybinding: ")))
+        (command-execute (key-binding command))))
+    nil))
 
 (use-package ace-window
   :ensure t
   :after (tiling pkg--zoom consult)
-  :init
-  (defvar window-management-keymap*  (make-sparse-keymap))
 
-  (defun make-new-frame ()
+  :bind-keymap*
+  ("C-o" . my/window-management-keymap)
+
+  :bind*
+  (("M-o" . ace-window)
+   ("M-O" . aw-flip-window))
+
+  :config
+  (require 'cl-lib)
+
+  (defvar-keymap my/window-management-keymap
+    :doc "My custom keymap for ace, tiling and other window adjustments."
+    "f"   #'toggle-frame-fullscreen
+    "m"   #'my-make-new-frame
+    "k"   #'delete-other-windows
+    "."   #'xref-find-definitions-other-window
+
+    "o"   #'create-tiling-window
+    "x"   #'delete-tiling-window
+    "SPC" #'toggle-tiling
+    "j"   #'tile-layout-master-left
+    "t"   #'tile-layout-master-top
+    "v"   #'tile-layout-even-vertical
+    "b"   #'tile-layout-even-horizontal
+
+    "A"   #'my-push-global-mark
+    "a"   #'pop-global-mark)
+
+  (defun my-make-new-frame ()
     "Create a new frame and make it fullscreen."
     (interactive)
     (let ((new-frame (make-frame)))
@@ -419,34 +460,33 @@
     (interactive)
     (push-mark))
 
-  :config
+  (defun my-aw--execute-command-other-window (command window)
+    "Execute COMMAND in WINDOW."
+    (aw-switch-to-window window)
+    (unwind-protect
+        (call-interactively command)
+      (aw-flip-window)))
+
+  (defun my-aw-add-custom-dispatches (dispatch-list)
+    "Adds every defined dispatch in DISPATCH-LIST to `aw-dispatch-alist'"
+    (dolist (dispatch dispatch-list)
+      (cl-destructuring-bind
+          (key command description) dispatch
+        (add-to-list
+         'aw-dispatch-alist
+         (list key
+               (apply-partially #'my-aw--execute-command-other-window command)
+               description)))))
+
+
+  (my-aw-add-custom-dispatches
+   '((?p consult-projectile "Consult Projectile")
+     (?l consult-line       "Consult Line")))
+
   (setq
    aw-scope 'global
    aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
-   aw-dispatch-always t)
-
-  :bind-keymap*
-  ("C-o" . window-management-keymap*)
-
-  :bind*
-  (("M-o" . ace-window)
-
-   :map window-management-keymap*
-   ("f" . toggle-frame-fullscreen)
-   ("m" . make-new-frame)
-   ("k" . delete-other-windows)
-   ("." . xref-find-definitions-other-window)
-
-   ("o"   . create-tiling-window)
-   ("x"   . delete-tiling-window)
-   ("SPC" . toggle-tiling)
-   ("j"   . tile-layout-master-left)
-   ("t"   . tile-layout-master-top)
-   ("v"   . tile-layout-even-vertical)
-   ("b"   . tile-layout-even-horizontal)
-
-   ("A" . my-push-global-mark)
-   ("a" . pop-global-mark)))
+   aw-dispatch-always t))
 
 (use-package expand-region
   :bind*
@@ -463,9 +503,11 @@
 (use-package undo-tree
   :demand t
   :diminish undo-tree-mode
+  :custom
+  (undo-tree-auto-save-history nil)
+
   :config
   (global-undo-tree-mode))
-
 
 (use-package multiple-cursors
   :ensure t
@@ -488,7 +530,9 @@
 (use-package mc-extras
   :ensure t
 
-  :requires (multiple-cursors-core ace-jump-mode)
+  :init
+  (require 'multiple-cursors-core)
+  (require 'ace-jump-mode)
 
   :bind*
   ("M-c RET" . add-n-fake-cursors-newline)
@@ -531,22 +575,53 @@
   ace-mc
   :ensure t
 
-  :requires
-  (multiple-cursors
-   multiple-cursors-core
-   mc-extras)
+  :init
+  (require 'multiple-cursors)
+  (require 'multiple-cursors-core)
+  (require 'mc-extras)
 
   :bind*
   ("M-c j" . ace-mc-add-multiple-cursors)
-  ("M-c y" . add-multiple-cursors-line-mode)
+  ("M-c y" . add-multiple-cursors-and-add-cursors-in-between)
 
   :functions
-  (mc-add-fake-cursors-between)
+  (add-multiple-cursors-line-mode--wrap-hook)
 
   :config
-  (defun add-multiple-cursors-line-mode ()
+  ;;FIXME: Does not work at all ...
+  (defun region-between-cursors ()
+    "Return the region (start and end positions) between the first and last cursor."
+    (let* ((cursors (sort (cons (point) (mapcar #'overlay-start (mc/all-fake-cursors))) '<))
+           (first-cursor-pos (nth 0 cursors))
+           (last-cursor-pos (nth (1- (length cursors)) cursors)))
+      (cons first-cursor-pos last-cursor-pos)))
+
+  (defun add-cursors-in-region (region)
+    "Add a fake cursor on each line within the REGION, excluding the first and last lines."
+    (let ((start (car region))
+          (end (cdr region))
+          (col (save-excursion
+                 (goto-char (car region))
+                 (current-column))))
+      (save-excursion
+        (goto-char start)
+        (forward-line 1)
+        (while (< (point) end)
+          (move-to-column col)
+          (unless (or (mc/fake-cursor-at-point) (eq (point) (car region)) (eq (point) (cdr region)))
+            (mc/create-fake-cursor-at-point))
+          (forward-line 1))
+        (mc/maybe-multiple-cursors-mode))))
+
+  (defun add-multiple-cursors-and-add-cursors-in-between ()
+    "Add multiple cursors, then add fake cursors between the first and last cursor."
     (interactive)
-    (ace-mc-add-multiple-cursors 16)))
+    ;; Add the initial multiple cursors
+    (ace-mc-add-multiple-cursors 16 t)
+    ;; Get the region between the first and last cursors
+    (let ((region (region-between-cursors)))
+      ;; Add cursors in the region
+      (add-cursors-in-region region))))
 
 (use-package
   pkg--zoom
@@ -554,7 +629,7 @@
   :load-path "configuration/"
 
   :init
-  (defvar zoom-keymap*  (make-sparse-keymap))
+  (defvar zoom-keymap* (make-sparse-keymap "zoom"))
 
   :bind-keymap*
   ("M-+" . zoom-keymap*)
@@ -578,6 +653,7 @@
  '(highlight-nonselected-windows t)
  '(shift-select-mode t)
  '(x-select-enable-clipboard t)
+ '(delete-selection-mode t)
  '(initial-major-mode (quote fundamental-mode))
  '(initial-buffer-choice "*new*")
  '(ring-bell-function (quote ignore)))
