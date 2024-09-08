@@ -143,6 +143,8 @@
 
   :config
   (setq
+   consult-projectile-use-projectile-switch-project t
+
    projectile-completion-system 'auto
    projectile-file-exists-remote-cache-expire 300
    projectile-file-exists-local-cache-expire nil

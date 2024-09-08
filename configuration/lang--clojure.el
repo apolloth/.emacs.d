@@ -264,12 +264,14 @@
              (intern 'user 'emacs-system-go-executed)
              (system-go))
            (user/system-restart!))
-         (user/system-restart!))"))
+         (user/system-restart!))")
+    (setq my/user-system-running-p t))
 
   (defun cider-repl-user-system-restart ()
     (interactive)
     (cider-interactive-eval
-     "(user/system-restart!)"))
+     "(user/system-restart!)")
+    (setq my/user-system-running-p t))
 
   ;; (defun cider-repl-user-system-start ()
   ;;   (interactive)
@@ -279,7 +281,8 @@
   (defun cider-repl-user-system-stop ()
     (interactive)
     (cider-interactive-eval
-     "(user/system-stop!)"))
+     "(user/system-stop!)")
+    (setq my/user-system-running-p nil))
 
   (defun cider-figwheel-main-profiles ()
     (thread-last
@@ -329,12 +332,12 @@
       (cider-interactive-eval
        ":cljs/quit")
 
-      (sleep-for 0 100)
+      (sleep-for 3)
 
       (cider-interactive-eval
        (format
         "(require 'figwheel.main.api)
-         (figwheel.main.api/cljs-repl \"%s\")"
+         (figwheel.main.api/cljs-repl \"%s\")"
         build build))
       ))
 
@@ -350,63 +353,51 @@
 
   ;; TODO Fix automatic connect of REPLs
 
-  ;; (defun my/cider-project-connected-p ()
-  ;;   "Check if there is an active CIDER connection for the current project."
-  ;;   (let ((project-dir (projectile-project-root)))
-  ;;     (message "Checking connection for project: %s" project-dir)
-  ;;     (seq-find
-  ;;      (lambda (conn)
-  ;;        (message "Checking connection: %s" (with-current-buffer (cider-current-repl-buffer) default-directory))
-  ;;        (string-prefix-p project-dir
-  ;;                         (with-current-buffer (cider-current-repl-buffer)
-  ;;                           default-directory)))
-  ;;      (cider-connections))))
 
-  ;; (defun my/cider-jack-in-with-system-restart ()
-  ;;   "Jack in with CIDER and run the system restart if necessary."
-  ;;   (interactive)
-  ;;   (let ((default-directory (projectile-project-root)))
-  ;;     (unless (my/cider-project-connected-p)
-  ;;       (message "No REPL connected, jacking in...")
-  ;;       (cider-jack-in nil))
-  ;;     (run-at-time "2 sec" nil
-  ;;                  (lambda ()
-  ;;                    (when (my/cider-project-connected-p)
-  ;;                      (message "REPL connected, restarting system...")
-  ;;                      (cider-interactive-eval "(user/system-restart)"))))))
+  (defvar my/user-system-running-p
+    nil
+    "Denotes wether user/system is currently running.")
 
-  ;; (defun my/cider-maybe-jack-in ()
-  ;;   "Check if the current project has a REPL connected; if not, start it."
-  ;;   (when (and (projectile-project-p)
-  ;;              (not (my/cider-project-connected-p)))
-  ;;     (my/cider-jack-in-with-system-restart)))
+  (defun my/sesman-current-project-session ()
+    (sesman-current-session 'CIDER '(project-current)))
+
+  (defun my/test-sesman-current-project-session ()
+    (interactive)
+    (message "Session: %s" (car (my/sesman-current-project-session))))
+
+  (defun my/sesman-maybe-cider-jack-in-dwim ()
+    "Check when inside a project if it has a running sesman cider session; if not, starts cider repl."
+    (when (and (projectile-project-p)
+               (not (my/sesman-current-project-session)))
+
+      (cider-jack-in-dwim)))
+
+  (defun my/lein-clean ()
+    (interactive)
+    (shell-command-to-string "lein clean"))
+
+  (defun my/cider-jack-in-with-system-restart ()
+    "Jack in with CIDER and run the system restart if necessary."
+    (interactive)
+    (MY/sesman-maybe-cider-jack-in-dwim)
+    (sleep-for 3)
+    (unless my/user-system-running-p
+      (call-interactively #'cider-repl-user-system-start)))
+
+  (defun my/cider-restart-project ()
+    "Restart the current Clojure project by closing REPLs, cleaning, and restarting."
+    (interactive)
+    (when-let (project-session (my/sesman-current-project-session))
+      (progn
+        (message "Restarting session: %s" (car project-session))
+        (sesman-quit project-session)
+        (sleep-for 2)
+        (call-interactively #'my/lein-clean)
+        (sleep-for 1)
+        (call-interactively #'my/cider-jack-in-with-system-restart))))
 
 
-  ;; (defun my/cider-restart-project ()
-  ;;   "Restart the current Clojure project by closing REPLs, cleaning, and restarting."
-  ;;   (interactive)
-  ;;   (let ((project-dir (projectile-project-root)))
-  ;;     (when project-dir
-  ;;       ;; 1. Close all REPLs associated with the project using sesman
-  ;;       (dolist (session (sesman-current-sessions 'CIDER))
-  ;;         (let ((session-project-dir (with-current-buffer (car (cdr session))
-  ;;                                      default-directory)))
-  ;;           (when (string-prefix-p project-dir session-project-dir)
-  ;;             (message "Killing session: %s" (car session))
-  ;;             (sesman-quit (cdr session)))))
-
-  ;;       ;; 2. Run `lein clean` in the project root
-  ;;       (message "Running `lein clean` in %s" project-dir)
-  ;;       (let ((default-directory project-dir))
-  ;;         (shell-command "lein clean"))
-
-  ;;       ;; 3. Restart the REPLs and the system
-  ;;       (message "Restarting REPLs and system...")
-  ;;       (my/cider-jack-in-with-system-restart))))
-
-  ;; (add-hook 'find-file-hook #'my/cider-maybe-jack-in)
-
-  ;;(add-hook 'projectile-after-switch-project-hook #'my/cider-jack-in-with-system-restart)
+  (add-hook 'projectile-after-switch-project-hook #'my/cider-jack-in-with-system-restart)
 
   (setq
    cider-jack-in-default 'clojure-cli
@@ -497,145 +488,145 @@
 
   :bind*
   (:map clojure-mode-map
-	("C-c M-j" . nil)
+        ("C-c M-j" . nil)
 
-	("C-c M-j J" . cider-jack-in-dwim)
-	("C-c M-j j" . cider-connect-clj)
+        ("C-c M-j J" . cider-jack-in-dwim)
+        ("C-c M-j j" . cider-connect-clj)
 
         ("C-c C-M-j" . cider-switch-to-repl-buffer)
         ("C-c C-M-S-J" . cider-repl-switch-to-repl-buffer-and-ns)
 
-	("C-c M-j S" . cider-jack-in-cljs)
-	("C-c M-j s" . cider-connect-cljs)
+        ("C-c M-j S" . cider-jack-in-cljs)
+        ("C-c M-j s" . cider-connect-cljs)
 
-	("C-c M-j B" . cider-jack-in-clj&cljs)
-	("C-c M-j b" . cider-connect-clj&cljs)
+        ("C-c M-j B" . cider-jack-in-clj&cljs)
+        ("C-c M-j b" . cider-connect-clj&cljs)
 
-	:map cider-mode-map
-	("C-M-g" . cider-interrupt)
+        :map cider-mode-map
+        ("C-M-g" . cider-interrupt)
         ("C-c C-c" . cider-eval-dwim)
         ("C-M-x" . cider-eval-last-sexp)
-	("C-M-S-X" . cider-insert-last-sexp-in-repl)
-	("C-c M-k" . cider-load-buffer)
+        ("C-M-S-X" . cider-insert-last-sexp-in-repl)
+        ("C-c M-k" . cider-load-buffer)
 
-	("C-h h" . cider-doc)
-	("C-h H" . cider-javadoc)
+        ("C-h h" . cider-doc)
+        ("C-h H" . cider-javadoc)
 
-	("M-f d" . cider-find-var)
-	("M-f D" . cider-grimoire)
-	("M-f r" . cider-apropos)
-	("M-f f" . cider-find-resource)
-	("M-f n" . cider-find-ns)
-	("M-F" . cider-pop-back)
+        ("M-f d" . cider-find-var)
+        ("M-f D" . cider-grimoire)
+        ("M-f r" . cider-apropos)
+        ("M-f f" . cider-find-resource)
+        ("M-f n" . cider-find-ns)
+        ("M-F" . cider-pop-back)
 
-	("C-c M-j" . nil)
+        ("C-c M-j" . nil)
         ("C-c C-M-j" . my-cider-switch-to-repl-buffer)
         ("C-c C-M-S-J" . cider-repl-switch-to-repl-buffer-and-ns)
 
-	("C-c M-q" . cider-quit)
-	("C-c M-r" . cider-restart)
+        ("C-c M-q" . cider-quit)
+        ("C-c M-r" . cider-restart)
         ("C-c M-o" . cider-find-and-clear-repl-output)
-	("C-c M-c" . cider-completion-flush-caches)
+        ("C-c M-c" . cider-completion-flush-caches)
 
         ("M-u" . nil)
         ("M-u s" . cider-repl-user-system-start)
-        ;; ("M-u R" . my/cider-restart-project)
+        ("M-u R" . my/cider-restart-project)
         ("M-u r" . cider-repl-user-system-restart)
         ("M-u S" . cider-repl-user-system-stop)
         ("M-u f" . cider-repl-user-fig-init)
         ("M-u w" . cider-repl-user-switch-cljs-repl)
         ("M-u W" . cider-repl-user-quit-cljs-repl)
 
-       	:map cider-repl-mode-map
-	("C-<left>" . sp-backward-sexp)
-	("M-<left>" . sp-forward-barf-sexp)
-	("C-M-<left>" . sp-backward-barf-sexp)
+        :map cider-repl-mode-map
+        ("C-<left>" . sp-backward-sexp)
+        ("M-<left>" . sp-forward-barf-sexp)
+        ("C-M-<left>" . sp-backward-barf-sexp)
 
-	("C-<right>" . sp-forward-sexp)
-	("M-<right>" . sp-forward-slurp-sexp)
-	("C-M-<right>" . sp-backward-slurp-sexp)
+        ("C-<right>" . sp-forward-sexp)
+        ("M-<right>" . sp-forward-slurp-sexp)
+        ("C-M-<right>" . sp-backward-slurp-sexp)
 
-	("C-<up>" . sp-backward-up-sexp)
-	("M-<up>" . sp-convolute-sexp)
+        ("C-<up>" . sp-backward-up-sexp)
+        ("M-<up>" . sp-convolute-sexp)
 
-	("C-<down>" . sp-down-sexp)
-	("M-<down>" . sp-raise-sexp)
+        ("C-<down>" . sp-down-sexp)
+        ("M-<down>" . sp-raise-sexp)
 
-	("C-M-<up>" . sp-backward-transpose-sexp)
-	("C-M-<down>" . sp-forward-transpose-sexp)
+        ("C-M-<up>" . sp-backward-transpose-sexp)
+        ("C-M-<down>" . sp-forward-transpose-sexp)
 
-	("M-\"" . sp-wrap-doublequote)
-	("C-(" . sp-wrap-round)
-	("M-[" . sp-wrap-square)
-	("M-{" . sp-wrap-curly)
+        ("M-\"" . sp-wrap-doublequote)
+        ("C-(" . sp-wrap-round)
+        ("M-[" . sp-wrap-square)
+        ("M-{" . sp-wrap-curly)
 
-	("C-M-(" . sp-rewrap-sexp)
+        ("C-M-(" . sp-rewrap-sexp)
 
-	("C-k" . sp-kill-sexp)
-	("C-S-K" . sp-unwrap-sexp)
+        ("C-k" . sp-kill-sexp)
+        ("C-S-K" . sp-unwrap-sexp)
 
-	("M-k" . sp-splice-sexp-killing-forward)
-	("M-K" . sp-splice-sexp-killing-backward)
-	("C-M-k" . sp-splice-sexp-killing-around)
+        ("M-k" . sp-splice-sexp-killing-forward)
+        ("M-K" . sp-splice-sexp-killing-backward)
+        ("C-M-k" . sp-splice-sexp-killing-around)
 
-	("C-;" . sp-comment-dwim)
+        ("C-;" . sp-comment-dwim)
 
-	("C-<left>" . sp-backward-sexp)
-	("M-<left>" . sp-forward-barf-sexp)
-	("C-M-<left>" . sp-backward-barf-sexp)
+        ("C-<left>" . sp-backward-sexp)
+        ("M-<left>" . sp-forward-barf-sexp)
+        ("C-M-<left>" . sp-backward-barf-sexp)
 
-	("C-<right>" . sp-forward-sexp)
-	("M-<right>" . sp-forward-slurp-sexp)
-	("C-M-<right>" . sp-backward-slurp-sexp)
+        ("C-<right>" . sp-forward-sexp)
+        ("M-<right>" . sp-forward-slurp-sexp)
+        ("C-M-<right>" . sp-backward-slurp-sexp)
 
-	("C-<up>" . sp-backward-up-sexp)
-	("M-<up>" . sp-convolute-sexp)
+        ("C-<up>" . sp-backward-up-sexp)
+        ("M-<up>" . sp-convolute-sexp)
 
-	("C-<down>" . sp-down-sexp)
-	("M-<down>" . sp-raise-sexp)
+        ("C-<down>" . sp-down-sexp)
+        ("M-<down>" . sp-raise-sexp)
 
-	("C-M-<up>" . sp-backward-transpose-sexp)
-	("C-M-<down>" . sp-forward-transpose-sexp)
+        ("C-M-<up>" . sp-backward-transpose-sexp)
+        ("C-M-<down>" . sp-forward-transpose-sexp)
 
-	("M-\"" . sp-wrap-doublequote)
-	("C-(" . sp-wrap-round)
-	("M-[" . sp-wrap-square)
-	("M-{" . sp-wrap-curly)
+        ("M-\"" . sp-wrap-doublequote)
+        ("C-(" . sp-wrap-round)
+        ("M-[" . sp-wrap-square)
+        ("M-{" . sp-wrap-curly)
 
-	("C-M-(" . sp-rewrap-sexp)
+        ("C-M-(" . sp-rewrap-sexp)
 
-	("C-k" . sp-kill-sexp)
-	("C-S-K" . sp-unwrap-sexp)
+        ("C-k" . sp-kill-sexp)
+        ("C-S-K" . sp-unwrap-sexp)
 
-	("M-k" . sp-splice-sexp-killing-forward)
-	("M-K" . sp-splice-sexp-killing-backward)
-	("C-M-k" . sp-splice-sexp-killing-around)
+        ("M-k" . sp-splice-sexp-killing-forward)
+        ("M-K" . sp-splice-sexp-killing-backward)
+        ("C-M-k" . sp-splice-sexp-killing-around)
 
-	("C-;" . sp-comment-dwim)
+        ("C-;" . sp-comment-dwim)
 
-	("C-c M-j" . nil)
+        ("C-c M-j" . nil)
         ("C-c C-M-j" . cider-switch-to-last-clojure-buffer)
 
-	("RET" . cider-repl-return)
-	("C-<return>" . cider-repl-newline-and-indent)
-	("C-S-<return>" . cider-repl-newline-and-indent)
+        ("RET" . cider-repl-return)
+        ("C-<return>" . cider-repl-newline-and-indent)
+        ("C-S-<return>" . cider-repl-newline-and-indent)
 
-	;; ("M-p" . history)
-	;; ("M-n" . history)
+        ;; ("M-p" . history)
+        ;; ("M-n" . history)
 
-	("M-P" . cider-repl-history)
+        ("M-P" . cider-repl-history)
 
-	("C-M-g" . cider-interrupt)
+        ("C-M-g" . cider-interrupt)
 
-	("C-h h" . cider-doc)
-	("C-h H" . cider-javadoc)
+        ("C-h h" . cider-doc)
+        ("C-h H" . cider-javadoc)
 
-	("M-j d" . cider-find-var)
-	("M-j D" . cider-grimoire)
-	("M-j r" . cider-apropos)
-	("M-j f" . cider-find-resource)
-	("M-j n" . cider-find-ns)
-	("M-J" . cider-pop-back)
+        ("M-j d" . cider-find-var)
+        ("M-j D" . cider-grimoire)
+        ("M-j r" . cider-apropos)
+        ("M-j f" . cider-find-resource)
+        ("M-j n" . cider-find-ns)
+        ("M-J" . cider-pop-back)
 
         ("M-u" . nil)
         ("M-u s" . cider-repl-user-system-start)
@@ -644,18 +635,18 @@
         ("M-u w" . cider-repl-user-switch-cljs-repl)
         ("M-u W" . cider-repl-user-quit-cljs-repl)
 
-	("C-c M-q" . cider-quit)
-	("C-c M-r" . cider-restart)
+        ("C-c M-q" . cider-quit)
+        ("C-c M-r" . cider-restart)
         ("C-c M-o" . cider-find-and-clear-repl-output)
 
-	:map cider-repl-history-mode-map
-	("M-p" . cider-repl-history-backward)
-	("M-n" . cider-repl-history-forward)
+        :map cider-repl-history-mode-map
+        ("M-p" . cider-repl-history-backward)
+        ("M-n" . cider-repl-history-forward)
 
-	("C-s" . cider-repl-history-occur)
-	("C-r" . nil)
+        ("C-s" . cider-repl-history-occur)
+        ("C-r" . nil)
 
-	("C-_" . cider-repl-history-undo-other-window)))
+        ("C-_" . cider-repl-history-undo-other-window)))
 
 ;;TODO: Switch to clojure-ts
 ;; (use-package clojure-ts
