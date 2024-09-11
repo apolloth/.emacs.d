@@ -116,8 +116,6 @@
   (setq cljr-warn-on-eval nil)
   (clj-refactor-mode 1))
 
-(use-package parseedn)
-
 (use-package cider
 
   :commands
@@ -132,72 +130,36 @@
    cider-jack-in-dwim)
 
   :config
-  (require 'parseedn)
   (require 'projectile)
+
+  (defvar excluded-lein-project-clj-profiles
+    '("base" "debug" "default" "leiningen/default"
+      "leiningen/test" "offline" "update"
+      "dev" "repl" "provided" "uberjar")
+    "Leiningen profiles that are not suitable for cider-jack-in.")
 
   (defun nil-blank-string (s)
     (when  s
       (unless (string-blank-p s)
         s)))
 
-  (defun get-file-content (filePath)
-    "Return filePath's file content."
-    (with-temp-buffer
-      (insert-file-contents filePath)
-      (buffer-string)))
+  ;;TODO: Not needed currently. May be used in optimized version of
+  ;;      'lein-project-clj-profiles'.
+  ;; (defun lein-project-clj-filepath ()
+  ;;   (thread-first
+  ;;     (projectile-project-root)
+  ;;     (concat "project.clj")))
 
-  (defun lein-project-clj-filepath ()
-    (thread-first
-      (projectile-project-root)
-      (concat "project.clj")))
+  ;;TODO: Needs optimization. Profiles are only prompted after 1-2 seconds.
+  ;;      Using 'lein show-profiles' itself seems to be the issue here.
+  (defun lein-project-clj-profiles ()
+    (interactive)
+    (let ((lein-show-profiles-output
+           (with-temp-buffer
+             (process-file "lein" nil (current-buffer) nil "show-profiles")
+             (buffer-string))))
 
-  (defun lein-project-clj-content (filepath)
-    (let* ((data
-            (thread-first
-              filepath
-              (get-file-content)
-              (parseedn-read-str)))
-
-           (name
-            (nth 1 data))
-
-           (version
-            (nth 2 data))
-
-           (rest-root-level-values
-            (seq-drop data 3))
-
-           (result
-            (make-hash-table :test 'equal)))
-
-      (puthash :name name result)
-      (puthash :version version result)
-
-      (mapc (lambda (pair) (puthash (car pair) (car (cdr pair)) result))
-            (seq-partition rest-root-level-values 2))
-
-      result))
-
-  (defun lein-project-clj-profiles (filepath)
-    (let* ((profiles
-            (thread-last filepath
-                         (lein-project-clj-content)
-                         (gethash :profiles))))
-
-      (when profiles
-        (thread-last profiles
-                     (hash-table-keys)
-                     (mapcar 'symbol-name)
-                     (mapcar (lambda (profile) (substring profile 1)))))))
-
-  (defun my-cider-switch-to-repl-buffer (&optional set-namespace)
-    (interactive "P")
-    (cider--switch-to-repl-buffer
-     (if (and (equal (cider-repl-type-for-buffer) 'cljs)
-              (not (cider-repls 'cljs nil)))
-         (cider-current-repl 'clj t)
-       (cider-current-repl (cider-repl-type-for-buffer) t))
-     set-namespace))
+      (split-string lein-show-profiles-output "\n" t)))
 
   (defun cider-jack-in-with-args (args)
     (interactive "sjack-in repl with args: ")
@@ -211,10 +173,11 @@
 
   (defun lein-project-clj-jack-in-profiles ()
     (thread-last
-      (lein-project-clj-filepath)
       (lein-project-clj-profiles)
-      (seq-filter (lambda (profile) (not (member profile '("dev" "repl" "provided" "uberjar")))))
-      (seq-map (lambda (profile) (list profile (concat "+" profile))))
+      (seq-filter (lambda (profile)
+                    (not (member profile excluded-lein-project-clj-profiles))))
+      (seq-map (lambda (profile)
+                 (list profile (concat "+" profile))))
       (apply 'append)))
 
   (defun cider-jack-in-dwim ()
@@ -227,7 +190,6 @@
               (nil-blank-string
                (completing-read "jack-in repl with profile: "
                                 profiles nil nil nil nil "")))))
-
       (if profile
           (cider-jack-in-with-profile profile)
         (cider-jack-in nil))))
@@ -345,6 +307,15 @@
     (interactive)
     (cider-interactive-eval
      "(do (require 'clojure.tools.namespace.repl) (clojure.tools.namespace.repl/refresh-all))"))
+
+  (defun my-cider-switch-to-repl-buffer (&optional set-namespace)
+    (interactive "P")
+    (cider--switch-to-repl-buffer
+     (if (and (equal (cider-repl-type-for-buffer) 'cljs)
+              (not (cider-repls 'cljs nil)))
+         (cider-current-repl 'clj t)
+       (cider-current-repl (cider-repl-type-for-buffer) t))
+     set-namespace))
 
   (defun cider-repl-switch-to-repl-buffer-and-ns ()
     (interactive)
