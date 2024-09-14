@@ -131,4 +131,43 @@
            "* TODO %?\n"
            :empty-lines 1))))
 
+(use-package org-jira
+  :ensure t
+
+  :custom
+  (org-jira-download-dir "~/Documents/org/jira/")
+  (jiralib-update-issue-fields-exclude-list '(reporter))
+
+  :bind
+  (:map org-jira-entry-mode-map
+        ("C-c o"  . org-jira-todo-to-jira)
+        ("C-c tt" . my/create-issue-from-template)
+        ("C-c tj" . my/create-default-issue))
+
+  :config
+  (setq jiralib-url (my/jira-auth-info "url"))
+
+  (defvar-local my/issue-template-dir
+      "~/.org-jira/templates/"
+    "Path to my templates for JIRA issues.")
+
+  (defun my/get-issue-template (&optional template)
+    (with-temp-buffer
+      (insert-file-contents (s-concat my/issue-template-dir (or template "default") ".org"))
+      (buffer-string)))
+
+  (defun my/create-issue-from-template (project type summary &optional template)
+    "docstring"
+    (org-jira-create-issue project type summary (my/get-issue-template template)))
+
+  (defun my/create-default-issue (project type summary)
+    ""
+    (interactive)
+    (create-issue-from-template project type summary))
+
+  (defun my/jira-login ()
+    (interactive)
+    (jiralib-login (my/jira-auth-info "email") (my/jira-auth-info 'secret))))
+
+
 (provide 'base--organisation)

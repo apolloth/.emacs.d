@@ -59,6 +59,7 @@
  warning-minimum-level :error)
 
 (require 'base--apperance)
+(require 'authentication)
 (require 'base--interface)
 (require 'base--filemanagement)
 (require 'base--organisation)
