@@ -2,7 +2,8 @@
   :after smartparens
 
   :mode
-  (("\\.clj\\'" . clojure-mode)
+  (("\\.clj\\'"  . clojure-mode)
+   ("\\.bb\\'"   . clojure-mode)
    ("\\.cljs\\'" . clojurescript-mode))
 
   :config
@@ -133,33 +134,27 @@
   (require 'projectile)
 
   (defvar excluded-lein-project-clj-profiles
-    '("base" "debug" "default" "leiningen/default"
-      "leiningen/test" "offline" "update"
-      "dev" "repl" "provided" "uberjar")
-    "Leiningen profiles that are not suitable for cider-jack-in.")
+    '("dev" "repl" "uberjar")
+    "Leiningen profiles that will be excluded from cider-jack-in profile prompts.")
 
   (defun nil-blank-string (s)
     (when  s
       (unless (string-blank-p s)
         s)))
 
-  ;;TODO: Not needed currently. May be used in optimized version of
-  ;;      'lein-project-clj-profiles'.
-  ;; (defun lein-project-clj-filepath ()
-  ;;   (thread-first
-  ;;     (projectile-project-root)
-  ;;     (concat "project.clj")))
+  (defun lein-project-clj-filepath ()
+    (thread-first
+      (projectile-project-root)
+      (concat "project.clj")))
 
-  ;;TODO: Needs optimization. Profiles are only prompted after 1-2 seconds.
-  ;;      Using 'lein show-profiles' itself seems to be the issue here.
   (defun lein-project-clj-profiles ()
-    (interactive)
-    (let ((lein-show-profiles-output
-           (with-temp-buffer
-             (process-file "lein" nil (current-buffer) nil "show-profiles")
-             (buffer-string))))
+    (let ((extract-lein-project-profiles
+           "~/.emacs.d/configuration/my-scripts/extract-lein-project-profiles.bb"))
 
-      (split-string lein-show-profiles-output "\n" t)))
+      (with-temp-buffer
+        (call-process extract-lein-project-profiles nil (current-buffer) nil (lein-project-clj-filepath))
+        (beginning-of-buffer)
+        (read (current-buffer)))))
 
   (defun cider-jack-in-with-args (args)
     (interactive "sjack-in repl with args: ")
