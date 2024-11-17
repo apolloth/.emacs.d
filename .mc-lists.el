@@ -26,6 +26,9 @@
         electric-newline-and-maybe-indent
         forward-sexp
         haml-electric-backspace
+        ibuffer-do-delete
+        ibuffer-mark-for-delete
+        ibuffer-mark-forward
         indent-for-tab-command
         ivy-switch-buffer
         kill-region
@@ -35,6 +38,7 @@
         org-backward-element-with-beginning
         org-beginning-of-line
         org-ctrl-c-ctrl-c
+        org-ctrl-c-minus
         org-ctrl-c-star
         org-delete-char
         org-end-of-line
@@ -48,6 +52,7 @@
         org-self-insert-command
         org-shiftleft
         org-shiftright
+        org-todo
         org-toggle-checkbox
         org-yank
         platformio-build
@@ -101,5 +106,6 @@
         my-swiper
         overwrite-mode
         platformio-build
+        undo-tree-visualize
         view-order-manuals
         ))
