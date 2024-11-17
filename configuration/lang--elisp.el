@@ -37,7 +37,7 @@
         ("M-K" . sp-splice-sexp-killing-backward)
         ("C-M-k" . sp-splice-sexp-killing-around)
 
-        ("C--" . sp-copy-sexp)
+        ("C--" . sp-copy-list)
         ("C-<" . sp-forward-transpose-sexp)
         ("C-c ." . sp-trim-whitespace-of-sexp)
         ("C-;" . comment-dwim)

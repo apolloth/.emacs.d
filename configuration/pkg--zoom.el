@@ -1,9 +1,16 @@
 (defun zoom/apply (n)
+  (interactive "nFace-Height (in px): ")
   (set-face-attribute 'default (selected-frame) :height n))
 
 (defun zoom/default ()
   (interactive)
-  (zoom/apply 200))
+  (cond ((equal (display-pixel-height) 2520)
+         (zoom/apply 180))
+
+        ((equal (display-pixel-height) 1080)
+         (zoom/apply 190))
+
+        (t (zoom/apply 200))))
 
 (defun zoom/custom-1 ()
   (interactive)
@@ -25,11 +32,11 @@
 
 (defun zoom/inc ()
   (interactive)
-  (zoom/modify 1))
+  (zoom/modify 2))
 
 (defun zoom/dec ()
   (interactive)
-  (zoom/modify -1))
+  (zoom/modify -2))
 
 (zoom/default)
 

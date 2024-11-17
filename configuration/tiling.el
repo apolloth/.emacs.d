@@ -333,9 +333,9 @@
   (when (not (minibufferp))
     (set-tiling-layout tiling-current-layout)))
 
-(add-hook 'minibuffer-setup-hook #'my-tiling-capture-layout)
-(add-hook 'minibuffer-setup-hook #'my-tiling-adjust-for-vertico)
-(add-hook 'minibuffer-exit-hook #'my-tiling-restore-layout)
+;; (add-hook 'minibuffer-setup-hook #'my-tiling-capture-layout)
+;; (add-hook 'minibuffer-setup-hook #'my-tiling-adjust-for-vertico)
+;; (add-hook 'minibuffer-exit-hook #'my-tiling-restore-layout)
 
 ;; (add-hook 'emacs-startup-hook #'set-tiling-layout)
 
