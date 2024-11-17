@@ -70,7 +70,7 @@
 	treemacs-space-between-root-nodes      t
 	treemacs-tag-follow-cleanup            t
 	treemacs-tag-follow-delay              1.5
-        treemacs-position                      'right
+        treemacs-position                      'left
 	treemacs-width                         40)
 
   :bind*

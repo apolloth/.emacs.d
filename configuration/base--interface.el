@@ -64,11 +64,15 @@
   (region-to-text
    wrap-region-text
    my-consult-git-grep
+   my-consult-ripgrep
    my-consult-line
    my-consult-line-multi
    my-consult-outline
    my-consult-find
    my-consult-find-in-home-dir)
+
+  :custom
+  ((consult-find-args "find ."))
 
   :config
   (defun region-to-text ()
@@ -81,21 +85,21 @@
       (deactivate-mark)
       (funcall func text)))
 
-  (defun my-consult-git-grep ()
-    (interactive)
-    (wrap-region-text (apply-partially 'consult-git-grep ".")))
-
   (defun my-consult-line ()
     (interactive)
     (wrap-region-text 'consult-line))
 
-  (defun my-consult-line-multi ()
+  (defun my-consult-line-multi (&optional query)
     (interactive)
-    (wrap-region-text 'consult-line))
+    (wrap-region-text (apply-partially 'consult-line-multi query)))
 
-  (defun my-consult-outline ()
+  (defun my-consult-git-grep (&optional dir)
     (interactive)
-    (wrap-region-text 'consult-outline))
+    (wrap-region-text (apply-partially 'consult-git-grep dir)))
+
+  (defun my-consult-ripgrep (&optional dir)
+    (interactive)
+    (wrap-region-text (apply-partially 'consult-ripgrep dir)))
 
   (defun my-consult-find (&optional dir)
     (interactive)
@@ -111,7 +115,7 @@
     "g"   #'my-consult-git-grep
     "s"   #'my-consult-line
     "m"   #'my-consult-line-multi
-    "o"   #'my-consult-outline
+    "o"   #'consult-outline
     "b"   #'consult-buffer
     "c c" #'consult-complex-command
     "l"   #'consult-goto-line
@@ -120,7 +124,7 @@
     "c m" #'consult-mode-command
     "p"   #'consult-projectile
     "P"   #'consult-projectile-switch-project
-    "r"   #'consult-ripgrep
+    "j"   #'my-consult-ripgrep
     "t"   #'consult-todo-dir
     "y s" #'consult-yasnippet
     "y f" #'consult-yasnippet-visit-snippet-file
@@ -133,6 +137,7 @@
 (use-package projectile
   :ensure t
   :custom
+  (projectile-require-project-root nil)
   (projectile-project-search-path '("~/projects"))
 
   :config
@@ -206,16 +211,14 @@
 (use-package cape
   :ensure t
 
-  :hook
-  ((completion-at-point-functions cape-dabbrev)
-   (completion-at-point-functions cape-file))
-
   :bind*
   ("C-ö" . cape-prefix-map)
 
   :config
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-file))
+  (add-to-list 'completion-at-point-functions
+               (cape-wrap-super #'cape-dabbrev
+                                #'cape-file))
+  )
 
 (use-package orderless
   :ensure t
@@ -391,6 +394,7 @@
 (use-package tiling
   :load-path "configuration/")
 
+
 (use-package avy
   :ensure t
 
@@ -404,18 +408,42 @@
      (?y . avy-action-yank)
      (?Y . avy-action-yank-line)
      (?z . avy-action-zap-to-char)
-     (?x . avy-action-run-command)))
+
+     (?- . my/avy-action-sp-copy-list)
+     (?_ . my/avy-action-sp-yank-list)
+     (?. . my/avy-action-sp-copy-sexp)
+     (?: . my/avy-action-sp-yank-sexp)
+     (?x . my/avy-action-run-command)))
 
   :bind
   (("M-j" . avy-goto-char-timer))
 
   :config
-  (defun avy-action-run-command (pt)
+  (defun my/avy-action-run-command (pt)
     (save-excursion
       (goto-char pt)
       (let ((command (read-key-sequence "Press keybinding: ")))
         (command-execute (key-binding command))))
-    nil))
+    nil)
+
+  (defun my/avy-action-sp-copy-sexp (pt)
+    (save-excursion
+      (goto-char pt)
+      (sp-copy-sexp))
+    nil)
+
+  (defun my/avy-action-sp-yank-sexp (pt)
+    (my/avy-action-sp-copy-sexp pt)
+    (yank)
+    t)
+
+  (defun my/avy-action-sp-yank-list (pt)
+    (my/avy-action-sp-copy-list pt)
+    (yank)
+    t))
+
+
+
 
 (use-package ace-window
   :ensure t

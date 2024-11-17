@@ -13,33 +13,13 @@
 (unless (package-installed-p 'use-package)
   (package-install 'diminish)
   (package-install 'smartrep)
-  (package-install 'use-package)
-  ;; (package-install 'spacemacs-theme)
-  ;; (package-install 'doom-themes)
-  (package-install 'exec-path-from-shell))
+  (package-install 'use-package))
 
 (defun normalized-shell-command-to-string (shell-command)
   "Trims newlines of the output of SHELL-COMMAND."
   (thread-last shell-command
                (shell-command-to-string)
                (replace-regexp-in-string "\n\\'" "")))
-
-(when (memq window-system '(mac ns x))
-
-  (let* ((default-shell-path
-          (normalized-shell-command-to-string "echo $SHELL"))
-
-         (default-shell
-          (thread-last default-shell-path
-                       (replace-regexp-in-string ".*/" "")))
-
-         ;;TODO: Implement general solution for default-shell
-         (path
-          (shell-command-to-string ". ~/.bashrc; echo -n $PATH")))
-
-    (setenv "PATH" path)
-    (setq exec-path (split-string-and-unquote path ":")
-          shell-file-name default-shell-path)))
 
 (setq custom-file "~/.emacs.d/custom.el")
 
@@ -59,8 +39,11 @@
  warning-minimum-level :error)
 
 (require 'base--apperance)
-(require 'authentication)
 (require 'base--interface)
+
+(require 'authentication)
+(require 'expansion--org-jira)
+
 (require 'base--filemanagement)
 (require 'base--organisation)
 (require 'base--startup)

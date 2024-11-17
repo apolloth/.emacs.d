@@ -4,7 +4,7 @@
   :diminish page-break-lines-mode
 
   :custom
-  ((dashboard-startup-banner "~/.emacs.d/configuration/dashboard/emacs-mascot.png")
+  ((dashboard-startup-banner "~/.emacs.d/configuration/dashboard/emacs-mascot.svg")
    (dashboard-items '((recents  .  10)
                       (projects .   5)
                       (agenda   .   5)))

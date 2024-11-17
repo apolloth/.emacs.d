@@ -61,7 +61,7 @@
       (sp-kill-sexp)))
 
   (defun sp-copy-list ()
-    (interactive )
+    (interactive)
     (save-excursion
       (sp-backward-up-sexp)
       (sp-copy-sexp)))
@@ -130,8 +130,7 @@
     (magit-push-to-gerrit-local-branch-or-commit (magit-get-current-branch)))
 
   :config
-  ;;FIXME: Use corfu/orderless instead of ivy
-  (setq magit-completing-read-function 'ivy-completing-read)
+  ;;FIXME: Add magit-completing-read-function for corfu/orderless
   (setq magit-repository-directories '(("/~" . 1)))
   (transient-append-suffix 'magit-push "e"
     '("P" "Push current branch to Gerrit" magit-push-to-gerrit-current-branch))
