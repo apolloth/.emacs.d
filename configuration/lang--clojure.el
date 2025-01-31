@@ -44,9 +44,9 @@
 
         ("M-k" . sp-splice-sexp)
         ("M-K" . sp-splice-sexp-killing-backward)
-        ("C-M-k" . sp-splice-sexp-killing-around)
+        ("C--" . sp-copy-list)
 
-        ("C--" . sp-copy-sexp)
+        ("C-M-k" . sp-splice-sexp-killing-around)
         ("C-<" . sp-forward-transpose-sexp)
         ("C-c ." . sp-trim-whitespace-of-sexp)
         ("C-;" . comment-dwim)))
@@ -117,6 +117,7 @@
   (setq cljr-warn-on-eval nil)
   (clj-refactor-mode 1))
 
+
 (use-package cider
 
   :commands
@@ -130,8 +131,22 @@
    cider-jack-in-with-profile
    cider-jack-in-dwim)
 
+  :init
+  (defvar my/lein-project-sessions
+    (make-hash-table :test 'equal))
+
+  (defvar my/lein-current-project-name
+    nil)
+
+  (defvar my/poll-ongoing-nrepl-request-timer
+    nil
+    "Timer to periodically check the value of `my-var`.")
+
   :config
+  (require 'dash)
   (require 'projectile)
+  (require 'sesman)
+  (require 'nrepl-client)
 
   (defvar excluded-lein-project-clj-profiles
     '("dev" "repl" "uberjar")
@@ -142,10 +157,27 @@
       (unless (string-blank-p s)
         s)))
 
+  (defun my/seq (sequence)
+    (and (not (seq-empty-p sequence)) sequence))
+
+  (defun my/project-session-put (key value)
+    (message "project-session-put %s" '(key value))
+    (let ((session-plist
+           (gethash my/lein-current-project-name my/lein-project-sessions)))
+
+      (--> session-plist
+           (plist-put it key value)
+           (puthash my/lein-current-project-name it my/lein-project-sessions))))
+
+  (defun my/project-session-get (key)
+    (message "project-session-get %s" key)
+    (-> my/lein-current-project-name
+        (gethash my/lein-project-sessions)
+        (plist-get key)))
+
   (defun lein-project-clj-filepath ()
-    (thread-first
-      (projectile-project-root)
-      (concat "project.clj")))
+    (-> (projectile-project-root)
+        (concat "project.clj")))
 
   (defun lein-project-clj-profiles ()
     (let ((extract-lein-project-profiles
@@ -212,35 +244,6 @@
         (when (string-match-p "^(\\([^\/]*\/\\)?deftest" (cider-sexp-at-point))
           (cider-test-run-test)))))
 
-  (defun cider-repl-user-system-start ()
-    (interactive)
-    (cider-interactive-eval
-     "(if-let [system-go (resolve 'user/system-go!)]
-         (if (nil? (resolve 'user/emacs-system-go-executed))
-           (do
-             (intern 'user 'emacs-system-go-executed)
-             (system-go))
-           (user/system-restart!))
-         (user/system-restart!))")
-    (setq my/user-system-running-p t))
-
-  (defun cider-repl-user-system-restart ()
-    (interactive)
-    (cider-interactive-eval
-     "(user/system-restart!)")
-    (setq my/user-system-running-p t))
-
-  ;; (defun cider-repl-user-system-start ()
-  ;;   (interactive)
-  ;;   (cider-interactive-eval
-  ;;    "(user/system-go!)"))
-
-  (defun cider-repl-user-system-stop ()
-    (interactive)
-    (cider-interactive-eval
-     "(user/system-stop!)")
-    (setq my/user-system-running-p nil))
-
   (defun cider-figwheel-main-profiles ()
     (thread-last
       (projectile-project-root)
@@ -272,31 +275,29 @@
     (cider-interactive-eval
      ":cljs/quit"))
 
-  (defun cider-repl-user-switch-cljs-repl ()
+  (defun cider-connect-cljs-repl ()
     (interactive)
-    (let* ((profiles
-            (cider-figwheel-main-profiles))
+    (let* ((clj-repl-p
+            (equal (cider-connection-type-for-buffer) 'clj))
 
-           (build
-            (unless (seq-empty-p profiles)
-              (nil-blank-string
-               (completing-read "switch cljs-repl to build: "
-                                profiles nil nil nil nil ""))))
+           (build (my/project-session-get :figwheel-build))
+
+           (profile-config-file
+            (when build
+              (s-concat (projectile-project-root) build ".cljs.edn")))
 
            (build
             (or build "dev")))
 
-      (cider-interactive-eval
-       ":cljs/quit")
-
-      (sleep-for 3)
-
-      (cider-interactive-eval
-       (format
-        "(require 'figwheel.main.api)
-         (figwheel.main.api/cljs-repl \"%s\")"
-        build build))
-      ))
+      (when clj-repl-p
+        (cider-interactive-eval
+         (format
+          "(require 'figwheel.main.api)
+           (figwheel.main.api/cljs-repl \"%s\")"
+          build))
+        (sleep-for 2)
+        (cider-connect-sibling-clj nil)
+        (my/project-session-put :cljs-repl-connected-p t))))
 
   (defun cider-repl-refresh-all ()
     (interactive)
@@ -317,53 +318,147 @@
     (call-interactively 'cider-repl-set-ns)
     (call-interactively 'cider-switch-to-repl-buffer))
 
-  ;; TODO Fix automatic connect of REPLs
-
-
-  (defvar my/user-system-running-p
-    nil
-    "Denotes wether user/system is currently running.")
-
-  (defun my/sesman-current-project-session ()
-    (sesman-current-session 'CIDER '(project-current)))
-
-  (defun my/test-sesman-current-project-session ()
+  (defun cider-repl-user-system-start ()
     (interactive)
-    (message "Session: %s" (car (my/sesman-current-project-session))))
+    (cider-interactive-eval
+     "(if-let [system-go (resolve 'user/system-go!)]
+         (if (nil? (resolve 'user/emacs-system-go-executed))
+           (do
+             (intern 'user 'emacs-system-go-executed)
+             (system-go))
+           (user/system-restart!))
+         (user/system-restart!))")
+    (my/project-session-put :user-system-running-p t))
+
+  (defun cider-repl-user-system-restart ()
+    (interactive)
+    (cider-interactive-eval
+     "(user/system-restart!)")
+    (my/project-session-put :user-system-running-p t))
+
+
+
+  ;; (defun cider-repl-user-system-start ()
+  ;;   (interactive)
+  ;;   (cider-interactive-eval
+  ;;    "(user/system-go!)"))
+
+  (defun cider-repl-user-system-stop ()
+    (interactive)
+    (cider-interactive-eval
+     "(user/system-stop!)")
+    (my/project-session-put :user-system-running-p nil))
+
+  ;;TODO: Think of better name
+  (defun my/cider-jack-in-dispatch ()
+    (if-let ((profile
+              (my/project-session-get :lein-profile)))
+
+        (cider-jack-in-with-profile profile)
+      (cider-jack-in nil)))
+
+  (defun my/cider-jack-in-dwim ()
+    (interactive)
+    (message "my/cider-jack-in-dwim")
+    (when (yes-or-no-p
+           (format
+            "Do you want to start REPL + System for %s ?"
+            (projectile-project-name)))
+
+      (when-let ((lein-profiles
+                  (my/seq (lein-project-clj-jack-in-profiles))))
+
+        (thread-last
+          lein-profiles
+          (completing-read "Jack-in REPL with profile: ")
+          (nil-blank-string)
+          (my/project-session-put :lein-profile)))
+
+      (when-let ((figwheel-profiles
+                  (my/seq (cider-figwheel-main-profiles))))
+
+        (thread-last
+          figwheel-profiles
+          (completing-read "Use figwheel build: ")
+          (nil-blank-string)
+          (my/project-session-put :figwheel-build)))
+
+      (my/cider-jack-in-dispatch)))
+
+  (defun my/setup-lein-project ()
+    (interactive)
+    (message "setup")
+    (when (and (projectile-project-p)
+               (file-exists-p (lein-project-clj-filepath)))
+      (message "setup2")
+      (setq my/lein-current-project-name (projectile-project-name))
+      (if (gethash my/lein-current-project-name my/lein-project-sessions)
+          (my/cider-jack-in-dispatch)
+        (my/cider-jack-in-dwim))))
+
 
   (defun my/sesman-maybe-cider-jack-in-dwim ()
     "Check when inside a project if it has a running sesman cider session; if not, starts cider repl."
+    (interactive)
     (when (and (projectile-project-p)
+               (file-exists-p (lein-project-clj-filepath))
                (not (my/sesman-current-project-session)))
 
       (cider-jack-in-dwim)))
 
   (defun my/lein-clean ()
     (interactive)
-    (shell-command-to-string "lein clean"))
+    (call-process "lein" nil nil nil "clean"))
 
-  (defun my/cider-jack-in-with-system-restart ()
-    "Jack in with CIDER and run the system restart if necessary."
+  (defun my/sesman-test-message ()
     (interactive)
-    (MY/sesman-maybe-cider-jack-in-dwim)
-    (sleep-for 3)
-    (unless my/user-system-running-p
-      (call-interactively #'cider-repl-user-system-start)))
+    (thread-last
+      (sesman-current-session 'CIDER '(project-current))
+      (message "%s")))
 
   (defun my/cider-restart-project ()
-    "Restart the current Clojure project by closing REPLs, cleaning, and restarting."
+    "Restart the current leiningen project by closing REPLs, cleaning target dir, and restarting system."
     (interactive)
-    (when-let (project-session (my/sesman-current-project-session))
-      (progn
-        (message "Restarting session: %s" (car project-session))
-        (sesman-quit project-session)
-        (sleep-for 2)
-        (call-interactively #'my/lein-clean)
-        (sleep-for 1)
-        (call-interactively #'my/cider-jack-in-with-system-restart))))
+    (message "Restart Project")
+    (when-let ((sesman-session
+                (sesman-current-session 'CIDER '(project-current))))
+      (message "Quitting CIDER session: %s..." sesman-session)
+      (sesman-quit sesman-session)
+      (message "Cleaning project...")
+      (my/project-session-put :user-system-running-p nil)
+      (my/project-session-put :clj-repl-connected-p nil)
+      (my/project-session-put :cljs-repl-connected-p nil)
+      (my/lein-clean)
+      (message "Restarting...")
+      (my/setup-lein-project)))
+
+  (defun my/cider-start-cljs-repl-with-polling ()
+    (message "call polling fn")
+    (unless (or (my/project-session-get :cljs-repl-connected-p)
+                (not (my/project-session-get :user-system-running-p))
+                nrepl-ongoing-sync-request)
+      (message "connect-cljs + cancel timer")
+      ;;TODO: Add this back in later
+      ;;(cider-connect-cljs-repl)
+      (cancel-timer my/poll-ongoing-nrepl-request-timer)))
 
 
-  (add-hook 'projectile-after-switch-project-hook #'my/cider-jack-in-with-system-restart)
+  (add-hook 'cider-connected-hook
+            (lambda ()
+              (unless (my/project-session-get :user-system-running-p)
+                (cider-repl-user-system-start))))
+
+  (add-hook 'cider-connected-hook
+            (lambda ()
+              (when (and (my/project-session-get :figwheel-build)
+                         (not (my/project-session-get :cljs-repl-connected-p)))
+
+                (sleep-for 3)
+                (message "Set polling timer")
+                (setq my/poll-ongoing-nrepl-request-timer
+                      (run-at-time t 1 'my/cider-start-cljs-repl-with-polling)))))
+
+  (add-hook 'projectile-after-switch-project-hook #'my/setup-lein-project)
 
   (setq
    cider-jack-in-default 'clojure-cli
@@ -456,7 +551,7 @@
   (:map clojure-mode-map
         ("C-c M-j" . nil)
 
-        ("C-c M-j J" . cider-jack-in-dwim)
+        ("C-c M-j J" . my/cider-jack-in-dwim)
         ("C-c M-j j" . cider-connect-clj)
 
         ("C-c C-M-j" . cider-switch-to-repl-buffer)
@@ -500,7 +595,7 @@
         ("M-u r" . cider-repl-user-system-restart)
         ("M-u S" . cider-repl-user-system-stop)
         ("M-u f" . cider-repl-user-fig-init)
-        ("M-u w" . cider-repl-user-switch-cljs-repl)
+        ("M-u w" . cider-connect-cljs-repl)
         ("M-u W" . cider-repl-user-quit-cljs-repl)
 
         :map cider-repl-mode-map
@@ -595,10 +690,11 @@
         ("M-J" . cider-pop-back)
 
         ("M-u" . nil)
+        ("M-u R" . my/cider-restart-project)
         ("M-u s" . cider-repl-user-system-start)
         ("M-u S" . cider-repl-user-system-stop)
         ("M-u f" . cider-repl-user-fig-init)
-        ("M-u w" . cider-repl-user-switch-cljs-repl)
+        ("M-u w" . cider-connect-cljs-repl)
         ("M-u W" . cider-repl-user-quit-cljs-repl)
 
         ("C-c M-q" . cider-quit)
@@ -630,6 +726,16 @@
 
   :config
   (setq vega-view-prefer-png t))
+
+
+;; (defvar test-hash-table
+;;   #s(hash-table test equal data
+;;                 ((CIDER . projects/numerals:localhost:39935)
+;;                  (projects/numerals:localhost:39935 *cider-repl projects/numerals:localhost:39935(clj)*))))
+
+
+;; (progn
+;;   (gethash `(CIDER . ,session-id) test-hash-table))
 
 
 (provide 'lang--clojure)

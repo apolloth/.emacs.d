@@ -394,7 +394,6 @@
 (use-package tiling
   :load-path "configuration/")
 
-
 (use-package avy
   :ensure t
 
@@ -403,6 +402,7 @@
    '((?k . avy-action-kill-move)
      (?K . avy-action-kill-stay)
      (?t . avy-action-teleport)
+     (?T . my/avy-action-sp-teleport-list)
      (?m . avy-action-mark)
      (?w . avy-action-copy)
      (?y . avy-action-yank)
@@ -413,15 +413,24 @@
      (?_ . my/avy-action-sp-yank-list)
      (?. . my/avy-action-sp-copy-sexp)
      (?: . my/avy-action-sp-yank-sexp)
-     (?x . my/avy-action-run-command)))
+     (?x . my/avy-action-run-command-sexp)
+     (?X . my/avy-action-run-command-list)))
 
   :bind
   (("M-j" . avy-goto-char-timer))
 
   :config
-  (defun my/avy-action-run-command (pt)
+  (defun my/avy-action-run-command-sexp (pt)
     (save-excursion
       (goto-char pt)
+      (let ((command (read-key-sequence "Press keybinding: ")))
+        (command-execute (key-binding command))))
+    nil)
+
+  (defun my/avy-action-run-command-list (pt)
+    (save-excursion
+      (goto-char pt)
+      (sp-backward-up-sexp)
       (let ((command (read-key-sequence "Press keybinding: ")))
         (command-execute (key-binding command))))
     nil)
@@ -437,13 +446,24 @@
     (yank)
     t)
 
+  (defun my/avy-action-sp-command (pt sp-command)
+    (save-excursion
+      (goto-char pt)
+      (sp-backward-up-sexp)
+      (funcall sp-command))
+    nil)
+
+  (defun my/avy-action-sp-copy-list (pt)
+    (my/avy-action-sp-command pt #'sp-copy-sexp))
+
   (defun my/avy-action-sp-yank-list (pt)
     (my/avy-action-sp-copy-list pt)
     (yank)
-    t))
+    t)
 
-
-
+  (defun my/avy-action-sp-teleport-list (pt)
+    (my/avy-action-sp-command pt #'sp-kill-sexp)
+    (yank)))
 
 (use-package ace-window
   :ensure t
@@ -486,7 +506,7 @@
       (zoom/default)))
 
   (defun my-push-global-mark ()
-    "Create a global mark and deactivate deactivates region"
+    "Create a global mark and deactivates region"
     (interactive)
     (push-mark))
 

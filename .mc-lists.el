@@ -104,6 +104,7 @@
         mouse-set-region
         my-freeze-fake-cursors
         my-swiper
+        my/toggle-vterm
         overwrite-mode
         platformio-build
         undo-tree-visualize

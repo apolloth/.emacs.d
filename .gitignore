@@ -13,7 +13,8 @@ eln-cache/
 custom.el
 eshell/history
 eshell/lastdir
-*.~undo-tree~
+*~
 tramp
 url/
 devdocs/
+request/
