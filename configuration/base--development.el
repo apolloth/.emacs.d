@@ -105,6 +105,7 @@
 
   :config
   (add-to-list 'aggressive-indent-excluded-modes 'sass-mode)
+  (add-to-list 'aggressive-indent-excluded-modes 'clojure-mode)
   (add-to-list 'aggressive-indent-excluded-modes 'cider-repl-mode))
 
 (use-package magit
@@ -140,12 +141,84 @@
   (fullframe magit-log-all magit-mode-quit-window)
   (fullframe magit-log-current magit-mode-quit-window))
 
+(use-package lsp-mode
+  :ensure t
+
+  :commands lsp-install-server
+
+  :hook
+  (lsp-mode . lsp-diagnostics-mode)
+  (lsp-mode . lsp-enable-which-key-integration)
+  (lsp-mode . lsp-completion-mode)
+  (prog-mode . lsp-deferred)
+
+  :custom
+  (lsp-keymap-prefix "C-c")
+  ;;(lsp-completion-provider :capf)
+  (lsp-log-io nil)
+  (lsp-keep-workspace-alive nil)
+  (lsp-idle-delay 0.5)
+  (lsp-inlay-hint-enable t)
+
+  (lsp-enable-xref t)
+  (lsp-auto-configure t)
+  (lsp-eldoc-enable-hover t)
+  (lsp-enable-dap-auto-configure t)
+  (lsp-enable-file-watchers nil)
+  (lsp-enable-folding nil)
+  (lsp-enable-imenu t)
+  (lsp-enable-on-type-formatting t)
+  (lsp-enable-suggest-server-download t)
+  (lsp-enable-symbol-highlighting t)
+  (lsp-enable-text-document-color nil)
+  (lsp-enable-indentation t)
+  (lsp-enable-on-type-formatting t)
+
+  (lsp-completion-enable nil)
+  (lsp-completion-enable-additional-text-edit nil)
+  (lsp-enable-snippet nil)
+  (lsp-completion-show-kind nil)
+
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-headerline-breadcrumb-enable-diagnostics nil)
+
+  (lsp-modeline-code-actions-enable t)
+  (lsp-modeline-diagnostics-enable t)
+  (lsp-modeline-workspace-status-enable t)
+  (lsp-signature-doc-lines 1)
+  (lsp-eldoc-render-all nil)
+  (lsp-semantic-tokens-enable t)
+  (lsp-warn-no-matched-clients nil))
+
+(use-package lsp-ui
+  :after lsp-mode
+
+  :commands (lsp-ui-doc-show lsp-ui-doc-glance)
+
+  :custom
+  (lsp-ui-sideline-show-hover nil)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-code-actions nil)
+  (lsp-ui-sideline-show-diagnostics nil)
+  (lsp-ui-sideline-show-symbol nil)
+  (lsp-ui-sideline-diagnostic-max-lines 20)
+  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-show-with-cursor nil)
+  (lsp-ui-doc-show-signature t)
+  (lsp-ui-doc-use-childframe t)
+  (lsp-ui-doc-position 'at-point))
+
+
 (use-package flycheck
   :diminish
   flycheck-mode
 
   :hook
-  (prog-mode . flycheck-mode-on-safe)
+  (prog-mode . flycheck-mode)
+
+  :custom
+  (flymake-show-diagnostics-at-end-of-line 'short)
+  (flymake-fringe-indicator-position 'right-fringe)
 
   :config
   (set-default 'flycheck-disabled-checkers '(sass)))

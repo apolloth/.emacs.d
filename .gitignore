@@ -25,3 +25,6 @@ request/
 *.lsp/
 *.nrepl-port
 session.*
+/persp
+/tree-sitter/
+/workspace/

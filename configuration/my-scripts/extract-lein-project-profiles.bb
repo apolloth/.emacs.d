@@ -10,14 +10,6 @@
        (concat [:name name :version version])
        (apply hash-map)))
 
-(defn- parse-project-clj
-  "Parses a leiningen project.clj to a map."
-  [project-clj-filepath]
-  (->> project-clj-filepath
-       (slurp)
-       (read-string)
-       (project-definition->map)))
-
 (defn- lein-project-profiles
   "Returns a list with all profile names from `project-map`."
   [project-map]
@@ -29,6 +21,14 @@
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Public API
+
+(defn parse-project-clj
+  "Parses a leiningen project.clj to a map."
+  [project-clj-filepath]
+  (->> project-clj-filepath
+       (slurp)
+       (read-string)
+       (project-definition->map)))
 
 (defn extract-project-profiles
   "Main function, that pretty prints all profile names from project.clj."

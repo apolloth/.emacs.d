@@ -318,27 +318,19 @@
     (call-interactively 'cider-repl-set-ns)
     (call-interactively 'cider-switch-to-repl-buffer))
 
-  (defun cider-repl-user-system-start ()
+  (defun my/cider-repl-user-system-start ()
     (interactive)
     (cider-interactive-eval
-     "(if-let [system-go (resolve 'user/system-go!)]
-         (if (nil? (resolve 'user/emacs-system-go-executed))
-           (do
-             (intern 'user 'emacs-system-go-executed)
-             (system-go))
-           (user/system-restart!))
-         (user/system-restart!))")
+     "(user/system-go!)")
     (my/project-session-put :user-system-running-p t))
 
-  (defun cider-repl-user-system-restart ()
+  (defun my/cider-repl-user-system-restart ()
     (interactive)
     (cider-interactive-eval
      "(user/system-restart!)")
     (my/project-session-put :user-system-running-p t))
 
-
-
-  ;; (defun cider-repl-user-system-start ()
+  ;; (defun my/cider-repl-user-system-start ()
   ;;   (interactive)
   ;;   (cider-interactive-eval
   ;;    "(user/system-go!)"))
@@ -387,12 +379,11 @@
 
   (defun my/setup-lein-project ()
     (interactive)
-    (message "setup")
     (when (and (projectile-project-p)
                (file-exists-p (lein-project-clj-filepath)))
-      (message "setup2")
       (setq my/lein-current-project-name (projectile-project-name))
-      (if (gethash my/lein-current-project-name my/lein-project-sessions)
+      (if (and (gethash my/lein-current-project-name my/lein-project-sessions)
+               (not (my/project-session-get :user-system-running-p)))
           (my/cider-jack-in-dispatch)
         (my/cider-jack-in-dwim))))
 
@@ -404,7 +395,7 @@
                (file-exists-p (lein-project-clj-filepath))
                (not (my/sesman-current-project-session)))
 
-      (cider-jack-in-dwim)))
+      (call-interactively my/cider-jack-in-dwim)))
 
   (defun my/lein-clean ()
     (interactive)
@@ -424,11 +415,11 @@
                 (sesman-current-session 'CIDER '(project-current))))
       (message "Quitting CIDER session: %s..." sesman-session)
       (sesman-quit sesman-session)
-      (message "Cleaning project...")
+      (message "Resetting project...")
       (my/project-session-put :user-system-running-p nil)
       (my/project-session-put :clj-repl-connected-p nil)
       (my/project-session-put :cljs-repl-connected-p nil)
-      (my/lein-clean)
+      ;; (my/lein-clean)
       (message "Restarting...")
       (my/setup-lein-project)))
 
@@ -446,17 +437,17 @@
   (add-hook 'cider-connected-hook
             (lambda ()
               (unless (my/project-session-get :user-system-running-p)
-                (cider-repl-user-system-start))))
+                (my/cider-repl-user-system-restart))))
 
-  (add-hook 'cider-connected-hook
-            (lambda ()
-              (when (and (my/project-session-get :figwheel-build)
-                         (not (my/project-session-get :cljs-repl-connected-p)))
+  ;; (add-hook 'cider-connected-hook
+  ;;           (lambda ()
+  ;;             (when (and (my/project-session-get :figwheel-build)
+  ;;                        (not (my/project-session-get :cljs-repl-connected-p)))
 
-                (sleep-for 3)
-                (message "Set polling timer")
-                (setq my/poll-ongoing-nrepl-request-timer
-                      (run-at-time t 1 'my/cider-start-cljs-repl-with-polling)))))
+  ;;               (sleep-for 3)
+  ;;               (message "Set polling timer")
+  ;;               (setq my/poll-ongoing-nrepl-request-timer
+  ;;                     (run-at-time t 1 'my/cider-start-cljs-repl-with-polling)))))
 
   (add-hook 'projectile-after-switch-project-hook #'my/setup-lein-project)
 
@@ -590,9 +581,9 @@
         ("C-c M-c" . cider-completion-flush-caches)
 
         ("M-u" . nil)
-        ("M-u s" . cider-repl-user-system-start)
+        ("M-u s" . my/cider-repl-user-system-start)
         ("M-u R" . my/cider-restart-project)
-        ("M-u r" . cider-repl-user-system-restart)
+        ("M-u r" . my/cider-repl-user-system-restart)
         ("M-u S" . cider-repl-user-system-stop)
         ("M-u f" . cider-repl-user-fig-init)
         ("M-u w" . cider-connect-cljs-repl)
@@ -691,7 +682,8 @@
 
         ("M-u" . nil)
         ("M-u R" . my/cider-restart-project)
-        ("M-u s" . cider-repl-user-system-start)
+        ("M-u r" . my/cider-repl-user-system-restart)
+        ("M-u s" . my/cider-repl-user-system-start)
         ("M-u S" . cider-repl-user-system-stop)
         ("M-u f" . cider-repl-user-fig-init)
         ("M-u w" . cider-connect-cljs-repl)
