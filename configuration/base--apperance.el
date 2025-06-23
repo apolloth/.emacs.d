@@ -68,6 +68,21 @@
   (load-theme 'kaolin-ocean t)
   (kaolin-treemacs-theme))
 
+(use-package hl-todo
+  :ensure t
+
+  :custom
+  (hl-todo-keyword-faces
+   '(("TODO"   . nerd-icons-lorange)
+     ("HACK"   . nerd-icons-lorange)
+     ("FIXME"  . nerd-icons-lorange)
+     ("NOTE"   . nerd-icons-lblue)
+     ("WATCHOUT" . nerd-icons-lred)))
+
+  :init
+  (global-hl-todo-mode 1))
+
+
 (defface error-face
   '((t (:foreground "#CC5353"))) "Red Highlight")
 
@@ -112,14 +127,6 @@
      "%b"))))
 
 (global-hl-line-mode 1)
-
-(add-hook
- 'prog-mode-hook
- (lambda ()
-   (font-lock-add-keywords
-    nil
-    '(("\\<\\(HACK\\|NOTE\\|FIXME\\|TODO\\|TEST\\|WATCHOUT\\|REVIEW\\|BUG\\)"
-       1 font-lock-warning-face t)))))
 
 (toggle-frame-maximized)
 

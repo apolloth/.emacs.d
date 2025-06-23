@@ -4,31 +4,37 @@
 
 (defun zoom/default ()
   (interactive)
-  (cond ((equal (display-pixel-height) 2520)
-         (zoom/apply 180))
+  (zoom/apply 145)
 
-        ((equal (display-pixel-height) 1080)
-         (zoom/apply 190))
+  ;; (cond ((equal (display-pixel-height) 2520)
+  ;;        (zoom/apply 180))
 
-        (t (zoom/apply 200))))
+  ;;       ((equal (display-pixel-height) 1080)
+  ;;        (zoom/apply 145))
+
+  ;;       (t (zoom/apply 160)))
+  )
 
 (defun zoom/custom-1 ()
   (interactive)
-  (zoom/apply 220))
+  (zoom/default)
+  (zoom/modify 2))
 
 (defun zoom/custom-2 ()
   (interactive)
-  (zoom/apply 250))
+  (zoom/default)
+  (zoom/modify 3))
 
 (defun zoom/custom-3 ()
   (interactive)
-  (zoom/apply 270))
+  (zoom/default)
+  (zoom/modify 4))
 
 (defun zoom/modify (n)
   (let ((factor 10))
     (zoom/apply
      (+ (face-attribute 'default :height)
-        (* n factor)))))
+        (round (* n factor))))))
 
 (defun zoom/inc ()
   (interactive)

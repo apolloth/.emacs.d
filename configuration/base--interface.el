@@ -72,7 +72,8 @@
    my-consult-find-in-home-dir)
 
   :custom
-  ((consult-find-args "find ."))
+  ((consult-find-args "find .")
+   (consult-line-args nil))
 
   :config
   (defun region-to-text ()
@@ -217,8 +218,7 @@
   :config
   (add-to-list 'completion-at-point-functions
                (cape-wrap-super #'cape-dabbrev
-                                #'cape-file))
-  )
+                                #'cape-file)))
 
 (use-package orderless
   :ensure t
@@ -321,48 +321,34 @@
    ("<S-left>"  . windmove-left)
    ("<S-right>" . windmove-right)))
 
-(use-package elscreen
+(use-package perspective
+  :ensure t
 
-  :commands
-  (elscreen-create)
-
-  :bind
-  (("M-n c" . elscreen-create)
-   ("M-n C" . elscreen-clone)
-
-   :map elscreen-map
-   ("c" . elscreen-create)
-   ("C" . elscreen-clone)
-   ("k" . elscreen-kill)
-   ("K" . elscreen-kill-screen-and-buffers)
-   ("p" . elscreen-previous)
-   ("n" . elscreen-next)
-   ("N" . elscreen-toggle)
-   ("t" . elscreen-screen-nickname)
-   ("f" . elscreen-select-and-goto))
+  :custom
+  (persp-state-default-file "~/.emacs.d/persp")
+  (persp-mode-prefix-key (kbd "C-Ö"))
 
   :config
-  (defun with-elscreen (open-command close-command)
-    (advice-add
-     open-command
-     :before
-     (lambda (&rest args)
-       (call-interactively 'elscreen-create))
-     '((name . "elscreen-open-command")))
+  (defun my/persp-save ()
+    (interactive)
+    (persp-state-save))
 
-    (advice-add
-     close-command
-     :after
-     (lambda (&rest args)
-       (call-interactively 'elscreen-kill))
-     '((name . "elscreen-close-command"))))
+  (defun my/persp-load ()
+    (interactive)
+    (persp-state-load persp-state-default-file))
 
-  (setq
-   elscreen-prefix-key "\M-n"
-   elscreen-display-screen-number nil
-   elscreen-display-tab nil)
+  :bind
+  (:map perspective-map
+        ("j" . my/persp-save)
+        ("l" . my/persp-load))
 
-  (elscreen-start))
+
+  ;;("C-x C-b" . persp-list-buffers)         ; or use a nicer switcher, see below
+  ;;:custom
+  ;;(persp-mode-prefix-key (kbd "C-Ö"))  ; pick your own prefix key here
+
+  :init
+  (persp-mode))
 
 (use-package ediff
   :ensure nil
@@ -370,9 +356,6 @@
   :config
   (setq ediff-window-setup-function #'ediff-setup-windows-plain
         ediff-split-window-function 'split-window-horizontally)
-  (with-elscreen #'ediff-buffers #'ediff-quit)
-  (with-elscreen #'ediff-files #'ediff-quit)
-  (with-elscreen #'ediff-directories #'ediff-quit)
 
   :commands
   (ediff-buffers

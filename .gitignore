@@ -16,5 +16,12 @@ eshell/lastdir
 *~
 tramp
 url/
-devdocs/
+*.html
+devdocs/*
 request/
+/.dap-breakpoints
+/.lsp-session-v1
+*.clj-kondo/
+*.lsp/
+*.nrepl-port
+session.*

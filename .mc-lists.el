@@ -20,6 +20,7 @@
         clojure-cycle-privacy
         comment-dwim
         corfu-insert-separator
+        corfu-next
         counsel-M-x
         counsel-switch-buffer
         counsel-yank-pop
@@ -27,6 +28,7 @@
         forward-sexp
         haml-electric-backspace
         ibuffer-do-delete
+        ibuffer-do-kill-on-deletion-marks
         ibuffer-mark-for-delete
         ibuffer-mark-forward
         indent-for-tab-command
@@ -75,6 +77,7 @@
         sp-wrap-doublequote
         sp-wrap-round
         sp-wrap-square
+        switch-to-buffer
         upcase-region
         web-mode-element-content-select
         web-mode-element-rename
@@ -97,7 +100,10 @@
         add-multiple-cursors-between
         add-multiple-cursors-line-mode
         cider-eval-dwim
+        cider-pprint-eval-last-sexp
+        clojure-toggle-ignore-surrounding-form
         eval-defun
+        lsp-ui-doc--handle-mouse-movement
         mc-remove-current-cursor
         mc/mark-all-in-region
         mouse-drag-vertical-line
@@ -107,6 +113,9 @@
         my/toggle-vterm
         overwrite-mode
         platformio-build
+        sp-wrap-curly
+        undefined
         undo-tree-visualize
         view-order-manuals
+        wgrep-change-to-wgrep-mode
         ))
