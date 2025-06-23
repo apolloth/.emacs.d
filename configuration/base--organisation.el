@@ -52,20 +52,9 @@
     (interactive)
     (org-capture nil "c"))
 
-  (defun org-insert-jira-issue (&optional jira-issue)
-    (interactive "JIRA Issue: ")
-    (let* ((jira-issue
-            (upcase jira-issue))
-
-           (jira-issue-link
-            (concat env-jira-host-url "browse/" jira-issue)))
-
-      (org-insert-link nil jira-issue-link jira-issue)))
-
   :bind*
   (:map org-mode-map
         ("M-i l" . org-insert-link)
-        ("M-i j" . org-insert-jira-issue)
         ("M-i d" . org-deadline)
 
         ("M-j j" . org-open-at-point)
@@ -142,15 +131,7 @@
 
   :config
   (setq org-capture-templates
-        '(("j" "Jira Ticket" entry
-           (file+headline (lambda ()
-                            (let ((ticket-id (read-string "JIRA-ID: ")))
-                              (expand-file-name (concat ticket-id ".org")
-                                                "~/Documents/org/jira")))
-                          "Tasks")
-           "* TODO %^{Summary}\n  CREATED: %U\n  %?"
-           :empty-lines 1)
-          ("d" "TODO for date" entry
+        '(("d" "TODO for date" entry
            (file (lambda ()
                    (let ((date (org-read-date nil t nil "Select a date")))
                      (expand-file-name
@@ -158,91 +139,5 @@
                       "~/Documents/org/agenda/"))))
            "* TODO Agenda\n** TODO %?"
            :empty-lines 1))))
-
-(use-package org-jira
-  :ensure t
-
-  :custom
-  (jiralib-update-issue-fields-exclude-list '(reporter))
-  (org-jira-reverse-comment-order t)
-  (org-jira-default-jql
-   "assignee = currentUser()
-    and resolution = unresolved
-    and sprint in openSprints()
-
-    ORDER BY project DESC")
-  (org-jira-custom nil)
-
-  :bind
-  (("C-x j" . my/jira-login)
-   (:map org-jira-entry-mode-map
-         ("C-c o"  . org-jira-todo-to-jira)
-
-         ("C-c tt" . my/create-issue-from-template)
-         ("C-c tj" . my/create-default-issue)
-
-         ("C-c ij" . my/get-issues-overview)
-         ("C-c im" . my/org-jira-mention-user)))
-
-  :config
-  (require 'authentication)
-
-  (defvar-local my/issue-template-dir
-      "~/.org-jira/templates/"
-    "Path to my JIRA issue templates.")
-
-  (defun my/get-issue-template (&optional template)
-    (with-temp-buffer
-      (insert-file-contents (s-concat my/issue-template-dir (or template "default") ".org"))
-      (buffer-string)))
-
-  (defun my/create-issue-from-template (project type summary &optional template)
-    "docstring"
-    (org-jira-create-issue project type summary (my/get-issue-template template)))
-
-  (defun my/create-default-issue (project type summary)
-    ""
-    (interactive)
-    (create-issue-from-template project type summary))
-
-  (defun my/get-issues-overview ()
-    "Fetches my assigned issues in current sprint, which are unresolved"
-    (interactive)
-    (my/org-jira-get-issues-from-custom-jql
-     `((:jql ,org-jira-default-jql
-             :filename "Open Issues Overview"
-             :group-by status))))
-
-  (defun my/org-jira-decoded-users (project)
-    (mapcar (lambda (user)
-              (cons (org-jira-decode (cdr (assoc 'displayName user)))
-                    (org-jira-decode (cdr (assoc 'accountId user)))))
-            (jiralib-get-users project)))
-
-  (defun my/org-jira-mention-user ()
-    "Prompts for an user and inserts a mention at point."
-    (interactive)
-    (let ((issue-id (org-jira-parse-issue-id)))
-      (if issue-id
-          (let* ((project
-                  (replace-regexp-in-string "-[0-9]+" "" issue-id))
-
-                 (jira-users
-                  (my/org-jira-decoded-users project))
-
-                 (jira-user
-                  (completing-read "Jira User: " jira-users))
-
-                 (user-id
-                  (cdr (assoc jira-user jira-users))))
-
-            (insert (format "[~accountid:%s]" user-id)))
-        (error "Not on an issue"))))
-
-  (defun my/jira-login ()
-    (interactive)
-    (setq jiralib-url (my/jira-auth-info "url"))
-    (jiralib-login (my/jira-auth-info "email") (my/jira-auth-info 'secret))
-    (org-jira-mode 1)))
 
 (provide 'base--organisation)

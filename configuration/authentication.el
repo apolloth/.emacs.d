@@ -7,9 +7,6 @@
   :config
   (auth-source-pass-enable))
 
-(defun my/jira-auth-info (key)
-  (auth-source-pass-get key "jira-access"))
-
 (provide 'authentication)
 
 
