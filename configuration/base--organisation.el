@@ -167,15 +167,14 @@
   (org-jira-reverse-comment-order t)
   (org-jira-default-jql
    "assignee = currentUser()
-    and resolution = unresolved
-    and sprint in openSprints()
+      and resolution = unresolved
+      and sprint in openSprints()
 
-    ORDER BY project DESC")
+      ORDER BY project DESC")
   (org-jira-custom nil)
 
   :bind
-  (("C-x j" . my/jira-login)
-   (:map org-jira-entry-mode-map
+  ((:map org-jira-entry-mode-map
          ("C-c o"  . org-jira-todo-to-jira)
 
          ("C-c tt" . my/create-issue-from-template)
@@ -196,22 +195,44 @@
       (insert-file-contents (s-concat my/issue-template-dir (or template "default") ".org"))
       (buffer-string)))
 
-  (defun my/create-issue-from-template (project type summary &optional template)
+  (defun my/read-issue-templates ()
+    "Read issue templates."
+    (let ((templates
+           (->> my/issue-template-dir
+                (directory-files)
+                (remove-if 'file-readable-p)
+                (mapcar 'file-name-sans-extension))))
+
+      (completing-read "Template: " templates nil t nil "default")))
+
+  (defun my/create-issue-from-template (project type summary description)
     "docstring"
-    (org-jira-create-issue project type summary (my/get-issue-template template)))
+    (interactive
+     (let* ((project (org-jira-read-project))
+            (type (org-jira-read-issue-type project))
+            (summary (read-string "Summary: "))
+            (template (my/read-issue-templates))
+            (description (my/get-issue-template template)))
+       (list project type summary description)))
+    (if (or (equal project "")
+            (equal type "")
+            (equal summary ""))
+        (error "Must provide all information!"))
+    (let* ((parent-id nil)
+           (ticket-struct (org-jira-get-issue-struct project type summary description)))
+      (org-jira-get-issues (list (jiralib-create-issue ticket-struct)))))
 
   (defun my/create-default-issue (project type summary)
     ""
     (interactive)
-    (create-issue-from-template project type summary))
+    (my/create-issue-from-template project type summary))
 
   (defun my/get-issues-overview ()
     "Fetches my assigned issues in current sprint, which are unresolved"
     (interactive)
-    (my/org-jira-get-issues-from-custom-jql
+    (org-jira-get-issues-from-custom-jql
      `((:jql ,org-jira-default-jql
-             :filename "Open Issues Overview"
-             :group-by status))))
+             :filename "Open Issues Overview"))))
 
   (defun my/org-jira-decoded-users (project)
     (mapcar (lambda (user)
@@ -237,12 +258,158 @@
                   (cdr (assoc jira-user jira-users))))
 
             (insert (format "[~accountid:%s]" user-id)))
-        (error "Not on an issue"))))
+        (error "Not on an issue")))))
+
+(use-package jira
+  :ensure t
+
+  :custom
+  (jira-token-is-personal-access-token nil)
+  (jira-api-version 3)
+  (jira-issues-max-results 100)
+  (jira-statuses-todo '("To Do"))
+  (jira-statuses-progress '("In Progress" "im Test"))
+  (jira-statuses-done '("Done" "Abgenommen" "Nicht umgesetzt"))
+  (jira-issues-table-fields
+   '(:key :issue-type-name :priority-name :status-name :story-points :assignee-name :summary))
+
+  :bind
+  (("C-x j" . my/jira-overview)
+   (:map jira-issues-mode-map
+         ("j" . my/org-jira-open-issue)))
+
+  :config
+  (require 'org-jira)
+
+  (setq jira-issues-fields
+        '((:key . ((:path . (key))
+                   (:columns . 12)
+                   (:name . "Key")
+                   (:formatter . jira-fmt-issue-key)))
+          (:priority-name . ((:path . (fields priority name))
+                             (:columns . 10)
+                             (:name . "Priority")))
+          (:priority-icon .  ((:path . (fields priority iconUrl))
+                              (:columns . 10)
+                              (:name . "Priority")))
+          (:labels . ((:path . (fields labels))
+                      (:columns . 10)
+                      (:name . "Labels")))
+          (:work-ratio . ((:path . (fields workratio))
+                          (:columns . 6)
+                          (:name . "WR")
+                          (:formatter . jira-fmt-issue-progress)))
+          (:original-estimate . ((:path . (fields aggregatetimeoriginalestimate))
+                                 (:columns . 10)
+                                 (:name . "Estimate")
+                                 (:formatter . jira-fmt-time-from-secs)))
+          (:remaining-time . ((:path . (fields timeestimate))
+                              (:columns . 10)
+                              (:name . "Remaining")
+                              (:formatter . jira-fmt-time-from-secs)))
+          (:assignee-name . ((:path . (fields assignee displayName))
+                             (:columns . 14)
+                             (:name . "Assignee")))
+          (:reporter-name . ((:path . (fields reporter displayName))
+                             (:columns . 14)
+                             (:name . "Reporter")))
+          (:components . ((:path . (fields components))
+                          (:columns . 10)
+                          (:name . "Components")
+                          (:formatter . jira-fmt-issue-components)))
+          (:fix-versions . ((:path . (fields fixVersions))
+                            (:columns . 10)
+                            (:name . "Fix Versions")
+                            (:formatter . jira-fmt-issue-fix-versions)))
+          (:status-name . ((:path . (fields status name))
+                           (:columns . 12)
+                           (:name . "Status")
+                           (:formatter . jira-fmt-issue-status)))
+          (:status-category-name . ((:path . (fields status statusCategory name))
+                                    (:columns . 10)
+                                    (:name . "Status Category")))
+          (:creator-name . ((:path (fields creator  displayName))
+                            (:columns . 10)
+                            (:name . "Creator")))
+          (:issue-type-name . ((:path . (fields issuetype name))
+                               (:columns . 7)
+                               (:name . "Type")
+                               (:formatter . jira-fmt-issue-type-name)))
+          (:issue-type-icon . ((:path . (fields issuetype iconUrl))
+                               (:columns .  10)
+                               (:name . "Type")))
+          (:project-key . ((:path . (fields project key))
+                           (:columns . 10)
+                           (:name . "Project")))
+          (:project-name .  ((:path . (fields project name))
+                             (:columns . 10)
+                             (:name . "Project")))
+          (:parent-type-name . ((:path . (fields parent fields issuetype name))
+                                (:columns . 10)
+                                (:name . "Parent Type")
+                                (:formatter . jira-fmt-issue-type-name)))
+          (:parent-status . ((:path . (fields parent fields status name))
+                             (:columns . 10)
+                             (:name . "Parent Status")
+                             (:formatter . jira-fmt-issue-status)))
+          (:parent-key . ((:path . (fields parent key))
+                          (:columns . 10)
+                          (:name . "Parent Key")
+                          (:formatter . jira-fmt-issue-key)))
+          (:created . ((:path . (fields created))
+                       (:columns . 10)
+                       (:name . "Created")))
+          (:updated . ((:path . (fields updated))
+                       (:columns . 10)
+                       (:name . "Updated")))
+          (:description . ((:path . (fields description))
+                           (:columns . 10)
+                           (:name . "Description")))
+          (:summary . ((:path . (fields summary))
+                       (:columns . 10)
+                       (:name . "Summary")))
+          (:due-date . ((:path . (fields duedate))
+                        (:columns . 10)
+                        (:name . "Due Date")
+                        (:formatter . jira-fmt-date)))
+          (:sprints . ((:path . (fields (custom "Sprint")))
+                       (:columns . 10)
+                       (:name . "Sprints")
+                       (:formatter . jira-fmt-issue-sprints)))
+          (:line . ((:path . (fields (custom "Business line")))
+                    (:columns . 10)
+                    (:name . "Business Line")
+                    (:formatter . jira-fmt-business-line)))
+          (:story-points . ((:path . (fields customfield_10004))
+                            (:columns . 12)
+                            (:name . "Story Points")))
+          (:cost-center . ((:path . (fields (custom "Cost center")))
+                           (:columns . 10)
+                           (:name . "Const Center")
+                           (:formatter . jira-fmt-cost-center)))
+          (:resolution . ((:path . (fields resolution name))
+                          (:columns . 10)
+                          (:name . "Resolution")))))
+
+  (defun my/org-jira-open-issue ()
+    (interactive)
+    (let ((issue-key (jira-utils-marked-item)))
+      (when issue-key
+        (org-jira-get-issue issue-key)
+        (org-jira-mode 1))))
 
   (defun my/jira-login ()
     (interactive)
-    (setq jiralib-url (my/jira-auth-info "url"))
-    (jiralib-login (my/jira-auth-info "email") (my/jira-auth-info 'secret))
-    (org-jira-mode 1)))
+    (setq jiralib-url (my/jira-auth-info "url")
+          jira-base-url (my/jira-auth-info "url")
+          jira-username (my/jira-auth-info "email")
+          jira-token    (my/jira-auth-info 'secret))
+    (jiralib-login jira-username jira-token))
+
+  (defun my/jira-overview ()
+    (interactive)
+    (my/jira-login)
+    (jira-issues)))
+
 
 (provide 'base--organisation)
